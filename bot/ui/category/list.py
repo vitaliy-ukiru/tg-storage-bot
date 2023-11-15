@@ -10,6 +10,8 @@ from core.domain.category import Category
 
 
 class CategoryViewMarkup(TelegramMarkup, ABC):
+    category: Category
+
     def __init__(self, category: Category):
         self.category = category
 

@@ -1,9 +1,12 @@
 __all__ = (
     'FileView',
+    'FileViewFactory',
     'FileViewAction',
+    'FileEdit',
     'FileEditMarkup',
-    'FileEditAction',
+    'FileEditFactory',
+    'EditScope',
 )
 
-from .edit import FileEditMarkup, FileEditAction, EditScope
-from .file_view import FileView, FileViewAction, ViewAction
+from .edit import FileEditMarkup, FileEditFactory, EditScope, FileEdit
+from .file_view import FileView, FileViewFactory, FileViewAction

@@ -6,4 +6,4 @@ __all__ = (
 )
 
 from .edit import FileEditMarkup, FileEditAction, EditScope
-from .file_view import FileView, FileViewAction, ViewAction
+from .file_edit import FileView, FileViewAction, ViewAction

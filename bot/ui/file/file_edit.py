@@ -36,7 +36,7 @@ class FileView(TelegramComponent, abc.ABC):
         markup = (
             ("Отправить файл", ViewAction.send),
             ("Изменить файл", ViewAction.edit),
-            ("Перезагрузить файл", ViewAction.delete),
+            ("Удалить файл", ViewAction.delete),
         )
 
         return common.create_markup(markup, FileViewAction, "action", file_id=self.file.id)

@@ -1,12 +1,13 @@
 __all__ = ('FileType',)
 
-from enum import Enum, auto
+from enum import StrEnum, auto
 
 
-class FileType(Enum):
+class FileType(StrEnum):
     unknown = auto()
     text = auto()
     photo = auto()
+    video = auto()
     document = auto()
     audio = auto()
     gif = auto()

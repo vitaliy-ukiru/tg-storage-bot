@@ -34,22 +34,22 @@ class FileView(TelegramComponent, abc.ABC):
 
     def _build_markup(self) -> InlineKeyboardMarkup:
         markup = (
-            ("Отправить файл", ViewAction.send),
-            ("Изменить файл", ViewAction.edit),
-            ("Удалить файл", ViewAction.delete),
+            ("Отправить файл", FileViewAction.send),
+            ("Изменить файл", FileViewAction.edit),
+            ("Удалить файл", FileViewAction.delete),
         )
 
-        return common.create_markup(markup, FileViewAction, "action", file_id=self.file.id)
+        return common.create_markup(markup, FileViewFactory, "action", file_id=self.file.id)
 
 
-class ViewAction(enum.StrEnum):
+class FileViewAction(enum.StrEnum):
     send = enum.auto()
     edit = enum.auto()
     delete = enum.auto()
 
 
-class FileViewAction(CallbackData, prefix="file_view"):
-    action: ViewAction
+class FileViewFactory(CallbackData, prefix="file_view"):
+    action: FileViewAction
     file_id: int
 
 

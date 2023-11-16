@@ -1,8 +1,8 @@
 """init schema
 
-Revision ID: 89b7db8238e9
+Revision ID: 71a446646851
 Revises: 
-Create Date: 2023-11-14 22:34:08.277479
+Create Date: 2023-11-16 17:05:39.400680
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '89b7db8238e9'
+revision: str = '71a446646851'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -39,10 +39,10 @@ def upgrade() -> None:
     sa.Column('id', sa.BigInteger(), sa.Identity(always=True), nullable=False),
     sa.Column('remote_id', sa.String(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
-    sa.Column('type_id', sa.Enum('unknown', 'text', 'photo', 'document', 'audio', 'gif', name='filetype'), nullable=False),
+    sa.Column('type_id', sa.Enum('unknown', 'text', 'photo', 'vide', 'document', 'audio', 'gif', name='filetype'), nullable=False),
     sa.Column('category_id', sa.BigInteger(), nullable=True),
     sa.Column('title', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

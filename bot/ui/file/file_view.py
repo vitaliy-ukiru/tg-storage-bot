@@ -8,7 +8,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.ui import TelegramComponent
 from bot.ui import common
 from bot.ui.telegram_component import TelegramMarkup
-from core.domain.file import File
+from core.domain.file import File, FileType
 
 
 class FileView(TelegramComponent, abc.ABC):
@@ -18,12 +18,26 @@ class FileView(TelegramComponent, abc.ABC):
         self.file = file
 
     async def send(self, bot: Bot, chat_id: int):
-        text = self._render_text()
-        markup = self._build_markup()
+        text = self.render_text()
+        markup = self.build_markup()
 
         return await bot.send_message(chat_id=chat_id, text=text, reply_markup=markup)
 
-    def _render_text(self) -> str:
+    async def send_media(self, bot: Bot, chat_id: int):
+        text = self.render_text()
+        match self.file.type:
+            case FileType.photo:
+                return await bot.send_photo(chat_id, self.file.remote_file_id, caption=text)
+            case FileType.document:
+                return await bot.send_document(chat_id, self.file.remote_file_id, caption=text)
+            case FileType.audio:
+                return await bot.send_audio(chat_id, self.file.remote_file_id, caption=text)
+            case FileType.video:
+                return await bot.send_video(chat_id, self.file.remote_file_id, caption=text)
+            case FileType.gif:
+                return await bot.send_animation(chat_id, self.file.remote_file_id, caption=text)
+
+    def render_text(self) -> str:
         upload_date = self.file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
         return '\n'.join((
             f"Название: {self.file.name}",
@@ -32,7 +46,7 @@ class FileView(TelegramComponent, abc.ABC):
             f"Дата загрузки: {upload_date}"
         ))
 
-    def _build_markup(self) -> InlineKeyboardMarkup:
+    def build_markup(self) -> InlineKeyboardMarkup:
         markup = (
             ("Отправить файл", FileViewAction.send),
             ("Изменить файл", FileViewAction.edit),

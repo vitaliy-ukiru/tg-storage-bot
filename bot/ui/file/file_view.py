@@ -27,7 +27,7 @@ class FileView(TelegramComponent, abc.ABC):
         upload_date = self.file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
         return '\n'.join((
             f"Название: {self.file.name}",
-            f"Категория: {self.file.category}",
+            f"Категория: {self.file.category_name}",
             f"Тип: {self.file.type.name}",
             f"Дата загрузки: {upload_date}"
         ))

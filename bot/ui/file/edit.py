@@ -19,7 +19,7 @@ class FileEditMarkup(TelegramMarkup):
             ("Изменить категорию", EditScope.category),
             ("Перезагрузить файл", EditScope.upload),
         )
-        return common.create_markup(markup, FileEditAction, "scope", file_id=self._file_id)
+        return common.create_markup(markup, FileEditFactory, "scope", file_id=self._file_id)
 
 
 class EditScope(enum.StrEnum):
@@ -28,6 +28,6 @@ class EditScope(enum.StrEnum):
     upload = enum.auto()
 
 
-class FileEditAction(CallbackData, prefix="file_edit"):
+class FileEditFactory(CallbackData, prefix="file_edit"):
     scope: EditScope
     file_id: int

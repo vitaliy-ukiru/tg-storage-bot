@@ -46,14 +46,14 @@ class File:
     created_at: datetime
 
     def __init__(self,
-                 id_: int,
+                 file_id: int,
                  file_type: FileType,
                  remote_file_id: str,
                  user_id: int,
                  created_at: datetime,
                  title: Optional[str] = None,
                  category: Optional[NamedCategory] = None):
-        self.id = id_
+        self.id = file_id
         self.title = title
         self.type = file_type
         self.remote_file_id = remote_file_id

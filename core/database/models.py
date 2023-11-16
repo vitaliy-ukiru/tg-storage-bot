@@ -52,4 +52,4 @@ class File(Base):
     category: Mapped[Optional[Category]] = relationship()
 
     title: Mapped[str | None]
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), insert_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

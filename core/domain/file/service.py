@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import noload, joinedload
 
 from core import database as db
-from core.domain.category import Category
+from .model import Category
 from core.domain.file import File
 from core.domain.file.dto import CreateFileDTO, ReloadFileDTO
 from core.domain.file.exceptions import FileAlreadyExists, FileCategoryViolation, FileNotFound
@@ -50,7 +50,7 @@ class FileService(FileUseCase):
             db_file = db.File(
                 remote_id=file_dto.remote_id,
                 user_id=file_dto.user_id,
-                file_type=file_dto.file_type,
+                type_id=file_dto.file_type,
                 category_id=file_dto.category_id,
                 title=file_dto.title,
             )
@@ -92,19 +92,34 @@ class FileService(FileUseCase):
 
     async def update_title(self, file_id: int, title: str):
         async with self._pool() as session:
-            sql = update(db.File).where(id=file_id).values(title=title)
+            sql = update(db.File).where(db.File.id == file_id).values(title=title)
             await session.execute(sql)
             await session.commit()
 
     async def reload_file(self, file_id: int, reload_file: ReloadFileDTO):
-        values = reload_file.__dict__.copy()
-        if reload_file.title is None:
-            values.pop("title")
-
         async with self._pool() as session:
-            sql = update(db.File).where(id=file_id).values(**values)
-            await session.execute(sql)
+            db_file = await session.get(db.File, file_id)
+            if db_file is None:
+                raise FileNotFound(file_id)
+
+            db_file = cast(db.File, db_file)
+
+            new_title = reload_file.title
+            if db_file.title == db_file.remote_id or db_file.title is None:
+                db_file.title = new_title
+
+            db_file.remote_id = reload_file.remote_id
+            db_file.type_id = reload_file.file_type
+            await session.merge(db_file)
             await session.commit()
+
+        #     sql = update(db.File).where(db.File.id == file_id).values(**values)
+        # values = reload_file.__dict__.copy()
+        # if reload_file.title is None:
+        #     values.pop("title")
+        #
+        #     await session.execute(sql)
+        #     await session.commit()
 
     async def delete_file(self, file_id: int):
         async with self._pool() as session:
@@ -122,7 +137,7 @@ class FileService(FileUseCase):
                 raise FileCategoryViolation(db_file.remote_id, category)
 
             db_file.category_id = category.id
-            await session.merge(db_file)
+            await session.merge(db_file, load=True)
             await session.commit()
 
             return db_file.to_domain()

@@ -17,3 +17,7 @@ class ReloadFileDTO:
     remote_id: str
     file_type: FileType
     title: str | None
+
+    @property
+    def non_titled(self) -> bool:
+        return self.title is None or self.title == self.remote_id

@@ -1,16 +1,22 @@
 __all__ = (
-    'TelegramFile',
     'File',
 )
 
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Protocol
 
 from .file_type import FileType
-from ..category import Category
 
 DEFAULT_CATEGORY_NAME = "default"
 
+@dataclass
+class Category:
+    id: int
+    user_id: int
+    title: str
+    created_at: datetime
+    description: Optional[str] = None
 
 class File:
     id: int

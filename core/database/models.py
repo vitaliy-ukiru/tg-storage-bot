@@ -12,9 +12,10 @@ from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-from core.domain.file import FileType, File as DFile
-from core.domain.category import Category as DCategory
-from core.domain.user import User as DUser
+from core.domain.file.file_type import FileType
+from core.domain.file.model import File as DFile
+from core.domain.category.models import Category as DCategory
+from core.domain.user.model import User as DUser
 
 
 class User(Base):

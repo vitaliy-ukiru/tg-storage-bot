@@ -1,6 +1,5 @@
 __all__ = (
     'TelegramFile',
-    'NamedCategory',
     'File',
 )
 
@@ -8,28 +7,7 @@ from datetime import datetime
 from typing import Optional
 
 from .file_type import FileType
-
-
-class TelegramFile:
-    file_id: str
-    size: Optional[int]
-    path: Optional[str]
-
-
-class NamedCategory:
-    id: int
-    name: Optional[str]
-
-    def __init__(self, category_id: int, name: Optional[str] = None):
-        self.category_id = category_id
-        self.name = name
-
-    def __str__(self) -> str:
-        if self.name:
-            return self.name
-
-        return f'ID[{self.id}]'
-
+from ..category import Category
 
 DEFAULT_CATEGORY_NAME = "default"
 
@@ -40,9 +18,8 @@ class File:
     type: FileType
 
     remote_file_id: str
-    tg_file: TelegramFile
     user_id: int
-    category: Optional[NamedCategory]
+    category: Optional[Category]
     created_at: datetime
 
     def __init__(self,
@@ -52,7 +29,7 @@ class File:
                  user_id: int,
                  created_at: datetime,
                  title: Optional[str] = None,
-                 category: Optional[NamedCategory] = None):
+                 category: Optional[Category] = None):
         self.id = file_id
         self.title = title
         self.type = file_type
@@ -67,9 +44,8 @@ class File:
         if category is None:
             return DEFAULT_CATEGORY_NAME
 
-        return str(category)
+        return category.title
 
     @property
     def name(self) -> str:
-        return self.title if self.title is not None \
-            else self.remote_file_id
+        return self.title if self.title is not None else self.remote_file_id

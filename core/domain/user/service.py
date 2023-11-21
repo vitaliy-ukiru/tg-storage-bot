@@ -76,12 +76,12 @@ class UserService(UserUseCase):
             user_id = user.id
 
         async with self._pool() as session:
-            sql = update(db.User).where(id=user_id).values(deleted_at=None)
+            sql = update(db.User).where(db.User.id == user_id).values(deleted_at=None)
             await session.execute(sql)
             await session.commit()
 
     async def delete_user(self, user: User | int):
-        db_user: db.User = None
+        db_user: db.User
         if isinstance(user, User):
             user.delete()
             db_user = db.User.from_domain(user)

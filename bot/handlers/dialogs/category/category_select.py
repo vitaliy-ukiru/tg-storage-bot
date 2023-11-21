@@ -2,7 +2,7 @@ from typing import Any
 
 from aiogram.fsm.state import StatesGroup, State
 from aiogram_dialog import Dialog, Window, Data, DialogManager
-from aiogram_dialog.widgets.kbd import Column, Start
+from aiogram_dialog.widgets.kbd import Column, Start, Cancel
 from aiogram_dialog.widgets.text import Const
 
 from .category_create import CreateSG
@@ -31,7 +31,8 @@ category_select_dialog = Dialog(
                 Const("Создать"),
                 id="category_create",
                 state=CreateSG.input_title
-            )
+            ),
+            Cancel()
         ),
         state=SelectSG.start,
     ),

@@ -91,7 +91,7 @@ class File(Base):
     title: Mapped[str | None]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    def to_domain(self) -> DFile:
+    def to_domain(self, with_category=True) -> DFile:
         file = DFile(
             file_id=self.id,
             file_type=self.type_id,
@@ -102,7 +102,7 @@ class File(Base):
         )
 
         # TODO: improve this code
-        if self.category_id is not None:
+        if with_category and self.category_id is not None:
             category = cast(Category, self.category)
             file.category = category.to_domain()
 

@@ -5,6 +5,7 @@ from asyncpg import UniqueViolationError
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import noload, joinedload
+from sqlalchemy.orm.interfaces import LoaderOption
 
 from core import database as db
 from .model import Category
@@ -137,7 +138,8 @@ class FileService(FileUseCase):
                 raise FileCategoryViolation(db_file.remote_id, category)
 
             db_file.category_id = category.id
-            await session.merge(db_file, load=True)
+            # TODO: FIX: not load category
+            db_file = await session.merge(db_file, load=True, options=[LoaderOption()])
             await session.commit()
 
             return db_file.to_domain()

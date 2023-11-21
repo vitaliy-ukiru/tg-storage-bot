@@ -29,4 +29,4 @@ class BackTo(Back):
         if self.user_on_click:
             await self.user_on_click(callback, self, manager)
 
-            await manager.switch_to(self.state)
+        await manager.switch_to(self.state)

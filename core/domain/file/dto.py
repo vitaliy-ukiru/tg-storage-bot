@@ -10,3 +10,10 @@ class CreateFileDTO:
     file_type: FileType
     title: str | None
     category_id: int | None
+
+
+@dataclass(frozen=True)
+class ReloadFileDTO:
+    remote_id: str
+    file_type: FileType
+    title: str | None

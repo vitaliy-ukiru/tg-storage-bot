@@ -5,14 +5,16 @@ __all__ = (
 )
 
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, cast
 
 from core.database.base import Base
 from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-from core.domain.file import FileType
+from core.domain.file import FileType, File as DFile
+from core.domain.category import Category as DCategory
+from core.domain.user import User as DUser
 
 
 class User(Base):
@@ -24,6 +26,21 @@ class User(Base):
 
     def __repr__(self):
         return f'<User id={self.id!r} created_at={self.created_at!r} deleted_at={self.deleted_at!r}'
+
+    def to_domain(self) -> DUser:
+        return DUser(
+            self.id,
+            self.created_at,
+            self.deleted_at,
+        )
+
+    @classmethod
+    def from_domain(cls, u: DUser) -> 'User':
+        return User(
+            id=u.id,
+            created_at=u.created_at,
+            deleted_at=u.deleted_at
+        )
 
 
 class Category(Base):
@@ -37,6 +54,25 @@ class Category(Base):
     description: Mapped[Optional[str]]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     files: Mapped[List["File"]] = relationship(lazy="noload")
+
+    def to_domain(self) -> DCategory:
+        return DCategory(
+            self.id,
+            self.user_id,
+            self.title,
+            self.created_at,
+            self.description,
+        )
+
+    @classmethod
+    def from_domain(cls, c: DCategory) -> 'Category':
+        return cls(
+            id=c.id,
+            user_id=c.user_id,
+            title=c.title,
+            created_at=c.created_at,
+            description=c.description,
+        )
 
 
 class File(Base):
@@ -53,3 +89,20 @@ class File(Base):
 
     title: Mapped[str | None]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    def to_domain(self) -> DFile:
+        file = DFile(
+            file_id=self.id,
+            file_type=self.type_id,
+            remote_file_id=self.remote_id,
+            user_id=self.user_id,
+            created_at=self.created_at,
+            title=self.title,
+        )
+
+        # TODO: improve this code
+        if self.category_id is not None:
+            category = cast(Category, self.category)
+            file.category = category.to_domain()
+
+        return file

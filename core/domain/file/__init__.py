@@ -1,9 +1,7 @@
 __all__ = (
     'File',
     'FileType',
-    'TelegramFile',
-    'NamedCategory',
 )
 
-from .model import File, TelegramFile, NamedCategory
+from .model import File
 from .file_type import FileType

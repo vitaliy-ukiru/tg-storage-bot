@@ -2,7 +2,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Column, Button, SwitchTo, Back
+from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
 from core.domain.category import CreateCategoryDTO
@@ -53,22 +53,26 @@ category_create_dialog = Dialog(
             Format("Название: {title}"),
             Format("Описание: {desc}", when="have_desc")
         ),
-        Column(
-            SwitchTo(
-                Const("Изменить название"),
-                id="create_category_edit_title",
-                state=CreateSG.input_title
-            ),
-            SwitchTo(
-                Const("Изменить описание"),
-                id="create_category_edit_desc",
-                state=CreateSG.input_desc
+        Group(
+            Row(
+
+                SwitchTo(
+                    Const("Изменить название"),
+                    id="create_category_edit_title",
+                    state=CreateSG.input_title
+                ),
+                SwitchTo(
+                    Const("Изменить описание"),
+                    id="create_category_edit_desc",
+                    state=CreateSG.input_desc
+                ),
             ),
             Button(
                 Const("Создать"),
                 id="create_category",
                 on_click=create_category,
-            )
+            ),
+            Cancel()
         ),
         getter=menu_getter,
         state=CreateSG.menu_idle,

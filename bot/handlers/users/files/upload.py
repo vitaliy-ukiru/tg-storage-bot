@@ -1,8 +1,10 @@
 from aiogram import Router
+from aiogram.filters import Command, CommandObject, StateFilter
 from aiogram.types import Message
+from aiogram_dialog import DialogManager, StartMode
 
 from bot.filters.media import MediaFilter
-from bot.ui.file import FileView
+from bot.handlers.dialogs.file import ViewSG
 from bot.utils.uploader import FileUploader
 
 router = Router(name="base-upload-files")

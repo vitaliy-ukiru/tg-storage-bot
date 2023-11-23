@@ -18,6 +18,7 @@ class Category:
     created_at: datetime
     description: Optional[str] = None
 
+@dataclass
 class File:
     id: int
     title: Optional[str]

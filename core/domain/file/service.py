@@ -127,19 +127,22 @@ class FileService(FileUseCase):
             await session.delete(db.File(id=file_id))
             await session.commit()
 
-    async def set_category(self, file_id: int, category: Category) -> File:
+    async def set_category(self, file_id: int, category_id: int) -> File:
         async with self._pool() as session:
-            db_file = await session.get(db.File, file_id)
+            db_category = await session.get(db.Category, category_id)
+            if db_category is None:
+                raise Exception("category not found")
+
+            db_file: db.File | None = await session.get(db.File, file_id)
             if db_file is None:
                 raise FileNotFound(str(file_id))
 
-            db_file = cast(db.File, db_file)
-            if db_file.user_id != category.user_id:
-                raise FileCategoryViolation(db_file.remote_id, category)
+            if db_file.user_id != db_category.user_id:
+                raise FileCategoryViolation(db_file.remote_id, category_id)
 
-            db_file.category_id = category.id
+            db_file.category_id = db_category.id
+            db_file.category = db_category
             # TODO: FIX: not load category
-            db_file = await session.merge(db_file, load=True, options=[LoaderOption()])
             await session.commit()
 
             return db_file.to_domain()

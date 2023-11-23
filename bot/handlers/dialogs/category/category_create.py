@@ -5,7 +5,8 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
-from core.domain.category import CreateCategoryDTO
+from core.domain.dto.category import CreateCategoryDTO
+from core.domain.services.category import CategoryUsecase
 
 
 class CreateSG(StatesGroup):
@@ -31,8 +32,8 @@ async def menu_getter(dialog_manager: DialogManager, **_):
 
 
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
-    category_service = manager.middleware_data["category_service"]
-    category = await category_service.create_category(CreateCategoryDTO(
+    category_service: CategoryUsecase = manager.middleware_data["category_service"]
+    category = await category_service.save_category(CreateCategoryDTO(
         title=manager.dialog_data["title"],
         desc=manager.dialog_data.get("desc"),
         user_id=call.from_user.id

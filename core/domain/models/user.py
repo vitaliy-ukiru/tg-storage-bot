@@ -1,16 +1,14 @@
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, NewType
 
+UserId = NewType("UserId", int)
 
+@dataclass
 class User:
-    id: int
+    id: UserId
     created_at: datetime
     deleted_at: Optional[datetime] = None
-
-    def __init__(self, user_id: int, created_at: datetime, deleted_at: Optional[datetime] = None):
-        self.id = user_id
-        self.created_at = created_at
-        self.deleted_at = deleted_at
 
     @property
     def is_deleted(self) -> bool:

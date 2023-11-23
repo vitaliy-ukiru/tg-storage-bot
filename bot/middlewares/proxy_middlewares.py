@@ -3,22 +3,22 @@ __all__ = (
     'CategoryProxyMiddleware',
     'FileProxyMiddleware'
 )
-from typing import Callable, Any, Awaitable, Dict, Union
+
+from typing import Callable, Any, Awaitable, Dict, Union, TypeVarTuple, TypeVar, Generic
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from core.domain.category import CategoryUseCase
-from core.domain.file.service import FileUseCase
+from core.domain.services.category import CategoryUsecase
+from core.domain.services.file import FileUsecase
 
-Domain = Union[CategoryUseCase, FileUseCase]
+UsecaseT = TypeVar('UsecaseT', CategoryUsecase, FileUsecase)
 
-
-class BaseProxyMiddleware(BaseMiddleware):
+class BaseProxyMiddleware(Generic[UsecaseT], BaseMiddleware):
     key: str
-    svc: Domain
+    svc: UsecaseT
 
-    def __init__(self, svc: Domain):
+    def __init__(self, svc: UsecaseT):
         self.svc = svc
 
     async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
@@ -27,16 +27,10 @@ class BaseProxyMiddleware(BaseMiddleware):
         return await handler(event, data)
 
 
-class CategoryProxyMiddleware(BaseProxyMiddleware):
+class CategoryProxyMiddleware(BaseProxyMiddleware[CategoryUsecase]):
     key = "category_service"
 
-    def __init__(self, svc: CategoryUseCase):
-        super().__init__(svc)
 
-
-class FileProxyMiddleware(BaseProxyMiddleware):
+class FileProxyMiddleware(BaseProxyMiddleware[FileUsecase]):
     key = "file_service"
-
-    def __init__(self, svc: FileUseCase):
-        super().__init__(svc)
 

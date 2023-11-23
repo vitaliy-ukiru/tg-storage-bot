@@ -1,5 +1,5 @@
-from core.domain.exceptions import DomainException
-from .model import User
+from core.domain.exceptions.base import DomainException
+from core.domain.models.user import User
 
 
 class UserException(DomainException):

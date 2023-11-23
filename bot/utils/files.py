@@ -4,18 +4,8 @@ from typing import Optional
 from aiogram.enums import ContentType
 from aiogram.types import Message
 
-from core.domain.file.file_type import FileType
-from core.domain.file.dto import ReloadFileDTO
-
-
-def select_file_name(caption: Optional[str], file_name: Optional[str], file_id: str) -> str:
-    if caption is not None:
-        return caption
-
-    if file_name is not None:
-        return file_name
-
-    return file_id
+from core.domain.models.file import FileType
+from core.domain.dto.file import ReloadFileDTO
 
 
 def file_type_from_mime(mime_type: str) -> FileType:
@@ -50,35 +40,35 @@ class FileCredentials:
                 return cls(
                     remote_id=photo.file_id,
                     file_type=FileType.photo,
-                    title=select_file_name(m.caption, None, photo.file_id)
+                    title=m.caption
                 )
             case ContentType.DOCUMENT:
                 doc = m.document
                 return cls(
                     remote_id=doc.file_id,
                     file_type=file_type_from_mime(doc.mime_type),
-                    title=select_file_name(m.caption, doc.file_name, doc.file_id)
+                    title=m.caption or doc.file_name
                 )
             case ContentType.AUDIO:
                 audio = m.audio
                 return cls(
                     remote_id=audio.file_id,
                     file_type=FileType.audio,
-                    title=select_file_name(m.caption, audio.file_name, audio.file_id),
+                    title=m.caption or audio.file_name,
                 )
             case ContentType.VIDEO:
                 video = m.video
                 return cls(
                     remote_id=video.file_id,
                     file_type=FileType.video,
-                    title=select_file_name(m.caption, video.file_name, video.file_id),
+                    title=m.caption or video.file_name,
                 )
             case ContentType.ANIMATION:
                 gif = m.animation
                 return cls(
                     remote_id=gif.file_id,
                     file_type=FileType.gif,
-                    title=select_file_name(m.caption, gif.file_name, gif.file_id),
+                    title=m.caption or gif.file_name,
                 )
             case _:
                 raise Exception("invalid media type")

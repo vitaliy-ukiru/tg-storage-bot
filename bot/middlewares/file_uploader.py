@@ -7,11 +7,11 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
 from bot.utils.uploader import FileUploader
-from core.domain.file.service import FileUseCase
+from core.domain.services.file import FileUsecase
 
 
 class FileUploaderMiddleware(BaseMiddleware):
-    def __init__(self, svc: FileUseCase):
+    def __init__(self, svc: FileUsecase):
         self._uploader = FileUploader(svc)
 
     async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],

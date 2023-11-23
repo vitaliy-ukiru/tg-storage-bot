@@ -7,15 +7,14 @@ __all__ = (
 from datetime import datetime
 from typing import Optional, List, cast
 
-from core.database.base import Base
+from .base import Base
 from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-from core.domain.file.file_type import FileType
-from core.domain.file.model import File as DFile
-from core.domain.category.models import Category as DCategory
-from core.domain.user.model import User as DUser
+from core.domain.models.file import File as DFile, FileType
+from core.domain.models.category import Category as DCategory
+from core.domain.models.user import User as DUser
 
 
 class User(Base):
@@ -93,8 +92,8 @@ class File(Base):
 
     def to_domain(self, with_category=True) -> DFile:
         file = DFile(
-            file_id=self.id,
-            file_type=self.type_id,
+            id=self.id,
+            type=self.type_id,
             remote_file_id=self.remote_id,
             user_id=self.user_id,
             created_at=self.created_at,

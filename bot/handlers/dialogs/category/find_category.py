@@ -8,7 +8,9 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel
 from aiogram_dialog.widgets.text import Const, Format
 
 from bot.handlers.dialogs.back import BackTo
-from core.domain.category import CategoryUseCase
+from bot.middlewares.user_manager import USER_KEY
+from core.domain.models.user import User
+from core.domain.services.category import CategoryUsecase
 
 
 class FindSG(StatesGroup):
@@ -27,19 +29,19 @@ async def _process_input_title(m: Message, _: MessageInput, manager: DialogManag
     await manager.next()
 
 
-async def _category_find_getter(dialog_manager: DialogManager, category_service: CategoryUseCase, **_):
-    user_id = dialog_manager.event.from_user.id
+async def _category_find_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
+    user: User = dialog_manager.middleware_data[USER_KEY]
     title = dialog_manager.dialog_data["title_mask"]
-    categories = await category_service.find_by_title(user_id, title)
+    categories = await category_service.find_by_title(user.id, title)
     return {
         "categories": categories,
     }
 
 
-async def _category_top_getter(dialog_manager: DialogManager, category_service: CategoryUseCase, **_):
-    user_id = dialog_manager.event.from_user.id
+async def _category_top_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
+    user: User = dialog_manager.middleware_data[USER_KEY]
 
-    categories = await category_service.find_top_5_popular(user_id)
+    categories = await category_service.find_top_5_popular(user.id)
     return {
         "categories": categories,
     }

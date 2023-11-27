@@ -53,7 +53,6 @@ class Category(Base):
     title: Mapped[str]
     description: Mapped[Optional[str]]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    files: Mapped[List["File"]] = relationship(lazy="noload")
 
     def to_domain(self) -> DCategory:
         return DCategory(

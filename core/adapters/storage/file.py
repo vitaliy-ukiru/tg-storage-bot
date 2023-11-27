@@ -1,13 +1,26 @@
+import abc
+from typing import Protocol, TypeVar, Sequence
+
 from asyncpg import UniqueViolationError
+from sqlalchemy import select, ColumnExpressionArgument
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import joinedload
 
 from core.domain.models.file import File, FileId
-from core.domain.services.file import FileRepository
-from core.domain.exceptions.file import FileAlreadyExists, FileNotFound
+from core.domain.services.file import FileRepository, FilterField
+from core.domain.exceptions.file import FileAlreadyExists, FileNotFound, InvalidFilterError
 
 from .database.models import File as FileModel
+from .filters.file_filters import Filter, Registry
 
+T = TypeVar("T")
+
+def filter_convert(f: FilterField) -> Filter[T]:
+    filter_type = Registry.get(f.name)
+    if filter_type is None:
+        raise InvalidFilterError(f.name)
+
+    return filter_type(f.value)
 
 class FileGateway(FileRepository):
     _pool: async_sessionmaker
@@ -25,7 +38,7 @@ class FileGateway(FileRepository):
                 created_at=file.created_at,
             )
             if file.category:
-                db_file.category_id=file.category.id
+                db_file.category_id = file.category.id
             try:
                 session.add(db_file)
                 await session.commit()
@@ -43,6 +56,21 @@ class FileGateway(FileRepository):
             if db_file is None:
                 raise FileNotFound(file_id)
             return db_file.to_domain()
+
+    async def find_files(self, filters: Sequence[FilterField]) -> list[File]:
+        async with self._pool() as session:
+            sql = select(FileModel)
+            for f in filters:
+                sql = sql.where(filter_convert(f).clause)
+
+            sql = sql.options(joinedload(FileModel.category))
+            res = await session.execute(sql)
+            files = res.scalars()
+            return [
+                file.to_domain()
+
+                for file in files
+            ]
 
     async def update_file(self, file: File):
         async with self._pool() as session:

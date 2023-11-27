@@ -1,6 +1,5 @@
-from .base import DomainException
-from ..models.category import Category, CategoryId
 from core.domain.models.file import FileId, RemoteFileId
+from .base import DomainException
 from ..models.user import UserId
 
 
@@ -33,6 +32,13 @@ class FileAlreadyExists(StaticFileException):
 class FileAccessDenied(FileException):
     user: UserId
 
-    def __init__(self, file_id: FileId, user: UserId) -> None:
+    def __init__(self, file_id: FileId | RemoteFileId, user: UserId) -> None:
         self.user = user
         super().__init__(file_id, f"user don't own file {user!r}")
+
+class InvalidFilterError(DomainException):
+    filter_name: str
+
+    def __init__(self, filter_name: str) -> None:
+        self.filter_name = filter_name
+        super().__init__(f"unknown filter {filter_name!r} ")

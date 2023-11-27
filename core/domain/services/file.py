@@ -1,13 +1,23 @@
 import abc
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Protocol
+from typing import Protocol, NewType, Generic, TypeVar, Sequence
 
-from core.domain.dto.file import CreateFileDTO, ReloadFileDTO
+from core.adapters.storage.filters.file_filters import Registry
+from core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilterDTO
 from core.domain.exceptions.category import CategoryViolation
-from core.domain.exceptions.file import FileNotFound, FileAccessDenied
+from core.domain.exceptions.file import FileNotFound, FileAccessDenied, InvalidFilterError
 from core.domain.models.category import CategoryId, Category
-from core.domain.models.file import File, FileId, RemoteFileId
+from core.domain.models.file import File, FileId, RemoteFileId, FileType
 from core.domain.models.user import UserId
+
+T = TypeVar("T")
+
+
+@dataclass(frozen=True)
+class FilterField(Generic[T]):
+    name: str
+    value: T
 
 
 class FileRepository(Protocol):
@@ -17,6 +27,10 @@ class FileRepository(Protocol):
 
     @abc.abstractmethod
     async def get_file(self, file_id: FileId) -> File:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def find_files(self, filters: Sequence[FilterField]) -> list[File]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -62,6 +76,43 @@ class FileUsecase(Protocol):
         raise NotImplementedError
 
 
+class Filters:
+    @classmethod
+    def file_type(cls, value: FileType) -> FilterField[FileType]:
+        return FilterField("file_type", value)
+
+    @classmethod
+    def user_id(cls, value: UserId | int) -> FilterField[UserId | int]:
+        return FilterField("user_id", value)
+
+    @classmethod
+    def category_id(cls, value: CategoryId | int) -> FilterField[CategoryId | int]:
+        return FilterField("category_id", value)
+
+    @classmethod
+    def title_match(cls, value: str) -> FilterField[str]:
+        return FilterField("title_match", value)
+
+    @classmethod
+    def from_dto(cls, dto: FilterDTO) -> list[FilterField]:
+        return [
+            FilterField(name, value)
+            for name, value in dto.as_tuple()
+            if value is not None
+        ]
+
+    @classmethod
+    def merge_filters(cls, dto: FilterDTO, native_filters: Sequence[FilterField]):
+        filters = {}
+        for f in native_filters:
+            filters[f.name] = f
+
+        for f in cls.from_dto(dto):
+            filters[f.name] = f  # override
+
+        return list(filters.values())
+
+
 UNDEFINED_FILE_ID = FileId(0)
 
 
@@ -71,6 +122,10 @@ def _ensure_owner(file: File, user_id: UserId = None):
 
     if file.user_id != user_id:
         raise FileAccessDenied(file.id, user_id)
+
+
+class InvalidUserError:
+    pass
 
 
 class FileService(FileUsecase):
@@ -138,3 +193,11 @@ class FileService(FileUsecase):
         _ensure_owner(file, user_id)
 
         await self._repo.delete_file(file_id)
+
+    async def find_files(self, *filters: FilterField, dto: FilterDTO) -> list[File]:
+        if dto.user_id == 0:
+            raise InvalidUserError
+
+        filters = Filters.merge_filters(dto, filters)
+        files = await self._repo.find_files(filters)
+        return files

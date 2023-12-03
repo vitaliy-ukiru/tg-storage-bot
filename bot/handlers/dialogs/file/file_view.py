@@ -1,12 +1,12 @@
 from aiogram import F
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, StartMode
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button
+from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button, Cancel, Back
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Const, Format
 
+from bot.states.dialogs import FileViewSG, FileEditSG
 from core.domain.models.file import FileId
 from core.domain.models.user import User
 from core.domain.services.file import FileUsecase
@@ -14,7 +14,6 @@ from core.domain.services.file import FileUsecase
 from bot.middlewares.user_manager import USER_KEY
 from bot.utils.files import content_type_from_file
 from bot.handlers.dialogs.start_data import StartWithData
-from .file_edit import EditSG
 
 
 async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogManager):
@@ -62,12 +61,7 @@ async def _media_getter(dialog_manager: DialogManager, file_service: FileUsecase
 
 async def _process_back_to_menu_click(__: CallbackQuery, _: Button, manager: DialogManager):
     file_id: int = manager.start_data["file_id"]
-    await manager.start(ViewSG.main, dict(file_id=file_id), mode=StartMode.RESET_STACK)
-
-
-class ViewSG(StatesGroup):
-    main = State()
-    send_file = State()
+    await manager.start(FileViewSG.main, dict(file_id=file_id), mode=StartMode.RESET_STACK)
 
 
 file_view_dialog = Dialog(
@@ -80,12 +74,12 @@ file_view_dialog = Dialog(
             SwitchTo(
                 Const("Отправить файл"),
                 id="send_file",
-                state=ViewSG.send_file,
+                state=FileViewSG.send_file,
             ),
             StartWithData(
                 Const("Редактировать файл"),
                 id="edit_file",
-                state=EditSG.main,
+                state=FileEditSG.main,
                 getter=_file_edit_getter
             ),
             Button(
@@ -94,17 +88,17 @@ file_view_dialog = Dialog(
                 on_click=_process_delete_file
             )
         ),
+        Cancel(),
         getter=_view_getter,
-        state=ViewSG.main,
+        state=FileViewSG.main,
     ),
     Window(
         DynamicMedia("file_media"),
-        Button(
+        Back(
             Const("Меню"),
             id="show_menu",
-            on_click=_process_back_to_menu_click,
         ),
         getter=_media_getter,
-        state=ViewSG.send_file,
+        state=FileViewSG.send_file,
     )
 )

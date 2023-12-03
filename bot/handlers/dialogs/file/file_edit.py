@@ -1,6 +1,5 @@
 from typing import Any
 
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 from aiogram_dialog import Dialog, Window, DialogManager, Data
 from aiogram_dialog.widgets.input import MessageInput
@@ -8,20 +7,14 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 from aiogram_dialog.widgets.text import Const
 
 from bot.filters.media import MediaFilter
-from bot.handlers.dialogs.back import BackTo
-from bot.handlers.dialogs.category import SelectSG
+from bot.handlers.dialogs.custom.back import BackTo
 from bot.handlers.dialogs.start_data import StartWithData
 from bot.middlewares.user_manager import USER_KEY
+from bot.states.dialogs import FileEditSG, CategorySelectSG
 from bot.utils.files import FileCredentials
 from core.domain.models.file import FileId
 from core.domain.models.user import User
 from core.domain.services.file import FileUsecase
-
-
-class EditSG(StatesGroup):
-    main = State()
-    edit_title = State()
-    reload_file = State()
 
 
 async def _process_new_title(m: Message, _: MessageInput, manager: DialogManager):
@@ -31,7 +24,7 @@ async def _process_new_title(m: Message, _: MessageInput, manager: DialogManager
     user: User = manager.middleware_data[USER_KEY]
 
     await file_service.update_title(file_id, title, user.id)
-    await manager.switch_to(EditSG.main)
+    await manager.switch_to(FileEditSG.main)
 
 
 async def _process_reload_file(m: Message, _: MessageInput, manager: DialogManager):
@@ -41,7 +34,7 @@ async def _process_reload_file(m: Message, _: MessageInput, manager: DialogManag
     user: User = manager.middleware_data[USER_KEY]
 
     await file_service.reload_file(file_id, cred.to_reload_dto(), user)
-    await manager.switch_to(EditSG.main)
+    await manager.switch_to(FileEditSG.main)
 
 
 async def _on_start(start_data: dict | Any, manager: DialogManager):
@@ -72,6 +65,7 @@ async def _set_category_getter(dialog_manager: DialogManager, **_):
     file_id: int = dialog_manager.start_data["file_id"]
     return dict(file_id=file_id)
 
+
 file_edit_dialog = Dialog(
     Window(
         Const("Выберите пункт"),
@@ -79,42 +73,41 @@ file_edit_dialog = Dialog(
             SwitchTo(
                 Const("Изменить название"),
                 id="file_edit_title",
-                state=EditSG.edit_title
+                state=FileEditSG.edit_title
             ),
             StartWithData(
                 Const("Изменить категорию"),
                 id="file_edit_c",
-                state=SelectSG.start,
+                state=CategorySelectSG.start,
                 getter=_set_category_getter
             ),
             SwitchTo(
                 Const("Перезагрузить файл"),
                 id="file_edit_reload",
-                state=EditSG.reload_file
+                state=FileEditSG.reload_file
             ),
             Cancel(),
         ),
-        state=EditSG.main,
+        state=FileEditSG.main,
     ),
     Window(
         Const("Введите новое название"),
         MessageInput(
             _process_new_title
         ),
-        BackTo(EditSG.main),
-        state=EditSG.edit_title,
+        BackTo(FileEditSG.main),
+        state=FileEditSG.edit_title,
     ),
 
-        Window(
-            Const("Отправьте новый файл"),
-            MessageInput(
-                _process_reload_file,
-                filter=MediaFilter()
-            ),
-            BackTo(EditSG.main),
-            state=EditSG.reload_file,
+    Window(
+        Const("Отправьте новый файл"),
+        MessageInput(
+            _process_reload_file,
+            filter=MediaFilter()
         ),
-        on_process_result=_process_result,
-        on_start=_on_start
-
-    )
+        BackTo(FileEditSG.main),
+        state=FileEditSG.reload_file,
+    ),
+    on_process_result=_process_result,
+    on_start=_on_start,
+)

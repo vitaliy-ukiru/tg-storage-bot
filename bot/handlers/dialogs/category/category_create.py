@@ -1,28 +1,22 @@
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
+from bot.states.dialogs import CategoryCreateSG
 from core.domain.dto.category import CreateCategoryDTO
 from core.domain.services.category import CategoryUsecase
 
 
-class CreateSG(StatesGroup):
-    input_title = State()
-    menu_idle = State()
-    input_desc = State()
-
-
 async def input_title_handler(m: Message, _: MessageInput, manager: DialogManager):
     manager.dialog_data["title"] = m.text
-    await manager.switch_to(CreateSG.menu_idle)
+    await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
 async def input_desc_handler(m: Message, _: MessageInput, manager: DialogManager):
     manager.dialog_data["desc"] = m.text
-    await manager.switch_to(CreateSG.menu_idle)
+    await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
 async def menu_getter(dialog_manager: DialogManager, **_):
@@ -46,7 +40,7 @@ category_create_dialog = Dialog(
     Window(
         Const("Отправь название категории"),
         MessageInput(input_title_handler),
-        state=CreateSG.input_title,
+        state=CategoryCreateSG.input_title,
     ),
 
     Window(
@@ -60,12 +54,12 @@ category_create_dialog = Dialog(
                 SwitchTo(
                     Const("Изменить название"),
                     id="create_category_edit_title",
-                    state=CreateSG.input_title
+                    state=CategoryCreateSG.input_title
                 ),
                 SwitchTo(
                     Const("Изменить описание"),
                     id="create_category_edit_desc",
-                    state=CreateSG.input_desc
+                    state=CategoryCreateSG.input_desc
                 ),
             ),
             Button(
@@ -76,14 +70,14 @@ category_create_dialog = Dialog(
             Cancel()
         ),
         getter=menu_getter,
-        state=CreateSG.menu_idle,
+        state=CategoryCreateSG.menu_idle,
     ),
 
     Window(
         Const("Отправьте описание для категории"),
         Back(Const("Назад")),
         MessageInput(input_desc_handler),
-        state=CreateSG.input_desc
+        state=CategoryCreateSG.input_desc
     ),
 
 )

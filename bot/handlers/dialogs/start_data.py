@@ -25,8 +25,8 @@ class StartWithData(Start):
         super().__init__(text, id, state, data, on_click, mode, when)
 
     async def _on_click(self, callback: CallbackQuery, button: Button, manager: DialogManager):
-        current_data = await self.getter(**manager.middleware_data)
         if self.user_on_click:
             await self.user_on_click(callback, self, manager)
+        current_data = await self.getter(**manager.middleware_data)
         start_data = self.start_data or {}
         await manager.start(self.state, start_data | current_data, self.mode)

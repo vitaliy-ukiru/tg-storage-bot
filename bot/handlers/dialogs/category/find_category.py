@@ -1,26 +1,19 @@
 from typing import Any
 
-from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel
 from aiogram_dialog.widgets.text import Const, Format
 
-from bot.handlers.dialogs.back import BackTo
+from bot.handlers.dialogs.custom.back import BackTo
 from bot.middlewares.user_manager import USER_KEY
+from bot.states.dialogs import CategoryFindSG
 from core.domain.models.user import User
 from core.domain.services.category import CategoryUsecase
 
 
-class FindSG(StatesGroup):
-    select_topic = State()
-    top = State()
-    input_title = State()
-    find = State()
-
-
-async def process_click_category(_: CallbackQuery, _1: Any, manager: DialogManager, item_id: str):
+async def process_click_category(_: CallbackQuery, __: Any, manager: DialogManager, item_id: str):
     await manager.done(dict(category_id=int(item_id)))
 
 
@@ -62,16 +55,16 @@ find_category_dialog = Dialog(
             SwitchTo(
                 Const("Самые используемые"),
                 id="category_exists_top",
-                state=FindSG.top,
+                state=CategoryFindSG.top,
             ),
             SwitchTo(
                 Const("Поиск по названию"),
                 id="category_exists_find",
-                state=FindSG.find,
+                state=CategoryFindSG.find,
             ),
             Cancel(),
         ),
-        state=FindSG.select_topic,
+        state=CategoryFindSG.main,
     ),
     Window(
         Const("Выберите категорию"),
@@ -79,24 +72,24 @@ find_category_dialog = Dialog(
             _select_category,
             width=2,
         ),
-        BackTo(FindSG.select_topic),
+        BackTo(CategoryFindSG.main),
         getter=_category_top_getter,
-        state=FindSG.top
+        state=CategoryFindSG.top
     ),
 
     Window(
         Const("Введите часть названия категории"),
         MessageInput(_process_input_title),
-        BackTo(FindSG.select_topic),
-        state=FindSG.input_title,
+        BackTo(CategoryFindSG.main),
+        state=CategoryFindSG.input_title,
     ),
     Window(
         Group(
             _select_category,
             width=2
         ),
-        BackTo(FindSG.select_topic),
-        state=FindSG.find,
+        BackTo(CategoryFindSG.main),
+        state=CategoryFindSG.find,
         getter=_category_find_getter,
     ),
 

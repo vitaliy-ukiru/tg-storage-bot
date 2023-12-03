@@ -5,7 +5,6 @@ from aiogram_dialog import DialogManager, StartMode
 
 from bot.filters.media import MediaFilter
 from bot.handlers.dialogs import execute
-from bot.handlers.dialogs.file import ViewSG
 from bot.utils.uploader import FileUploader
 
 router = Router(name="base-upload-files")

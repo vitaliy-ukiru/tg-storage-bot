@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 
-from aiogram import Bot, Dispatcher, Router
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import setup_dialogs
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
@@ -13,12 +13,15 @@ from bot.middlewares.proxy_middlewares import (CategoryProxyMiddleware,
 from bot.middlewares.file_uploader import FileUploaderMiddleware
 from bot.handlers.dialogs.setup import router as get_dialog_router
 from bot.handlers.users.files.upload import router as upload_router
+from bot.handlers.users.files.list import router as list_router
 from core.adapters.storage.category import CategoryGateway
 from core.adapters.storage.database import DSN
 from core.adapters.storage.file import FileGateway
 from core.adapters.storage.user import UserGateway
+from core.domain.dto.file import FilterDTO
+from core.domain.models.file import FileType
 from core.domain.services.category import CategoryService
-from core.domain.services.file import FileService
+from core.domain.services.file import FileService, Filters
 from core.domain.services.user import UserService
 
 API_TOKEN = os.getenv("BOT_TOKEN")
@@ -49,7 +52,10 @@ async def main():
 
     # dp.message.register(start, CommandStart())
     setup_dialogs(dp)
-    dp.include_router(upload_router)
+    dp.include_routers(
+        upload_router,
+        list_router,
+    )
     await dp.start_polling(bot)
 
 

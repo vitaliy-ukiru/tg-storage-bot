@@ -60,6 +60,10 @@ class FileUsecase(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
+    async def find_files(self, *filters: FilterField, dto: FilterDTO) -> list[File]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def set_category(self, file_id: FileId, category_id: CategoryId, user_id: UserId) -> File:
         raise NotImplementedError
 

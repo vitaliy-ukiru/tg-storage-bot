@@ -29,12 +29,9 @@ class CategoryCreateSG(StatesGroup):
     input_desc = State()
 
 
-class FilterSG(StatesGroup):
-    main = State()
-    file_type = State()
-    file_title = State()
-
 
 class FileListSG(StatesGroup):
     main = State()
+    input_file_type = State()
+    input_file_title = State()
     file_list = State()

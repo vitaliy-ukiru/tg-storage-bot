@@ -1,18 +1,37 @@
-from typing import Any
+from typing import Any, NamedTuple
 
-from aiogram.types import CallbackQuery
+from aiogram.enums import ContentType
+from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager, Data
-from aiogram_dialog.widgets.kbd import Start, Select, Back, ScrollingGroup, Next
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.kbd import Start, Select, Back, ScrollingGroup, SwitchTo, Group
+from aiogram_dialog.widgets.text import Const, Format, Case, Multi
+from magic_filter import F
 
 from bot.handlers.dialogs import execute
-from bot.handlers.dialogs.file.filter_select import filters_text
-from bot.handlers.dialogs.start_data import StartWithData
+from bot.handlers.dialogs.custom.back import BackTo
 from bot.middlewares.user_manager import USER_KEY
-from bot.states.dialogs import FilterSG, FileListSG
+from bot.states.dialogs import FileListSG, CategoryFindSG
 from core.domain.dto.file import FilterDTO
+from core.domain.models.file import FileType
 from core.domain.models.user import User
+from core.domain.services.category import CategoryUsecase
 from core.domain.services.file import FileUsecase
+
+
+async def _main_window_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
+    filters = dialog_manager.dialog_data.get("filters")
+    if not filters:
+        return {}
+
+    category_id = filters.get("category_id")
+    if category_id is None:
+        return {}
+
+    category = await category_service.get_category(category_id)
+    return {
+        "category_name": category.title
+    }
 
 
 async def _process_click_file(_: CallbackQuery, __: Select, manager: DialogManager, item_id: int):
@@ -30,7 +49,8 @@ def _to_dto(user_id: int, filters: dict[str, Any]) -> FilterDTO:
 
 async def _on_process_result(_: Data, result: Any, manager: DialogManager):
     if result:
-        manager.dialog_data["filters"] = result.get("filters", {}).copy()
+        filters = manager.dialog_data.setdefault("filters", {})
+        filters["category_id"] = result["category_id"]
 
 
 async def _on_start(start_data: dict | Any, manager: DialogManager):
@@ -38,6 +58,26 @@ async def _on_start(start_data: dict | Any, manager: DialogManager):
         return
 
     manager.dialog_data["filters"] = start_data.get("filters", {})
+
+class FileTypeItem(NamedTuple):
+    name: str
+    value: FileType
+
+def str_to_file_type(item_id: str) -> FileType:
+    return FileType(item_id)
+
+
+async def process_click_file_type(_: CallbackQuery, __: Any, manager: DialogManager, item_id: FileType):
+    filters = manager.dialog_data.setdefault("filters", {})
+    filters["file_type"] = item_id
+    await manager.back()
+
+
+async def _process_input_title(m: Message, _: MessageInput, dialog_manager: DialogManager):
+    title_pattern = m.text
+    filters = dialog_manager.dialog_data.setdefault("filters", {})
+    filters["title"] = title_pattern
+    await dialog_manager.switch_to(FileListSG.main)
 
 
 async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUsecase, **_):
@@ -58,19 +98,74 @@ async def _filters_start_getter(dialog_manager: DialogManager, **_):
         "filters": filters,
     }
 
+_filters = F["dialog_data"]["filters"]
 
 file_list_dialog = Dialog(
     Window(
-        Const("Список"),
-        filters_text,
-        StartWithData(
-            Const("Фильтры"),
-            id="file_select_open",
-            state=FilterSG.main,
-            getter=_filters_start_getter
+        Case(
+            {
+                0: Const("Фильтры не установлены"),
+                None: Const("Фильтры не установлены"),
+                ...: Multi(
+                    Format(
+                        text="Тип файла: {dialog_data[filters][file_type].name}",
+                        when=_filters["file_type"],
+                    ),
+                    Format(
+                        text="Название: {dialog_data[filters][title]}",
+                        when=_filters["title"],
+                    ),
+                    Format(
+                        text="Категория: {category_name}",
+                        when="category_name"
+                    ),
+                ),
+            },
+            selector=_filters.len() or 0
         ),
-        Next(Const("🔎 Поиск")),
-        state=FileListSG.main
+        Start(Const("Категория"), state=CategoryFindSG.main, id="category"),
+        SwitchTo(Const("Тип файла"), state=FileListSG.input_file_type, id="file_type"),
+        SwitchTo(Const("Название файла"), state=FileListSG.input_file_title, id="file_title"),
+
+        SwitchTo(Const("🔎 Поиск"), state=FileListSG.file_list, id="find_files"),
+        state=FileListSG.main,
+        getter=_main_window_getter,
+    ),
+
+    Window(
+        Const("Выберите тип файла"),
+        Group(
+            Select(
+                Format("{item.name}"),
+                id="select_file_type",
+                type_factory=str_to_file_type,
+                on_click=process_click_file_type,
+                item_id_getter=lambda file_type: file_type.value,
+                items="file_types",
+            ),
+            width=1,
+        ),
+        Back(),
+        state=FileListSG.input_file_type,
+        getter={
+            "file_types": [
+                FileTypeItem(name="Текст", value=FileType.text),
+                FileTypeItem(name="Фото", value=FileType.photo),
+                FileTypeItem(name="Видео", value=FileType.video),
+                FileTypeItem(name="Документ", value=FileType.document),
+                FileTypeItem(name="Аудио", value=FileType.audio),
+                FileTypeItem(name="Гиф", value=FileType.gif),
+            ]
+        },
+    ),
+    Window(
+        Const("Введите часть названия файлов"),
+        MessageInput(
+            _process_input_title,
+            content_types=ContentType.TEXT,
+        ),
+        BackTo(FileListSG.main),
+        state=FileListSG.input_file_title,
     ),
 
     Window(
@@ -88,7 +183,7 @@ file_list_dialog = Dialog(
             width=1,
             height=7
         ),
-        Back(),
+        BackTo(FileListSG.main),
         state=FileListSG.file_list,
         getter=_files_find_getter
     ),

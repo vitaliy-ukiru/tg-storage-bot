@@ -1,13 +1,10 @@
 __all__ = (
     'Registry',
-    'FileTypeFilter',
-    'UserFilter',
-    'CategoryFilter',
-    'TitleMatchFilter',
+    'Filter'
 )
 
-from abc import ABC, abstractmethod
-from typing import Tuple, Any, Protocol, TypeVar
+from abc import abstractmethod
+from typing import Protocol, TypeVar, Sequence
 
 from sqlalchemy import ColumnExpressionArgument
 
@@ -16,77 +13,60 @@ from core.domain.models.category import CategoryId, Category
 from core.domain.models.file import FileType
 from core.domain.models.user import UserId, User
 
-_REGISTRY: dict[str, type] = {}
-
 T = TypeVar('T')
 
 
+# FilterFunc = Callable[[T], ColumnExpressionArgument[bool]]
 class Filter(Protocol[T]):
-    @property
     @abstractmethod
-    def clause(self) -> ColumnExpressionArgument[bool]:
+    def __call__(self, v: T) -> ColumnExpressionArgument[bool]:
         raise NotImplementedError
 
 
-class BaseFilter(Filter[T], ABC):
-    def __init__(self, value: T):
-        self._value = value
-
-    def __init_subclass__(cls, *, name: str = None, **kwargs):
-        if name is None:
-            raise ValueError("name is required")
-        cls.__filter_name__ = name
-        _REGISTRY[name] = cls
-        super().__init_subclass__(**kwargs)
-
-    @property
-    def name(self) -> str:
-        return self.__filter_name__
+_REGISTRY: dict[str, 'Filter'] = {}
 
 
 class Registry:
     @classmethod
-    def get(cls, name: str) -> type[BaseFilter] | None:
+    def get(cls, name: str) -> Filter | None:
         return _REGISTRY.get(name)
 
     @classmethod
     def names(cls) -> tuple[str]:
         return tuple(_REGISTRY.keys())
 
+    @classmethod
+    def register(cls, name: str):
+        def wrapper(func: Filter):
+            _REGISTRY[name] = func
+            return func
 
-class FileTypeFilter(BaseFilter[FileType], name="file_type"):
-
-    @property
-    def clause(self) -> ColumnExpressionArgument[bool]:
-        return FileModel.type_id == self._value
-
-
-class UserFilter(BaseFilter[UserId | int], name="user_id"):
-    def __init__(self, value: UserId | int | User):
-        if isinstance(value, User):
-            value = value.id
-
-        super().__init__(value)
-
-    @property
-    def clause(self) -> ColumnExpressionArgument[bool]:
-        return FileModel.user_id == self._value
+        return wrapper
 
 
-class CategoryFilter(BaseFilter[int | CategoryId], name="category_id"):
+@Registry.register("file_type")
+def _file_type(value: FileType) -> ColumnExpressionArgument[bool]:
+    return FileModel.type_id == value
 
-    def __init__(self, value: int | CategoryId | Category):
-        if isinstance(value, Category):
-            value = value.id
+@Registry.register("file_types")
+def _file_types(value: Sequence[FileType]) -> ColumnExpressionArgument[bool]:
+    return FileModel.type_id.in_(value)
 
-        super().__init__(value)
+@Registry.register("user_id")
+def _user(value: UserId | int | User):
+    if isinstance(value, User):
+        value = value.id
 
-    @property
-    def clause(self) -> ColumnExpressionArgument[bool]:
-        return FileModel.category_id == self._value
+    return FileModel.user_id == value
 
 
-class TitleMatchFilter(BaseFilter[str], name="title_match"):
-    @property
-    def clause(self) -> ColumnExpressionArgument[bool]:
-        return FileModel.title.icontains(self._value)
+@Registry.register("category_id")
+def _category(value: int | CategoryId | Category) -> ColumnExpressionArgument[bool]:
+    if isinstance(value, Category):
+        value = value.id
+    return FileModel.category_id == value
+
+
+@Registry.register("title_match")
+def _title(value: str) -> ColumnExpressionArgument[bool]:
+    return FileModel.title.icontains(value)

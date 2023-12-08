@@ -1,26 +1,24 @@
-import abc
-from typing import Protocol, TypeVar, Sequence
+from typing import TypeVar, Sequence
 
 from asyncpg import UniqueViolationError
 from sqlalchemy import select, ColumnExpressionArgument
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import joinedload
 
+from core.domain.exceptions.file import FileAlreadyExists, FileNotFound, InvalidFilterError
 from core.domain.models.file import File, FileId
 from core.domain.services.file import FileRepository, FilterField
-from core.domain.exceptions.file import FileAlreadyExists, FileNotFound, InvalidFilterError
-
 from .database.models import File as FileModel
-from .filters.file_filters import Filter, Registry
+from .filters.file_filters import Registry
 
 T = TypeVar("T")
 
-def filter_convert(f: FilterField) -> Filter[T]:
-    filter_type = Registry.get(f.name)
-    if filter_type is None:
+def filter_convert(f: FilterField[T]) -> ColumnExpressionArgument[bool]:
+    filter_func = Registry.get(f.name)
+    if filter_func is None:
         raise InvalidFilterError(f.name)
 
-    return filter_type(f.value)
+    return filter_func(f.value)
 
 class FileGateway(FileRepository):
     _pool: async_sessionmaker
@@ -61,7 +59,7 @@ class FileGateway(FileRepository):
         async with self._pool() as session:
             sql = select(FileModel)
             for f in filters:
-                sql = sql.where(filter_convert(f).clause)
+                sql = sql.where(filter_convert(f))
 
             sql = sql.options(joinedload(FileModel.category))
             res = await session.execute(sql)

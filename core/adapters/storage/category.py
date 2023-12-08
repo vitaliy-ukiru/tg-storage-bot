@@ -9,7 +9,7 @@ from core.domain.models.category import Category, CategoryId
 from core.domain.models.user import UserId
 
 from .database import Category as CategoryModel, File as FileModel
-from ...domain.services.category import CategoryRepository
+from core.domain.services.category import CategoryRepository
 
 
 class CategoryGateway(CategoryRepository):
@@ -57,7 +57,7 @@ class CategoryGateway(CategoryRepository):
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
         sql = (select(CategoryModel).where(
             CategoryModel.user_id == user_id,
-            CategoryModel.title.match(title_mask),
+            CategoryModel.title.icontains(title_mask),
         ))
 
         async with self._pool() as session:

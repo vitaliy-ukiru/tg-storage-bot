@@ -4,8 +4,9 @@ from aiogram.enums import ContentType
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager, Data
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Start, Select, Back, ScrollingGroup, SwitchTo, Group
-from aiogram_dialog.widgets.text import Const, Format, Case, Multi
+from aiogram_dialog.widgets.kbd import Start, Select, Back, ScrollingGroup, SwitchTo, Group, Multiselect, \
+    ManagedMultiselect, Button, Row
+from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from magic_filter import F
 
 from bot.handlers.dialogs import execute
@@ -42,7 +43,7 @@ def _to_dto(user_id: int, filters: dict[str, Any]) -> FilterDTO:
     return FilterDTO(
         user_id=user_id,
         category_id=filters.get('category_id'),
-        file_type=filters.get('file_type'),
+        file_types=filters.get('file_types'),
         title_match=filters.get('title'),
     )
 
@@ -53,24 +54,41 @@ async def _on_process_result(_: Data, result: Any, manager: DialogManager):
         filters["category_id"] = result["category_id"]
 
 
+SELECT_FILE_TYPES_ID = "SELECT_FILE_TYPES"
+
+
 async def _on_start(start_data: dict | Any, manager: DialogManager):
     if not isinstance(start_data, dict):
         return
 
-    manager.dialog_data["filters"] = start_data.get("filters", {})
+    filters: dict = start_data.get("filters")
+    if filters is None:
+        return
+
+    file_types = filters.get('file_types')
+    if file_types is not None:
+        select: ManagedMultiselect[FileType] = manager.find(SELECT_FILE_TYPES_ID)
+        for file_type in file_types:
+            if isinstance(file_type, FileTypeItem):
+                file_type = file_type.value
+            await select.set_checked(file_type, False)
+
+    manager.dialog_data["filters"] = filters
+
 
 class FileTypeItem(NamedTuple):
     name: str
     value: FileType
 
+
 def str_to_file_type(item_id: str) -> FileType:
     return FileType(item_id)
 
 
-async def process_click_file_type(_: CallbackQuery, __: Any, manager: DialogManager, item_id: FileType):
+async def _process_state_file_type(_: CallbackQuery, select: ManagedMultiselect, manager: DialogManager,
+                                   __: FileType):
     filters = manager.dialog_data.setdefault("filters", {})
-    filters["file_type"] = item_id
-    await manager.back()
+    filters["file_types"] = select.get_checked()
 
 
 async def _process_input_title(m: Message, _: MessageInput, dialog_manager: DialogManager):
@@ -89,14 +107,21 @@ async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUs
     }
 
 
-async def _filters_start_getter(dialog_manager: DialogManager, **_):
-    filters = dialog_manager.dialog_data.get("filters")
-    if filters is not None:
-        filters = filters.copy()
+async def _process_delete_category(_: CallbackQuery, __: Button, manager: DialogManager):
+    filters = manager.dialog_data["filters"]
+    del filters["category_id"]
 
-    return {
-        "filters": filters,
-    }
+
+async def _process_delete_title(_: CallbackQuery, __: Button, manager: DialogManager):
+    filters = manager.dialog_data["filters"]
+    del filters["title"]
+
+
+async def _process_delete_file_types(_: CallbackQuery, __: Button, manager: DialogManager):
+    filters = manager.dialog_data["filters"]
+    del filters["file_types"]
+    await manager.find(SELECT_FILE_TYPES_ID).reset_checked()
+
 
 _filters = F["dialog_data"]["filters"]
 
@@ -107,9 +132,15 @@ file_list_dialog = Dialog(
                 0: Const("Фильтры не установлены"),
                 None: Const("Фильтры не установлены"),
                 ...: Multi(
-                    Format(
-                        text="Тип файла: {dialog_data[filters][file_type].name}",
-                        when=_filters["file_type"],
+                    Multi(
+                        Const("Типы файлов"),
+                        List(
+                            Format("{item.name}"),
+                            sep=', ',
+                            items=_filters["file_types"]
+                        ),
+                        sep=': ',
+                        when=_filters["file_types"],
                     ),
                     Format(
                         text="Название: {dialog_data[filters][title]}",
@@ -123,11 +154,52 @@ file_list_dialog = Dialog(
             },
             selector=_filters.len() or 0
         ),
-        Start(Const("Категория"), state=CategoryFindSG.main, id="category"),
-        SwitchTo(Const("Тип файла"), state=FileListSG.input_file_type, id="file_type"),
-        SwitchTo(Const("Название файла"), state=FileListSG.input_file_title, id="file_title"),
+        Row(
+            Start(
+                Const("Категория"),
+                state=CategoryFindSG.main,
+                id="category"
+            ),
+            Button(
+                Const("❌"),
+                id="del_category",
+                on_click=_process_delete_category,
+                when=_filters["category_id"]
+            ),
+        ),
+        Row(
+            SwitchTo(
+                Const("Тип файла"),
+                state=FileListSG.input_file_type,
+                id="file_types"
+            ),
+            Button(
+                Const("❌"),
+                id="del_file_types",
+                on_click=_process_delete_file_types,
+                when=_filters["file_types"]
+            ),
+        ),
 
-        SwitchTo(Const("🔎 Поиск"), state=FileListSG.file_list, id="find_files"),
+        Row(
+            SwitchTo(
+                Const("Название файла"),
+                state=FileListSG.input_file_title,
+                id="file_title"
+            ),
+            Button(
+                Const("❌"),
+                id="del_title",
+                on_click=_process_delete_title,
+                when=_filters["title"]
+            ),
+        ),
+
+        SwitchTo(
+            Const("🔎 Поиск"),
+            state=FileListSG.file_list,
+            id="find_files",
+        ),
         state=FileListSG.main,
         getter=_main_window_getter,
     ),
@@ -135,11 +207,12 @@ file_list_dialog = Dialog(
     Window(
         Const("Выберите тип файла"),
         Group(
-            Select(
+            Multiselect(
+                Format("✓ {item.name}"),
                 Format("{item.name}"),
-                id="select_file_type",
+                id=SELECT_FILE_TYPES_ID,
                 type_factory=str_to_file_type,
-                on_click=process_click_file_type,
+                on_state_changed=_process_state_file_type,
                 item_id_getter=lambda file_type: file_type.value,
                 items="file_types",
             ),

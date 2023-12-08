@@ -82,8 +82,8 @@ class FileUsecase(Protocol):
 
 class Filters:
     @classmethod
-    def file_type(cls, value: FileType) -> FilterField[FileType]:
-        return FilterField("file_type", value)
+    def file_types(cls, *value: FileType) -> FilterField[Sequence[FileType]]:
+        return FilterField("file_types", value)
 
     @classmethod
     def user_id(cls, value: UserId | int) -> FilterField[UserId | int]:
@@ -166,7 +166,7 @@ class FileService(FileUsecase):
 
         category = await self._category_getter.get_category(category_id)
         if user_id != category.user_id:
-            raise CategoryViolation(user_id)
+            raise CategoryViolation(category_id, user_id)
 
         file.category = category
         await self._repo.update_file(file)

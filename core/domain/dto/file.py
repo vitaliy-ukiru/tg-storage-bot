@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Sequence
 
 from core.domain.models.file import FileType
 
@@ -24,13 +24,13 @@ class ReloadFileDTO:
 class FilterDTO:
     user_id: int
     category_id: Optional[int] = None
-    file_type: Optional[int] = None
+    file_types: Optional[Sequence[FileType]] = None
     title_match: Optional[str] = None
 
     def as_tuple(self):
         return (
             ("user_id", self.user_id),
             ("category_id", self.category_id),
-            ("file_type", self.file_type),
+            ("file_types", self.file_types),
             ("title_match", self.title_match)
         )

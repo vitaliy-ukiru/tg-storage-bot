@@ -60,7 +60,7 @@ find_category_dialog = Dialog(
             SwitchTo(
                 Const("Поиск по названию"),
                 id="category_exists_find",
-                state=CategoryFindSG.find,
+                state=CategoryFindSG.input_title,
             ),
             Cancel(),
         ),
@@ -84,6 +84,7 @@ find_category_dialog = Dialog(
         state=CategoryFindSG.input_title,
     ),
     Window(
+        Const("Список найденных категорий"),
         Group(
             _select_category,
             width=2

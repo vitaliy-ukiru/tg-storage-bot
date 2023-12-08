@@ -29,7 +29,6 @@ class CategoryCreateSG(StatesGroup):
     input_desc = State()
 
 
-
 class FileListSG(StatesGroup):
     main = State()
     input_file_type = State()

@@ -71,18 +71,18 @@ file_edit_dialog = Dialog(
         Const("Выберите пункт"),
         Column(
             SwitchTo(
-                Const("Изменить название"),
+                Const("📝 Изменить название"),
                 id="file_edit_title",
                 state=FileEditSG.edit_title
             ),
             StartWithData(
-                Const("Изменить категорию"),
+                Const("🗂 Изменить категорию"),
                 id="file_edit_c",
                 state=CategorySelectSG.start,
                 getter=_set_category_getter
             ),
             SwitchTo(
-                Const("Перезагрузить файл"),
+                Const("🔄 Перезагрузить файл"),
                 id="file_edit_reload",
                 state=FileEditSG.reload_file
             ),

@@ -156,7 +156,7 @@ file_list_dialog = Dialog(
         ),
         Row(
             Start(
-                Const("Категория"),
+                Const("🗂 Категория"),
                 state=CategoryFindSG.main,
                 id="category"
             ),
@@ -169,7 +169,7 @@ file_list_dialog = Dialog(
         ),
         Row(
             SwitchTo(
-                Const("Тип файла"),
+                Const("🏷 Тип файла"),
                 state=FileListSG.input_file_type,
                 id="file_types"
             ),
@@ -183,7 +183,7 @@ file_list_dialog = Dialog(
 
         Row(
             SwitchTo(
-                Const("Название файла"),
+                Const("📃 Название файла"),
                 state=FileListSG.input_file_title,
                 id="file_title"
             ),

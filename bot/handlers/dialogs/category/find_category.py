@@ -53,12 +53,12 @@ find_category_dialog = Dialog(
         Const("Выберите раздел"),
         Column(
             SwitchTo(
-                Const("Самые используемые"),
+                Const("🔝 Самые используемые"),
                 id="category_exists_top",
                 state=CategoryFindSG.top,
             ),
             SwitchTo(
-                Const("Поиск по названию"),
+                Const("🔎 Поиск по названию"),
                 id="category_exists_find",
                 state=CategoryFindSG.input_title,
             ),

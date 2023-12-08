@@ -17,12 +17,12 @@ category_select_dialog = Dialog(
         Const("Выберите источник категории"),
         Column(
             Start(
-                Const("Существующая"),
+                Const("🔎 Существующая"),
                 id="category_exists",
                 state=CategoryFindSG.main,
             ),
             Start(
-                Const("Создать"),
+                Const("🆕 Создать"),
                 id="category_create",
                 state=CategoryCreateSG.input_title
             ),

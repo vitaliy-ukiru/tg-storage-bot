@@ -22,7 +22,7 @@ async def input_desc_handler(m: Message, _: MessageInput, manager: DialogManager
 async def menu_getter(dialog_manager: DialogManager, **_):
     title = dialog_manager.dialog_data["title"]
     desc = dialog_manager.dialog_data.get("desc")
-    return dict(title=title, desc=desc, have_desc=desc is not None)
+    return dict(title=title, desc=desc)
 
 
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
@@ -46,24 +46,24 @@ category_create_dialog = Dialog(
     Window(
         Multi(
             Format("Название: {title}"),
-            Format("Описание: {desc}", when="have_desc")
+            Format("Описание: {desc}", when="desc")
         ),
         Group(
             Row(
 
                 SwitchTo(
-                    Const("Изменить название"),
+                    Const("📝 Название"),
                     id="create_category_edit_title",
                     state=CategoryCreateSG.input_title
                 ),
                 SwitchTo(
-                    Const("Изменить описание"),
+                    Const("📝 Описание"),
                     id="create_category_edit_desc",
                     state=CategoryCreateSG.input_desc
                 ),
             ),
             Button(
-                Const("Создать"),
+                Const("✅ Создать"),
                 id="create_category",
                 on_click=create_category,
             ),

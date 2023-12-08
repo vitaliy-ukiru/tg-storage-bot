@@ -72,18 +72,18 @@ file_view_dialog = Dialog(
         Format("Дата загрузки: {upload_time}"),
         Column(
             SwitchTo(
-                Const("Отправить файл"),
+                Const("📥 Отправить файл"),
                 id="send_file",
                 state=FileViewSG.send_file,
             ),
             StartWithData(
-                Const("Редактировать файл"),
+                Const("✏️ Редактировать файл"),
                 id="edit_file",
                 state=FileEditSG.main,
                 getter=_file_edit_getter
             ),
             Button(
-                Const("Удалить файл"),
+                Const("❌ Удалить файл"),
                 id="delete_file",
                 on_click=_process_delete_file
             )

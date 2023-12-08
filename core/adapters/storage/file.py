@@ -1,7 +1,7 @@
 from typing import TypeVar, Sequence
 
 from asyncpg import UniqueViolationError
-from sqlalchemy import select, ColumnExpressionArgument
+from sqlalchemy import select, ColumnExpressionArgument, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import joinedload
 
@@ -92,5 +92,6 @@ class FileGateway(FileRepository):
 
     async def delete_file(self, file_id: FileId):
         async with self._pool() as session:
-            await session.delete(FileModel(id=int(file_id)))
+            sql = delete(FileModel).where(FileModel.id == int(file_id))
+            await session.execute(sql)
             await session.commit()

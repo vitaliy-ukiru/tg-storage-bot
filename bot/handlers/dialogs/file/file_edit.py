@@ -8,7 +8,7 @@ from aiogram_dialog.widgets.text import Const
 
 from bot.filters.media import MediaFilter
 from bot.handlers.dialogs.custom.back import BackTo
-from bot.handlers.dialogs.start_data import StartWithData
+from bot.handlers.dialogs.custom.start_data import StartWithData
 from bot.middlewares.user_manager import USER_KEY
 from bot.states.dialogs import FileEditSG, CategorySelectSG
 from bot.utils.files import FileCredentials

@@ -13,7 +13,7 @@ from core.domain.services.file import FileUsecase
 
 from bot.middlewares.user_manager import USER_KEY
 from bot.utils.files import content_type_from_file
-from bot.handlers.dialogs.start_data import StartWithData
+from bot.handlers.dialogs.custom.start_data import StartWithData
 
 
 async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogManager):

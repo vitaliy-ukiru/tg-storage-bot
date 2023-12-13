@@ -78,7 +78,7 @@ def content_type_from_file(file_type: FileType) -> ContentType:
     match file_type:
         case FileType.photo:
             return ContentType.PHOTO
-        case FileType.text, FileType.document:
+        case FileType.document:
             return ContentType.DOCUMENT
         case FileType.video:
             return ContentType.VIDEO

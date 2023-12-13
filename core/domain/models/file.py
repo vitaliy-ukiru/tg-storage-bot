@@ -9,7 +9,6 @@ from .user import UserId
 
 class FileType(StrEnum):
     unknown = auto()
-    text = auto()
     photo = auto()
     video = auto()
     document = auto()

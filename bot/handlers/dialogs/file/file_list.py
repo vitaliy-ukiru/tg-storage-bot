@@ -10,9 +10,10 @@ from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from magic_filter import F
 
 from bot.handlers.dialogs import execute
-from bot.handlers.dialogs.custom.back import BackTo
+from bot.handlers.dialogs.custom.back import BackTo, BACK_TEXT_RU, CANCEL_TEXT_RU
 from bot.middlewares.user_manager import USER_KEY
 from bot.states.dialogs import FileListSG, CategoryFindSG
+from bot.utils.file_type_str import file_types_with_names, get_file_type_name
 from core.domain.dto.file import FilterDTO
 from core.domain.models.file import FileType
 from core.domain.models.user import User
@@ -123,6 +124,13 @@ async def _process_delete_file_types(_: CallbackQuery, __: Button, manager: Dial
     await manager.find(SELECT_FILE_TYPES_ID).reset_checked()
 
 
+def file_types_names(data: dict) -> list[str]:
+    return [
+        get_file_type_name(ft)
+        for ft in data["dialog_data"]["filters"]["file_types"]
+    ]
+
+
 _filters = F["dialog_data"]["filters"]
 
 file_list_dialog = Dialog(
@@ -135,9 +143,9 @@ file_list_dialog = Dialog(
                     Multi(
                         Const("Типы файлов"),
                         List(
-                            Format("{item.name}"),
+                            Format("{item}"),
                             sep=', ',
-                            items=_filters["file_types"]
+                            items=file_types_names
                         ),
                         sep=': ',
                         when=_filters["file_types"],
@@ -218,16 +226,12 @@ file_list_dialog = Dialog(
             ),
             width=1,
         ),
-        Back(),
+        Back(BACK_TEXT_RU),
         state=FileListSG.input_file_type,
         getter={
             "file_types": [
-                FileTypeItem(name="Текст", value=FileType.text),
-                FileTypeItem(name="Фото", value=FileType.photo),
-                FileTypeItem(name="Видео", value=FileType.video),
-                FileTypeItem(name="Документ", value=FileType.document),
-                FileTypeItem(name="Аудио", value=FileType.audio),
-                FileTypeItem(name="Гиф", value=FileType.gif),
+                FileTypeItem(name=name, value=ft)
+                for name, ft in file_types_with_names()
             ]
         },
     ),
@@ -237,7 +241,7 @@ file_list_dialog = Dialog(
             _process_input_title,
             content_types=ContentType.TEXT,
         ),
-        BackTo(FileListSG.main),
+        BackTo(FileListSG.main, BACK_TEXT_RU),
         state=FileListSG.input_file_title,
     ),
 
@@ -256,7 +260,7 @@ file_list_dialog = Dialog(
             width=1,
             height=7
         ),
-        BackTo(FileListSG.main),
+        BackTo(FileListSG.main, BACK_TEXT_RU),
         state=FileListSG.file_list,
         getter=_files_find_getter
     ),

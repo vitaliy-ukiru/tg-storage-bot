@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 from aiogram_dialog.widgets.text import Const
 
 from bot.filters.media import MediaFilter
-from bot.handlers.dialogs.custom.back import BackTo
+from bot.handlers.dialogs.custom.back import BackTo, CANCEL_TEXT_RU
 from bot.handlers.dialogs.custom.start_data import StartWithData
 from bot.middlewares.user_manager import USER_KEY
 from bot.states.dialogs import FileEditSG, CategorySelectSG
@@ -86,7 +86,7 @@ file_edit_dialog = Dialog(
                 id="file_edit_reload",
                 state=FileEditSG.reload_file
             ),
-            Cancel(),
+            Cancel(CANCEL_TEXT_RU),
         ),
         state=FileEditSG.main,
     ),
@@ -95,7 +95,7 @@ file_edit_dialog = Dialog(
         MessageInput(
             _process_new_title
         ),
-        BackTo(FileEditSG.main),
+        BackTo(FileEditSG.main, CANCEL_TEXT_RU),
         state=FileEditSG.edit_title,
     ),
 
@@ -105,7 +105,7 @@ file_edit_dialog = Dialog(
             _process_reload_file,
             filter=MediaFilter()
         ),
-        BackTo(FileEditSG.main),
+        BackTo(FileEditSG.main, CANCEL_TEXT_RU),
         state=FileEditSG.reload_file,
     ),
     on_process_result=_process_result,

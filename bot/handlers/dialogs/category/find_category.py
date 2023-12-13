@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel
 from aiogram_dialog.widgets.text import Const, Format
 
-from bot.handlers.dialogs.custom.back import BackTo
+from bot.handlers.dialogs.custom.back import BackTo, CANCEL_TEXT_RU, BACK_TEXT_RU
 from bot.middlewares.user_manager import USER_KEY
 from bot.states.dialogs import CategoryFindSG
 from core.domain.models.user import User
@@ -62,7 +62,7 @@ find_category_dialog = Dialog(
                 id="category_exists_find",
                 state=CategoryFindSG.input_title,
             ),
-            Cancel(),
+            Cancel(CANCEL_TEXT_RU),
         ),
         state=CategoryFindSG.main,
     ),
@@ -72,7 +72,7 @@ find_category_dialog = Dialog(
             _select_category,
             width=2,
         ),
-        BackTo(CategoryFindSG.main),
+        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
         getter=_category_top_getter,
         state=CategoryFindSG.top
     ),
@@ -80,7 +80,7 @@ find_category_dialog = Dialog(
     Window(
         Const("Введите часть названия категории"),
         MessageInput(_process_input_title),
-        BackTo(CategoryFindSG.main),
+        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
         state=CategoryFindSG.input_title,
     ),
     Window(
@@ -89,7 +89,7 @@ find_category_dialog = Dialog(
             _select_category,
             width=2
         ),
-        BackTo(CategoryFindSG.main),
+        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
         state=CategoryFindSG.find,
         getter=_category_find_getter,
     ),

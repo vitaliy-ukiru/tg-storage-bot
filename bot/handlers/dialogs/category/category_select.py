@@ -4,6 +4,7 @@ from aiogram_dialog import Dialog, Window, Data, DialogManager
 from aiogram_dialog.widgets.kbd import Column, Start, Cancel
 from aiogram_dialog.widgets.text import Const
 
+from bot.handlers.dialogs.custom.back import CANCEL_TEXT_RU
 from bot.states.dialogs import CategoryFindSG, CategorySelectSG, CategoryCreateSG
 
 
@@ -26,7 +27,7 @@ category_select_dialog = Dialog(
                 id="category_create",
                 state=CategoryCreateSG.input_title
             ),
-            Cancel()
+            Cancel(CANCEL_TEXT_RU)
         ),
         state=CategorySelectSG.start,
     ),

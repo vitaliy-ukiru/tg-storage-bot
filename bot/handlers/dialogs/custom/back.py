@@ -6,15 +6,17 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.kbd import Back, Button, SwitchTo
 from aiogram_dialog.widgets.kbd.button import OnClick
+from aiogram_dialog.widgets.kbd.state import BACK_TEXT as _BACK_TEXT
 from aiogram_dialog.widgets.text import Text, Const
 
-BACK_TEXT = Const("Назад")
-
+BACK_TEXT_RU = Const("Назад")
+CANCEL_TEXT_RU = Const("Отмена")
+CLOSE_TEXT_RU = Const("Закрыть")
 
 class BackTo(SwitchTo):
     def __init__(self,
                  state: State,
-                 text: Text = BACK_TEXT,
+                 text: Text = _BACK_TEXT,
                  id: str = "__back_to__",
                  on_click: Optional[OnClick] = None,
                  when: WhenCondition = None):

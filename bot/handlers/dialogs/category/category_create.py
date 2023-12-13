@@ -4,6 +4,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
+from bot.handlers.dialogs.custom.back import CANCEL_TEXT_RU, BACK_TEXT_RU
 from bot.states.dialogs import CategoryCreateSG
 from core.domain.dto.category import CreateCategoryDTO
 from core.domain.services.category import CategoryUsecase
@@ -67,7 +68,7 @@ category_create_dialog = Dialog(
                 id="create_category",
                 on_click=create_category,
             ),
-            Cancel()
+            Cancel(CANCEL_TEXT_RU)
         ),
         getter=menu_getter,
         state=CategoryCreateSG.menu_idle,
@@ -75,7 +76,7 @@ category_create_dialog = Dialog(
 
     Window(
         Const("Отправьте описание для категории"),
-        Back(Const("Назад")),
+        Back(BACK_TEXT_RU),
         MessageInput(input_desc_handler),
         state=CategoryCreateSG.input_desc
     ),

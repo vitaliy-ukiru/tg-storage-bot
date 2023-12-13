@@ -7,6 +7,7 @@ from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Const, Format
 
 from bot.states.dialogs import FileViewSG, FileEditSG
+from bot.utils.file_type_str import get_file_type_name
 from core.domain.models.file import FileId
 from core.domain.models.user import User
 from core.domain.services.file import FileUsecase
@@ -39,6 +40,7 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
         file_id=file.id,
         file_title=file.name,
         file_type=file.type,
+        file_type_name=get_file_type_name(file.type),
         file_category=category_name,
         upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
     )
@@ -68,7 +70,7 @@ file_view_dialog = Dialog(
     Window(
         Format("Название: {file_title}"),
         Format("Категория: {file_category}", when=F["file_category"]),
-        Format("Тип: {file_type}"),
+        Format("Тип: {file_type_name}"),
         Format("Дата загрузки: {upload_time}"),
         Column(
             SwitchTo(
@@ -88,7 +90,7 @@ file_view_dialog = Dialog(
                 on_click=_process_delete_file
             )
         ),
-        Cancel(),
+        Cancel(Const("Закрыть")),
         getter=_view_getter,
         state=FileViewSG.main,
     ),

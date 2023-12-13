@@ -8,21 +8,6 @@ from core.domain.models.file import FileType
 from core.domain.dto.file import ReloadFileDTO
 
 
-def file_type_from_mime(mime_type: str) -> FileType:
-    mime_base, *_ = mime_type.split('/', 2)
-    match mime_base:
-        case "image":
-            return FileType.photo
-        case "video":
-            return FileType.video
-        case "application":
-            return FileType.document
-        case "audio":
-            return FileType.audio
-        case "text":
-            return FileType.text
-
-
 @dataclass
 class FileCredentials:
     remote_id: str
@@ -46,7 +31,7 @@ class FileCredentials:
                 doc = m.document
                 return cls(
                     remote_id=doc.file_id,
-                    file_type=file_type_from_mime(doc.mime_type),
+                    file_type=FileType.document,
                     title=m.caption or doc.file_name
                 )
             case ContentType.AUDIO:

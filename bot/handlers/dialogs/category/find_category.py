@@ -3,7 +3,7 @@ from typing import Any
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel
+from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel, ScrollingGroup
 from aiogram_dialog.widgets.text import Const, Format
 
 from bot.handlers.dialogs.custom.back import BackTo, CANCEL_TEXT_RU, BACK_TEXT_RU
@@ -34,7 +34,7 @@ async def _category_find_getter(dialog_manager: DialogManager, category_service:
 async def _category_top_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
     user: User = dialog_manager.middleware_data[USER_KEY]
 
-    categories = await category_service.find_top_5_popular(user.id)
+    categories = await category_service.find_popular(user.id)
     return {
         "categories": categories,
     }
@@ -67,10 +67,13 @@ find_category_dialog = Dialog(
         state=CategoryFindSG.main,
     ),
     Window(
+
         Const("Выберите категорию"),
-        Group(
+        ScrollingGroup(
             _select_category,
+            id="select_category_scroll",
             width=2,
+            height=2
         ),
         BackTo(CategoryFindSG.main, BACK_TEXT_RU),
         getter=_category_top_getter,

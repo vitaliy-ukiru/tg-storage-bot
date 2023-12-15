@@ -39,7 +39,7 @@ async def main():
     file_repo = FileGateway(session_maker)
 
     user_service = UserService(user_repo)
-    category_service = CategoryService(category_repo)
+    category_service = CategoryService(category_repo, file_repo)
     file_service = FileService(file_repo, category_service)
 
     dp.update.middleware(UserMiddleware(user_service))

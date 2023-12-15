@@ -1,15 +1,12 @@
-import abc
-from typing import Protocol, Optional
+from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
-from sqlalchemy.sql.functions import count
 
 from core.domain.models.category import Category, CategoryId
 from core.domain.models.user import UserId
-
-from .database import Category as CategoryModel, File as FileModel
 from core.domain.services.category import CategoryRepository
+from .database import Category as CategoryModel
 
 
 class CategoryGateway(CategoryRepository):
@@ -35,17 +32,8 @@ class CategoryGateway(CategoryRepository):
             category: Optional[CategoryModel] = await session.get(CategoryModel, int(category_id))
             return category.to_domain() if category else None
 
-    async def find_top_5_popular(self, user_id: UserId) -> list[Category]:
-        sql = (select(CategoryModel).
-               join(FileModel,
-                    FileModel.category_id == CategoryModel.id and
-                    CategoryModel.user_id == FileModel.user_id
-                    ).
-               where(CategoryModel.user_id == user_id).
-               group_by(CategoryModel.id).
-               order_by(count().desc()).
-               limit(5))
-
+    async def find_user_categories(self, user_id: UserId) -> list[Category]:
+        sql = select(CategoryModel).where(CategoryModel.user_id == user_id)
         async with self._pool() as session:
             res = await session.execute(sql)
             categories = res.scalars()

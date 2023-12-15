@@ -4,14 +4,18 @@ from asyncpg import UniqueViolationError
 from sqlalchemy import select, ColumnExpressionArgument, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.functions import count
 
 from core.domain.exceptions.file import FileAlreadyExists, FileNotFound, InvalidFilterError
+from core.domain.models.category import CategoryId
 from core.domain.models.file import File, FileId
+from core.domain.models.user import UserId
 from core.domain.services.file import FileRepository, FilterField
 from .database.models import File as FileModel
 from .filters.file_filters import Registry
 
 T = TypeVar("T")
+
 
 def filter_convert(f: FilterField[T]) -> ColumnExpressionArgument[bool]:
     filter_func = Registry.get(f.name)
@@ -19,6 +23,7 @@ def filter_convert(f: FilterField[T]) -> ColumnExpressionArgument[bool]:
         raise InvalidFilterError(f.name)
 
     return filter_func(f.value)
+
 
 class FileGateway(FileRepository):
     _pool: async_sessionmaker
@@ -95,3 +100,15 @@ class FileGateway(FileRepository):
             sql = delete(FileModel).where(FileModel.id == int(file_id))
             await session.execute(sql)
             await session.commit()
+
+    async def get_categories_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
+        async with self._pool() as session:
+            sql = (select(FileModel.category_id, count().label("rate")).
+                   where(FileModel.user_id == user_id).
+                   group_by(FileModel.category_id))
+            res = await session.execute(sql)
+
+            return {
+                CategoryId(category_id): rate
+                for category_id, rate in res.all()
+            }

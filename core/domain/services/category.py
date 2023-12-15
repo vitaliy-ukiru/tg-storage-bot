@@ -18,7 +18,7 @@ class CategoryRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_top_5_popular(self, user_id: UserId) -> list[Category]:
+    async def find_user_categories(self, user_id: UserId) -> list[Category]:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -36,11 +36,17 @@ class CategoryUsecase(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_top_5_popular(self, user_id: UserId) -> list[Category]:
+    async def find_popular(self, user_id: UserId) -> list[Category]:
         raise NotImplementedError
 
     @abc.abstractmethod
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
+        raise NotImplementedError
+
+
+class CategoryRate(Protocol):
+    @abc.abstractmethod
+    async def get_categories_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
         raise NotImplementedError
 
 
@@ -49,9 +55,11 @@ UNDEFINED_CATEGORY_ID = CategoryId(0)
 
 class CategoryService(CategoryUsecase):
     _repo: CategoryRepository
+    _counter: CategoryRate
 
-    def __init__(self, repo: CategoryRepository):
+    def __init__(self, repo: CategoryRepository, counter: CategoryRate):
         self._repo = repo
+        self._counter = counter
 
     async def save_category(self, dto: CreateCategoryDTO) -> Category:
         c = Category(
@@ -72,8 +80,21 @@ class CategoryService(CategoryUsecase):
 
         return c
 
-    async def find_top_5_popular(self, user_id: UserId) -> list[Category]:
-        return await self._repo.find_top_5_popular(user_id)
+    async def find_popular(self, user_id: UserId) -> list[Category]:
+        # return await self._repo.find_top_5_popular(user_id)
+        categories = await self._repo.find_user_categories(user_id)
+        if len(categories) == 0:
+            return categories
+
+        categories_rates = await self._counter.get_categories_usage_rate(user_id)
+        if len(categories_rates) == 0:
+            return categories
+
+        categories.sort(
+            key=lambda c: categories_rates.get(c.id, 0),
+            reverse=True
+        )
+        return categories
 
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
         return await self._repo.find_by_title(user_id, title_mask)

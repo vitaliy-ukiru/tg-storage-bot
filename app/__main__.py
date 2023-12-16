@@ -25,17 +25,21 @@ from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
 
 
-
 async def main():
     env = Env()
     env.read_env()
 
     loader = Loader.read(env=env)
     cfg = loader.load()
-    engine = create_async_engine(to_dsn(cfg.db), echo=True)
+    engine = create_async_engine(to_dsn(cfg.db), echo=cfg.is_debug)
     session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
-    logging.basicConfig(level=logging.INFO)
+    if cfg.env == "dev":
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    logging.info(f"env is {cfg.env!r}")
+
     storage = MemoryStorage()
     bot = Bot(token=cfg.tg_bot.token)
     dp = Dispatcher(storage=storage)

@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel, ScrollingGroup
 from aiogram_dialog.widgets.text import Const, Format
 
-from app.bot.handlers.dialogs.custom.back import BackTo, CANCEL_TEXT_RU, BACK_TEXT_RU
+from app.bot.widgets import BackTo, CANCEL_TEXT_RU, BACK_TEXT_RU
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import CategoryFindSG
 from app.core.domain.models.user import User
@@ -33,7 +33,6 @@ async def _category_find_getter(dialog_manager: DialogManager, category_service:
 
 async def _category_top_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
     user: User = dialog_manager.middleware_data[USER_KEY]
-
     categories = await category_service.find_popular(user.id)
     return {
         "categories": categories,

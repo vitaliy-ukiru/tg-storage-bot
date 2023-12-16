@@ -14,7 +14,7 @@ from app.core.interfaces.usecase.file import FileUsecase
 
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.utils.files import content_type_from_file
-from app.bot.handlers.dialogs.custom.start_data import StartWithData
+from app.bot.widgets import StartWithData
 
 
 async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogManager):

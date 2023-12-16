@@ -4,7 +4,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
-from app.bot.handlers.dialogs.custom.back import CANCEL_TEXT_RU, BACK_TEXT_RU
+from app.bot.widgets import CANCEL_TEXT_RU, BACK_TEXT_RU
 from app.bot.states.dialogs import CategoryCreateSG
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.interfaces.usecase.category import CategoryUsecase

@@ -10,7 +10,7 @@ from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from magic_filter import F
 
 from app.bot.handlers.dialogs import execute
-from app.bot.handlers.dialogs.custom.back import BackTo, BACK_TEXT_RU
+from app.bot.widgets import BackTo, BACK_TEXT_RU
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_str import file_types_with_names, get_file_type_name

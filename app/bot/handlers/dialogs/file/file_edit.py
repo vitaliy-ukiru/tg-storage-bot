@@ -7,8 +7,8 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 from aiogram_dialog.widgets.text import Const
 
 from app.bot.filters.media import MediaFilter
-from app.bot.handlers.dialogs.custom.back import BackTo, CANCEL_TEXT_RU
-from app.bot.handlers.dialogs.custom.start_data import StartWithData
+from app.bot.widgets import BackTo, CANCEL_TEXT_RU, CLOSE_TEXT_RU
+from app.bot.widgets import StartWithData
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileEditSG, CategorySelectSG
 from app.bot.utils.files import FileCredentials
@@ -86,7 +86,7 @@ file_edit_dialog = Dialog(
                 id="file_edit_reload",
                 state=FileEditSG.reload_file
             ),
-            Cancel(CANCEL_TEXT_RU),
+            Cancel(CLOSE_TEXT_RU),
         ),
         state=FileEditSG.main,
     ),

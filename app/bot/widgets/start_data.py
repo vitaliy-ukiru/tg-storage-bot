@@ -11,7 +11,6 @@ from aiogram_dialog.widgets.utils import GetterVariant, ensure_data_getter
 
 
 class StartWithData(Start):
-
     def __init__(self,
                  text: Text,
                  id: str,

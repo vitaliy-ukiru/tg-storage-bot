@@ -28,8 +28,10 @@ async def file_list(manager: DialogManager,
                     data: Data = None,
                     mode: StartMode = StartMode.NORMAL,
                     show_mode: Optional[ShowMode] = None):
-    data = data or {}
     if filters is not None:
+        if data is None:
+            data = {}
+
         data["filters"] = filters
 
     await manager.start(

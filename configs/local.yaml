@@ -3,3 +3,4 @@ database:
   database: "tg-storage"
   password: "py-tg"
   host: "localhost"
+env: local

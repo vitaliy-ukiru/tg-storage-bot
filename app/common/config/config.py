@@ -20,6 +20,11 @@ class TgBot:
 class Config:
     tg_bot: TgBot
     db: DbConfig
+    env: str
+
+    @property
+    def is_debug(self) -> bool:
+        return self.env != "prod"
 
 
 

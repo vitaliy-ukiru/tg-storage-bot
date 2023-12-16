@@ -15,7 +15,8 @@ class Loader:
     def load(self) -> Config:
         tg_bot = self.load_tg_bot()
         db = self.load_db_config()
-        return Config(tg_bot, db)
+        env = self.config.get('env', 'local')
+        return Config(tg_bot, db, env)
 
     @staticmethod
     def _assert_not_none(val: Any, name: str, type_: type = None, ):

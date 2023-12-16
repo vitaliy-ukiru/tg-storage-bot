@@ -8,7 +8,7 @@ from typing import Protocol, TypeVar, Sequence
 
 from sqlalchemy import ColumnExpressionArgument
 
-from app.infrastructure.db import File as FileModel
+from app.infrastructure.db.models import File as FileModel
 from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.file import FileType
 from app.core.domain.models.user import UserId, User

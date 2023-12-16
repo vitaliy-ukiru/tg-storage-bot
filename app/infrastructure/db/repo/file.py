@@ -11,7 +11,7 @@ from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.file import FilterField, FileRepository
-from app.infrastructure.db import File as FileModel
+from app.infrastructure.db import models
 from .filters.file_filters import Registry
 
 T = TypeVar("T")
@@ -33,7 +33,7 @@ class FileStorage(FileRepository):
 
     async def save_file(self, file: File) -> FileId:
         async with self._pool() as session:
-            db_file = FileModel(
+            db_file = models.File(
                 remote_id=file.remote_file_id,
                 user_id=file.user_id,
                 type_id=file.type,
@@ -54,19 +54,22 @@ class FileStorage(FileRepository):
 
     async def get_file(self, file_id: FileId) -> File:
         async with self._pool() as session:
-            db_file: FileModel | None = await session.get(FileModel, file_id,
-                                                          options=[joinedload(FileModel.category)])
+            db_file: models.File | None = await session.get(
+                models.File,
+                file_id,
+                options=[joinedload(models.File.category)]
+            )
             if db_file is None:
                 raise FileNotFound(file_id)
             return db_file.to_domain()
 
     async def find_files(self, filters: Sequence[FilterField]) -> list[File]:
         async with self._pool() as session:
-            sql = select(FileModel)
+            sql = select(models.File)
             for f in filters:
                 sql = sql.where(filter_convert(f))
 
-            sql = sql.options(joinedload(FileModel.category))
+            sql = sql.options(joinedload(models.File.category))
             res = await session.execute(sql)
             files = res.scalars()
             return [
@@ -77,7 +80,7 @@ class FileStorage(FileRepository):
 
     async def update_file(self, file: File):
         async with self._pool() as session:
-            model: FileModel | None = await session.get(FileModel, int(file.id))
+            model: models.File | None = await session.get(models.File, int(file.id))
             if model is None:
                 raise FileNotFound(file.id)
 
@@ -97,15 +100,15 @@ class FileStorage(FileRepository):
 
     async def delete_file(self, file_id: FileId):
         async with self._pool() as session:
-            sql = delete(FileModel).where(FileModel.id == int(file_id))
+            sql = delete(models.File).where(models.File.id == int(file_id))
             await session.execute(sql)
             await session.commit()
 
     async def get_categories_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
         async with self._pool() as session:
-            sql = (select(FileModel.category_id, count().label("rate")).
-                   where(FileModel.user_id == user_id).
-                   group_by(FileModel.category_id))
+            sql = (select(models.File.category_id, count().label("rate")).
+                   where(models.File.user_id == user_id).
+                   group_by(models.File.category_id))
             res = await session.execute(sql)
 
             return {

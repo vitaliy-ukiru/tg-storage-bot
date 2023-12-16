@@ -8,7 +8,7 @@ from app.core.interfaces.repository.user import UserRepository
 from app.core.domain.models.user import User
 from app.core.domain.exceptions.user import UserAlreadyExists
 
-from app.infrastructure.db import User as UserModel
+from app.infrastructure.db import models
 
 
 class UserStorage(UserRepository):
@@ -19,7 +19,7 @@ class UserStorage(UserRepository):
 
     async def save_user(self, user_id: int) -> User:
         async with self._pool() as session:
-            db_user = UserModel(id=user_id)
+            db_user = models.User(id=user_id)
             try:
                 session.add(db_user)
                 await session.commit()
@@ -31,7 +31,7 @@ class UserStorage(UserRepository):
 
     async def get_user(self, user_id: int) -> Optional[User]:
         async with self._pool() as session:
-            db_user: UserModel | None = await session.get(UserModel, user_id)
+            db_user: models.User | None = await session.get(models.User, user_id)
             if db_user is None:
                 return None
 
@@ -39,7 +39,7 @@ class UserStorage(UserRepository):
 
     async def restore_user(self, user_id: int) -> Optional[User]:
         async with self._pool() as session:
-            user: UserModel | None = await session.get(UserModel, user_id)
+            user: models.User | None = await session.get(models.User, user_id)
             if user is None:
                 return None
 
@@ -49,7 +49,7 @@ class UserStorage(UserRepository):
 
     async def delete_user(self, user_id: int) -> Optional[User]:
         async with self._pool() as session:
-            user: UserModel | None = await session.get(UserModel, user_id)
+            user: models.User | None = await session.get(models.User, user_id)
             if user is None:
                 return None
 

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.category import CategoryRepository
-from app.infrastructure.db import Category as CategoryModel
+from app.infrastructure.db import models
 
 
 class CategoryStorage(CategoryRepository):
@@ -17,7 +17,7 @@ class CategoryStorage(CategoryRepository):
 
     async def save_category(self, c: Category) -> CategoryId:
         async with self._pool() as session:
-            db_category = CategoryModel(
+            db_category = models.Category(
                 user_id=int(c.user_id),
                 title=c.title,
                 created_at=c.created_at,
@@ -29,11 +29,14 @@ class CategoryStorage(CategoryRepository):
 
     async def get_category(self, category_id: CategoryId) -> Optional[Category]:
         async with self._pool() as session:
-            category: Optional[CategoryModel] = await session.get(CategoryModel, int(category_id))
+            category: Optional[models.Category] = await session.get(
+                models.Category,
+                int(category_id)
+            )
             return category.to_domain() if category else None
 
     async def find_user_categories(self, user_id: UserId) -> list[Category]:
-        sql = select(CategoryModel).where(CategoryModel.user_id == user_id)
+        sql = select(models.Category).where(models.Category.user_id == user_id)
         async with self._pool() as session:
             res = await session.execute(sql)
             categories = res.scalars()
@@ -43,9 +46,9 @@ class CategoryStorage(CategoryRepository):
             ]
 
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
-        sql = (select(CategoryModel).where(
-            CategoryModel.user_id == user_id,
-            CategoryModel.title.icontains(title_mask),
+        sql = (select(models.Category).where(
+            models.Category.user_id == user_id,
+            models.Category.title.icontains(title_mask),
         ))
 
         async with self._pool() as session:

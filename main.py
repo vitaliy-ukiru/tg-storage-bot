@@ -5,6 +5,7 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import setup_dialogs
+from environs import Env
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from app.bot.handlers.dialogs.setup import router as get_dialog_router
@@ -14,7 +15,8 @@ from app.bot.middlewares import UserMiddleware
 from app.bot.middlewares import FileUploaderMiddleware
 from app.bot.middlewares.proxy_middlewares import (CategoryProxyMiddleware,
                                                    FileProxyMiddleware)
-from app.infrastructure.db import DSN
+from app.common.config import Loader
+from app.infrastructure.db.config import to_dsn
 from app.infrastructure.db.repo.category import CategoryStorage
 from app.infrastructure.db.repo.file import FileStorage
 from app.infrastructure.db.repo.user import UserStorage
@@ -22,16 +24,20 @@ from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
 
-API_TOKEN = os.getenv("BOT_TOKEN")
 
 
 async def main():
-    engine = create_async_engine(DSN, echo=True)
+    env = Env()
+    env.read_env()
+
+    loader = Loader.read(env=env)
+    cfg = loader.load()
+    engine = create_async_engine(to_dsn(cfg.db), echo=True)
     session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
     logging.basicConfig(level=logging.INFO)
     storage = MemoryStorage()
-    bot = Bot(token=API_TOKEN)
+    bot = Bot(token=cfg.tg_bot.token)
     dp = Dispatcher(storage=storage)
 
     user_repo = UserStorage(session_maker)

@@ -1,0 +1,5 @@
+database:
+  username: "py-tg"
+  database: "tg-storage"
+  password: "py-tg"
+  host: "localhost"

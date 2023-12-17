@@ -36,9 +36,3 @@ class FileAccessDenied(FileException):
         self.user = user
         super().__init__(file_id, f"user don't own file {user!r}")
 
-class InvalidFilterError(DomainException):
-    filter_name: str
-
-    def __init__(self, filter_name: str) -> None:
-        self.filter_name = filter_name
-        super().__init__(f"unknown filter {filter_name!r} ")

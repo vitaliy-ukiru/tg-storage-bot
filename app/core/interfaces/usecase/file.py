@@ -22,7 +22,7 @@ class FileUsecase(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_files(self, *filters: FilterField, dto: FilesFindDTO) -> list[File]:
+    async def find_files(self, *filters: FilterField, dto: FilesFindDTO = None) -> list[File]:
         raise NotImplementedError
 
     @abc.abstractmethod

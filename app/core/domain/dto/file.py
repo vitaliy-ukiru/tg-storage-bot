@@ -21,16 +21,8 @@ class ReloadFileDTO:
 
 
 @dataclass(frozen=True)
-class FilterDTO:
+class FilesFindDTO:
     user_id: int
     category_id: Optional[int] = None
     file_types: Optional[Sequence[FileType]] = None
     title_match: Optional[str] = None
-
-    def as_tuple(self):
-        return (
-            ("user_id", self.user_id),
-            ("category_id", self.category_id),
-            ("file_types", self.file_types),
-            ("title_match", self.title_match)
-        )

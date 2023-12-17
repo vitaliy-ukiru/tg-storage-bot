@@ -1,15 +1,17 @@
 import abc
+from dataclasses import asdict
 from datetime import datetime
 from typing import Protocol, Sequence
 
-from app.core.interfaces.repository.file import FilterField, FileRepository
-from app.core.interfaces.usecase.file import FileUsecase
-from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilterDTO
+from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
 from app.core.domain.exceptions.category import CategoryViolation
 from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.file import File, FileId, RemoteFileId, FileType
 from app.core.domain.models.user import UserId
+from app.core.interfaces.repository.file import FilterField, FileRepository
+from app.core.interfaces.usecase.file import FileUsecase
+from app.core.internal.filter_merger import FilterMerger
 
 
 class CategoryGetter(Protocol):
@@ -18,7 +20,7 @@ class CategoryGetter(Protocol):
         raise NotImplementedError
 
 
-class Filters:
+class Filters(FilterMerger):
     @classmethod
     def file_types(cls, *value: FileType) -> FilterField[Sequence[FileType]]:
         return FilterField("file_types", value)
@@ -35,25 +37,6 @@ class Filters:
     def title_match(cls, value: str) -> FilterField[str]:
         return FilterField("title_match", value)
 
-    @classmethod
-    def from_dto(cls, dto: FilterDTO) -> list[FilterField]:
-        return [
-            FilterField(name, value)
-            for name, value in dto.as_tuple()
-            if value is not None
-        ]
-
-    @classmethod
-    def merge_filters(cls, dto: FilterDTO, native_filters: Sequence[FilterField]):
-        filters = {}
-        for f in native_filters:
-            filters[f.name] = f
-
-        for f in cls.from_dto(dto):
-            filters[f.name] = f  # override
-
-        return list(filters.values())
-
 
 UNDEFINED_FILE_ID = FileId(0)
 
@@ -64,10 +47,6 @@ def _ensure_owner(file: File, user_id: UserId = None):
 
     if file.user_id != user_id:
         raise FileAccessDenied(file.id, user_id)
-
-
-class InvalidUserError:
-    pass
 
 
 class FileService(FileUsecase):
@@ -136,10 +115,10 @@ class FileService(FileUsecase):
 
         await self._repo.delete_file(file_id)
 
-    async def find_files(self, *filters: FilterField, dto: FilterDTO) -> list[File]:
-        if dto.user_id == 0:
-            raise InvalidUserError
+    async def find_files(self, *filters: FilterField, dto: FilesFindDTO = None) -> list[File]:
+        dto_items = asdict(dto) if dto else None
+        filters = Filters.merge_filters(dto_items, filters)
+        Filters.ensure_have_user_id(filters)
 
-        filters = Filters.merge_filters(dto, filters)
         files = await self._repo.find_files(filters)
         return files

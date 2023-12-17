@@ -2,12 +2,31 @@ import abc
 from datetime import datetime
 from typing import Protocol
 
+from dataclasses import asdict
+
+from app.core.domain.exceptions.base import UserNotProvidedError
 from app.core.interfaces.repository.category import CategoryRepository
+from app.core.interfaces.repository.file import FilterField
 from app.core.interfaces.usecase.category import CategoryUsecase
-from app.core.domain.dto.category import CreateCategoryDTO
+from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
+from app.core.internal.filter_merger import FilterMerger
+
+
+class Filters(FilterMerger):
+    @classmethod
+    def user_id(cls, value: UserId | int) -> FilterField[UserId | int]:
+        return FilterField("user_id", value)
+
+    @classmethod
+    def title_match(cls, value: str) -> FilterField[str]:
+        return FilterField("title_match", value)
+
+    @classmethod
+    def favorites(cls, favorites: bool = True) -> FilterField[bool]:
+        return FilterField("favorites", favorites)
 
 
 class CategoryRate(Protocol):
@@ -46,9 +65,20 @@ class CategoryService(CategoryUsecase):
 
         return c
 
+    async def find_categories(self,
+                              *filters: FilterField,
+                              dto: CategoriesFindDTO = None) -> list[Category]:
+        dto_items = asdict(dto) if dto else None
+
+        filters = Filters.merge_filters(dto_items, filters)
+        Filters.ensure_have_user_id(filters)
+
+        categories = await self._repo.find_categories(filters)
+        return categories
+
     async def find_popular(self, user_id: UserId) -> list[Category]:
         # return await self._repo.find_top_5_popular(user_id)
-        categories = await self._repo.find_user_categories(user_id)
+        categories = await self.find_categories(Filters.user_id(user_id))
         if len(categories) == 0:
             return categories
 
@@ -63,7 +93,10 @@ class CategoryService(CategoryUsecase):
         return categories
 
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
-        return await self._repo.find_by_title(user_id, title_mask)
+        return await self.find_categories(dto=CategoriesFindDTO(user_id=user_id, title_match=title_mask))
 
     async def find_favorites(self, user_id: UserId) -> list[Category]:
-        return await self._repo.find_favorites_categories(user_id)
+        return await self.find_categories(
+            Filters.user_id(user_id),
+            Filters.favorites()
+        )

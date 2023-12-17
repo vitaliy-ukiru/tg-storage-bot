@@ -5,7 +5,7 @@ import abc
 from typing import Protocol
 
 from app.core.interfaces.repository.file import FilterField
-from app.core.domain.dto.file import CreateFileDTO, FilterDTO, ReloadFileDTO
+from app.core.domain.dto.file import CreateFileDTO, FilesFindDTO, ReloadFileDTO
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
@@ -22,7 +22,7 @@ class FileUsecase(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_files(self, *filters: FilterField, dto: FilterDTO) -> list[File]:
+    async def find_files(self, *filters: FilterField, dto: FilesFindDTO) -> list[File]:
         raise NotImplementedError
 
     @abc.abstractmethod

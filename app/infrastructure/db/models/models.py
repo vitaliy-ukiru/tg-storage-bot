@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Optional, cast
 
 from .base import Base
-from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity
+from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
@@ -52,6 +52,7 @@ class Category(Base):
 
     title: Mapped[str]
     description: Mapped[Optional[str]]
+    is_favorite: Mapped[bool] = mapped_column(server_default=false())
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     def to_domain(self) -> DCategory:

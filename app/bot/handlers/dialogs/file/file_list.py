@@ -14,7 +14,7 @@ from app.bot.widgets import BackTo, BACK_TEXT_RU
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_str import file_types_with_names, get_file_type_name
-from app.core.domain.dto.file import FilterDTO
+from app.core.domain.dto.file import FilesFindDTO
 from app.core.domain.models.file import FileType
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -40,8 +40,8 @@ async def _process_click_file(_: CallbackQuery, __: Select, manager: DialogManag
     await execute.file_view(manager, item_id, data=dict(opened_over=True))
 
 
-def _to_dto(user_id: int, filters: dict[str, Any]) -> FilterDTO:
-    return FilterDTO(
+def _to_dto(user_id: int, filters: dict[str, Any]) -> FilesFindDTO:
+    return FilesFindDTO(
         user_id=user_id,
         category_id=filters.get('category_id'),
         file_types=filters.get('file_types'),

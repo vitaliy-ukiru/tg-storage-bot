@@ -1,28 +1,18 @@
-from typing import TypeVar, Sequence
+from typing import Sequence
 
 from asyncpg import UniqueViolationError
-from sqlalchemy import select, ColumnExpressionArgument, delete
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.functions import count
 
-from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound, InvalidFilterError
+from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.file import FilterField, FileRepository
 from app.infrastructure.db import models
-from .filters.file_filters import Registry
-
-T = TypeVar("T")
-
-
-def filter_convert(f: FilterField[T]) -> ColumnExpressionArgument[bool]:
-    filter_func = Registry.get(f.name)
-    if filter_func is None:
-        raise InvalidFilterError(f.name)
-
-    return filter_func(f.value)
+from .filters import Registry
 
 
 class FileStorage(FileRepository):
@@ -67,7 +57,7 @@ class FileStorage(FileRepository):
         async with self._pool() as session:
             sql = select(models.File)
             for f in filters:
-                sql = sql.where(filter_convert(f))
+                sql = sql.where(Registry.files.convert(f))
 
             sql = sql.options(joinedload(models.File.category))
             res = await session.execute(sql)
@@ -106,9 +96,11 @@ class FileStorage(FileRepository):
 
     async def get_categories_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
         async with self._pool() as session:
-            sql = (select(models.File.category_id, count().label("rate")).
-                   where(models.File.user_id == user_id).
-                   group_by(models.File.category_id))
+            sql = (
+                select(models.File.category_id, count().label("rate")).
+                where(models.File.user_id == user_id).
+                group_by(models.File.category_id)
+            )
             res = await session.execute(sql)
 
             return {

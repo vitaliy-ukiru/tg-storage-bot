@@ -64,3 +64,6 @@ class CategoryService(CategoryUsecase):
 
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
         return await self._repo.find_by_title(user_id, title_mask)
+
+    async def find_favorites(self, user_id: UserId) -> list[Category]:
+        return await self._repo.find_favorites_categories(user_id)

@@ -14,10 +14,4 @@ class Category:
     title: str
     created_at: datetime
     description: Optional[str] = None
-
-    @classmethod
-    def from_category_id(cls,
-                         category_id: CategoryId,
-                         user_id: UserId = 0,
-                         title: str = '') -> 'Category':
-        return cls(category_id, user_id, title, datetime.now())
+    is_favorite: bool = False

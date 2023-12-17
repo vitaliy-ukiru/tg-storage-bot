@@ -45,6 +45,23 @@ class CategoryStorage(CategoryRepository):
                 for c in categories
             ]
 
+    async def find_favorites_categories(self, user_id: UserId) -> list[Category]:
+        sql = (
+            select(models.Category).
+            where(
+                models.Category.user_id == user_id,
+                models.Category.is_favorite == True
+            )
+        )
+
+        async with self._pool() as session:
+            res = await session.execute(sql)
+            categories = res.scalars()
+            return [
+                c.to_domain()
+                for c in categories
+            ]
+
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
         sql = (select(models.Category).where(
             models.Category.user_id == user_id,

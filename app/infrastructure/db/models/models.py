@@ -57,11 +57,12 @@ class Category(Base):
 
     def to_domain(self) -> DCategory:
         return DCategory(
-            self.id,
-            self.user_id,
-            self.title,
-            self.created_at,
-            self.description,
+            id=self.id,
+            user_id=self.user_id,
+            title=self.title,
+            description=self.description,
+            is_favorite=self.is_favorite,
+            created_at=self.created_at,
         )
 
     @classmethod
@@ -72,6 +73,7 @@ class Category(Base):
             title=c.title,
             created_at=c.created_at,
             description=c.description,
+            is_favorite=c.is_favorite,
         )
 
 

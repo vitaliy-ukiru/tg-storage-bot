@@ -22,5 +22,9 @@ class CategoryRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
+    async def find_favorites_categories(self, user_id: UserId) -> list[Category]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
         raise NotImplementedError

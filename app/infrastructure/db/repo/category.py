@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -6,7 +6,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.category import CategoryRepository
+from app.core.interfaces.repository.file import FilterField
 from app.infrastructure.db import models
+from app.infrastructure.db.repo.filters import Registry
 
 
 class CategoryStorage(CategoryRepository):
@@ -75,3 +77,13 @@ class CategoryStorage(CategoryRepository):
                 c.to_domain()
                 for c in categories
             ]
+
+    async def find_categories(self, filters: Sequence[FilterField]) -> list[Category]:
+        async with self._pool() as session:
+            sql = select(models.File)
+            for f in filters:
+                sql = sql.where(Registry.categories.convert(f))
+
+            res = await session.execute(sql)
+            categories = res.scalars()
+            return [c.to_domain() for c in categories]

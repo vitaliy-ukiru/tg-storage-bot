@@ -2,10 +2,10 @@ __all__ = (
     'CategoryRepository',
 )
 import abc
-from typing import Protocol, Optional
+from typing import Protocol, Optional, Sequence
 
 from app.core.domain.models.category import Category, CategoryId
-from app.core.domain.models.user import UserId
+from app.core.interfaces.repository.file import FilterField
 
 
 class CategoryRepository(Protocol):
@@ -18,13 +18,5 @@ class CategoryRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_user_categories(self, user_id: UserId) -> list[Category]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def find_favorites_categories(self, user_id: UserId) -> list[Category]:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
+    async def find_categories(self, filters: Sequence[FilterField]) -> list[Category]:
         raise NotImplementedError

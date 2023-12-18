@@ -27,7 +27,7 @@ database:
 pip install -r requirements
 ```
 ### Установите миграции.
-[Подброные инструкции](./app/infrastructure/db/migrations/README.md)
+[Подробные инструкции](./app/infrastructure/db/migrations/README.md)
 ```
 alembic upgrade head
 ```

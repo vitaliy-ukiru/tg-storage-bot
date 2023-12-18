@@ -8,9 +8,7 @@ from aiogram_dialog import setup_dialogs
 from environs import Env
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from app.bot.handlers.dialogs.setup import router as get_dialog_router
-from app.bot.handlers.users.files.list import router as list_router
-from app.bot.handlers.users.files.upload import router as upload_router
+from app.bot.handlers import dialogs, users
 from app.bot.middlewares import UserMiddleware
 from app.bot.middlewares import FileUploaderMiddleware
 from app.bot.middlewares.proxy_middlewares import (CategoryProxyMiddleware,
@@ -53,15 +51,13 @@ async def main():
     file_service = FileService(file_repo, category_service)
 
     dp.update.middleware(UserMiddleware(user_service))
-    upload_router.message.middleware(FileUploaderMiddleware(file_service))
     dp.update.middleware(FileProxyMiddleware(file_service))
     dp.update.middleware(CategoryProxyMiddleware(category_service))
 
-    dp.include_routers(
-        upload_router,
-        list_router,
-    )
-    dp.include_router(get_dialog_router())
+    dp.message.middleware(FileUploaderMiddleware(file_service))
+
+    users.setup(dp)
+    dialogs.setup(dp)
 
     # dp.message.register(start, CommandStart())
     setup_dialogs(dp)

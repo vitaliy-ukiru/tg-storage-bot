@@ -7,8 +7,11 @@ from app.bot.filters.media import MediaFilter
 from app.bot.handlers.dialogs import execute
 from app.bot.utils.uploader import FileUploader
 
-router = Router(name="base-upload-files")
-
+router = Router()
+@router.message(Command("list"))
+async def command_list(msg: Message, dialog_manager: DialogManager):
+    del msg # unused
+    await execute.file_list(dialog_manager, mode=StartMode.RESET_STACK)
 
 @router.message(MediaFilter(), StateFilter(None))
 async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manager: DialogManager):

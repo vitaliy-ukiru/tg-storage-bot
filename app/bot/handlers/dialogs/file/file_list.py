@@ -82,10 +82,6 @@ class FileTypeItem(NamedTuple):
     value: FileType
 
 
-def str_to_file_type(item_id: str) -> FileType:
-    return FileType(item_id)
-
-
 async def _process_state_file_type(_: CallbackQuery, select: ManagedMultiselect, manager: DialogManager,
                                    __: FileType):
     filters = manager.dialog_data.setdefault("filters", {})
@@ -219,7 +215,7 @@ file_list_dialog = Dialog(
                 Format("✓ {item.name}"),
                 Format("{item.name}"),
                 id=SELECT_FILE_TYPES_ID,
-                type_factory=str_to_file_type,
+                type_factory=lambda s: FileType(s),
                 on_state_changed=_process_state_file_type,
                 item_id_getter=lambda file_type: file_type.value,
                 items="file_types",

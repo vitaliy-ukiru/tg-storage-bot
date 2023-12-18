@@ -29,6 +29,11 @@ class CategoryCreateSG(StatesGroup):
     menu_idle = State()
     input_desc = State()
 
+class CategoryEditSG(StatesGroup):
+    main = State()
+    title = State()
+    desc = State()
+
 
 class FileListSG(StatesGroup):
     main = State()

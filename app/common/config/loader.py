@@ -50,6 +50,8 @@ class Loader:
         database = _get_env(config.get('database'), 'DB_DATABASE')
         host = _get_env(config.get('host'), 'DB_HOST')
         port = _get_env(config.get('port'), 'DB_PORT', env.int)
+        if port is not None and not isinstance(port, int):
+            raise ValueError("Port must be integer")
 
         self._assert_not_none(username, 'username', str)
         self._assert_not_none(database, 'database', str)

@@ -5,7 +5,7 @@ __all__ = (
 import abc
 from typing import Protocol
 
-from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO
+from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.file import FilterField
@@ -18,6 +18,10 @@ class CategoryUsecase(Protocol):
 
     @abc.abstractmethod
     async def get_category(self, category_id: CategoryId) -> Category:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    async def update_category(self, dto: UpdateCategoryDTO) -> Category:
         raise NotImplementedError
 
     @abc.abstractmethod

@@ -18,5 +18,9 @@ class CategoryRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
+    async def update_category(self, category: Category):
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def find_categories(self, filters: Sequence[FilterField]) -> list[Category]:
         raise NotImplementedError

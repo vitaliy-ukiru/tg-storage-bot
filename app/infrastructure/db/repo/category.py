@@ -3,6 +3,7 @@ from typing import Optional, Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.category import CategoryRepository
@@ -37,47 +38,6 @@ class CategoryStorage(CategoryRepository):
             )
             return category.to_domain() if category else None
 
-    async def find_user_categories(self, user_id: UserId) -> list[Category]:
-        sql = select(models.Category).where(models.Category.user_id == user_id)
-        async with self._pool() as session:
-            res = await session.execute(sql)
-            categories = res.scalars()
-            return [
-                c.to_domain()
-                for c in categories
-            ]
-
-    async def find_favorites_categories(self, user_id: UserId) -> list[Category]:
-        sql = (
-            select(models.Category).
-            where(
-                models.Category.user_id == user_id,
-                models.Category.is_favorite == True
-            )
-        )
-
-        async with self._pool() as session:
-            res = await session.execute(sql)
-            categories = res.scalars()
-            return [
-                c.to_domain()
-                for c in categories
-            ]
-
-    async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
-        sql = (select(models.Category).where(
-            models.Category.user_id == user_id,
-            models.Category.title.icontains(title_mask),
-        ))
-
-        async with self._pool() as session:
-            res = await session.execute(sql)
-            categories = res.scalars()
-            return [
-                c.to_domain()
-                for c in categories
-            ]
-
     async def find_categories(self, filters: Sequence[FilterField]) -> list[Category]:
         async with self._pool() as session:
             sql = select(models.File)
@@ -87,3 +47,20 @@ class CategoryStorage(CategoryRepository):
             res = await session.execute(sql)
             categories = res.scalars()
             return [c.to_domain() for c in categories]
+
+    async def update_category(self, category: Category):
+        async with self._pool() as session:
+            model: models.Category | None = await session.get(models.Category, int(category.id))
+            if model is None:
+                raise CategoryNotFound(category.id)
+
+            if category.title != model.title:
+                model.title = category.title
+
+            if category.description != model.description:
+                model.description = category.description
+
+            if category.is_favorite != model.is_favorite:
+                model.is_favorite = category.is_favorite
+
+            await session.commit()

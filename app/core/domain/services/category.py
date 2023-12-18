@@ -8,7 +8,7 @@ from app.core.domain.exceptions.base import UserNotProvidedError
 from app.core.interfaces.repository.category import CategoryRepository
 from app.core.interfaces.repository.file import FilterField
 from app.core.interfaces.usecase.category import CategoryUsecase
-from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO
+from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
@@ -100,3 +100,20 @@ class CategoryService(CategoryUsecase):
             Filters.user_id(user_id),
             Filters.favorites()
         )
+
+    async def update_category(self, dto: UpdateCategoryDTO) -> Category:
+        category = await self.get_category(dto.category_id)
+        if dto.title is not None:
+            category.title = dto.title
+
+        if dto.desc is not None:
+            category.description = dto.desc
+
+        if dto.delete_desc:
+            category.description = None
+
+        if dto.favorite is not None:
+            category.is_favorite = dto.favorite
+
+        await self._repo.update_category(category)
+        return category

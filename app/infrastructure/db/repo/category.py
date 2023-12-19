@@ -40,7 +40,7 @@ class CategoryStorage(CategoryRepository):
 
     async def find_categories(self, filters: Sequence[FilterField]) -> list[Category]:
         async with self._pool() as session:
-            sql = select(models.File)
+            sql = select(models.Category)
             for f in filters:
                 sql = sql.where(Registry.categories.convert(f))
 

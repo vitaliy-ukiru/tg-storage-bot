@@ -10,7 +10,8 @@ from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.file import FilterField, FileRepository
+from app.core.interfaces.repository.file import FileRepository
+from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
 from .filters import Registry
 

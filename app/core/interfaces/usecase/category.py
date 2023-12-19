@@ -8,7 +8,7 @@ from typing import Protocol
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.file import FilterField
+from app.core.interfaces.repository.common import FilterField
 
 
 class CategoryUsecase(Protocol):

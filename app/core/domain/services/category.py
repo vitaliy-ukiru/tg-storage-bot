@@ -1,17 +1,15 @@
 import abc
+from dataclasses import asdict
 from datetime import datetime
 from typing import Protocol
 
-from dataclasses import asdict
-
-from app.core.domain.exceptions.base import UserNotProvidedError
-from app.core.interfaces.repository.category import CategoryRepository
-from app.core.interfaces.repository.file import FilterField
-from app.core.interfaces.usecase.category import CategoryUsecase
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
+from app.core.interfaces.repository.category import CategoryRepository
+from app.core.interfaces.repository.common import FilterField
+from app.core.interfaces.usecase.category import CategoryUsecase
 from app.core.internal.filter_merger import FilterMerger
 
 

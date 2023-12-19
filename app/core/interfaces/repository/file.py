@@ -1,21 +1,12 @@
 __all__ = (
     'FileRepository',
-    'FilterField',
 )
 
 import abc
-from dataclasses import dataclass
-from typing import TypeVar, Generic, Protocol, Sequence
+from typing import Protocol, Sequence
 
 from app.core.domain.models.file import File, FileId
-
-T = TypeVar("T")
-
-
-@dataclass(frozen=True)
-class FilterField(Generic[T]):
-    name: str
-    value: T
+from app.core.interfaces.repository.common import FilterField
 
 
 class FileRepository(Protocol):

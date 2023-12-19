@@ -3,7 +3,7 @@ from typing import TypeVar
 from sqlalchemy import ColumnExpressionArgument
 
 from app.core.domain.exceptions.base import InvalidFilterError
-from app.core.interfaces.repository.file import FilterField
+from app.core.interfaces.repository.common import FilterField
 from .base import Filter
 
 T = TypeVar('T')

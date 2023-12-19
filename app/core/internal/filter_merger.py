@@ -1,7 +1,7 @@
 from typing import Any, Sequence, Optional
 
 from app.core.domain.exceptions.base import UserNotProvidedError
-from app.core.interfaces.repository.file import FilterField
+from app.core.interfaces.repository.common import FilterField
 
 
 class FilterMerger:

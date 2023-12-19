@@ -5,7 +5,7 @@ import abc
 from typing import Protocol, Optional, Sequence
 
 from app.core.domain.models.category import Category, CategoryId
-from app.core.interfaces.repository.file import FilterField
+from app.core.interfaces.repository.common import FilterField
 
 
 class CategoryRepository(Protocol):

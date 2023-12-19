@@ -9,7 +9,8 @@ from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.file import File, FileId, RemoteFileId, FileType
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.file import FilterField, FileRepository
+from app.core.interfaces.repository.file import FileRepository
+from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.file import FileUsecase
 from app.core.internal.filter_merger import FilterMerger
 

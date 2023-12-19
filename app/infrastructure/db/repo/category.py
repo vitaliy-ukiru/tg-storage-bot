@@ -5,9 +5,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
-from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.category import CategoryRepository
-from app.core.interfaces.repository.file import FilterField
+from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
 from app.infrastructure.db.repo.filters import Registry
 

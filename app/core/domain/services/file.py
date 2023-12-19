@@ -1,13 +1,13 @@
 import abc
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol, Sequence
+from typing import Protocol
 
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
 from app.core.domain.exceptions.category import CategoryViolation
 from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId, Category
-from app.core.domain.models.file import File, FileId, RemoteFileId, FileType
+from app.core.domain.models.file import File, FileId, RemoteFileId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.file import FileRepository
 from app.core.interfaces.repository.common import FilterField
@@ -19,24 +19,6 @@ class CategoryGetter(Protocol):
     @abc.abstractmethod
     async def get_category(self, category_id: CategoryId) -> Category:
         raise NotImplementedError
-
-
-class Filters(FilterMerger):
-    @classmethod
-    def file_types(cls, *value: FileType) -> FilterField[Sequence[FileType]]:
-        return FilterField("file_types", value)
-
-    @classmethod
-    def user_id(cls, value: UserId | int) -> FilterField[UserId | int]:
-        return FilterField("user_id", value)
-
-    @classmethod
-    def category_id(cls, value: CategoryId | int) -> FilterField[CategoryId | int]:
-        return FilterField("category_id", value)
-
-    @classmethod
-    def title_match(cls, value: str) -> FilterField[str]:
-        return FilterField("title_match", value)
 
 
 UNDEFINED_FILE_ID = FileId(0)
@@ -118,8 +100,8 @@ class FileService(FileUsecase):
 
     async def find_files(self, *filters: FilterField, dto: FilesFindDTO = None) -> list[File]:
         dto_items = asdict(dto) if dto else None
-        filters = Filters.merge_filters(dto_items, filters)
-        Filters.ensure_have_user_id(filters)
+        filters = FilterMerger.merge(dto_items, filters)
+        FilterMerger.ensure_have_user_id(filters)
 
         files = await self._repo.find_files(filters)
         return files

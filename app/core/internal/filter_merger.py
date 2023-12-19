@@ -14,7 +14,7 @@ class FilterMerger:
         ]
 
     @classmethod
-    def merge_filters(cls, data: Optional[dict[str, Any]], native_filters: Sequence[FilterField]):
+    def merge(cls, data: Optional[dict[str, Any]], native_filters: Sequence[FilterField]):
         filters = {}
         for f in native_filters:
             filters[f.name] = f

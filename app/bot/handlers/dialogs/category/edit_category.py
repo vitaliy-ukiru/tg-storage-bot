@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput
@@ -15,6 +17,26 @@ _ON_START_SET_DATA = "__on_startup_setup"
 _FAVORITE_ID = "favorite"
 
 
+async def _update_category(
+    manager: DialogManager,
+    title: Optional[str] = None,
+    desc: Optional[str] = None,
+    delete_desc: Optional[bool] = None,
+    favorite: Optional[bool] = None,
+) -> Category:
+    category_service: CategoryUsecase = manager.middleware_data["category_service"]
+    category_id: CategoryId = manager.dialog_data["category_id"]
+    category = await category_service.update_category(UpdateCategoryDTO(
+        category_id=category_id,
+        title=title,
+        desc=desc,
+        delete_desc=delete_desc,
+        favorite=favorite
+    ))
+    manager.dialog_data["category"] = category
+    return category
+
+
 async def _get_category(manager: DialogManager) -> Category:
     category = manager.dialog_data.get("category")
     if isinstance(category, Category):
@@ -27,47 +49,27 @@ async def _get_category(manager: DialogManager) -> Category:
     manager.dialog_data["category"] = category
     return category
 
+
 async def _input_title_handler(m: Message, _: MessageInput, manager: DialogManager):
-    category_service: CategoryUsecase = manager.middleware_data["category_service"]
-    category_id: CategoryId = manager.dialog_data["category_id"]
-    manager.dialog_data["category"] = await category_service.update_category(UpdateCategoryDTO(
-        category_id=category_id,
-        title=m.text
-    ))
+    await _update_category(manager, title=m.text)
     await manager.switch_to(CategoryEditSG.main)
 
 
 async def _input_desc_handler(m: Message, _: MessageInput, manager: DialogManager):
-    category_service: CategoryUsecase = manager.middleware_data["category_service"]
-    category_id: CategoryId = manager.dialog_data["category_id"]
-    manager.dialog_data["category"] = await category_service.update_category(UpdateCategoryDTO(
-        category_id=category_id,
-        desc=m.text
-    ))
+    await _update_category(manager, desc=m.text)
     await manager.switch_to(CategoryEditSG.main)
-
 
 
 async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, manager: DialogManager):
     if event.data == _ON_START_SET_DATA:
         return
 
-    category_service: CategoryUsecase = manager.middleware_data["category_service"]
-    category_id: CategoryId = manager.dialog_data["category_id"]
-    manager.dialog_data["category"] = await category_service.update_category(UpdateCategoryDTO(
-        category_id=category_id,
-        favorite=m.is_checked()
-    ))
+    await _update_category(manager, favorite=m.is_checked())
     await manager.switch_to(CategoryEditSG.main)
 
 
 async def _process_delete_desc(_: CallbackQuery, __: Button, manager: DialogManager):
-    category_service: CategoryUsecase = manager.middleware_data["category_service"]
-    category_id: CategoryId = manager.dialog_data["category_id"]
-    manager.dialog_data["category"] = await category_service.update_category(UpdateCategoryDTO(
-        category_id=category_id,
-        delete_desc=True,
-    ))
+    await _update_category(manager, delete_desc=True)
     await manager.switch_to(CategoryEditSG.main)
 
 
@@ -80,16 +82,23 @@ async def _desc_window_getter(dialog_manager: DialogManager, **_):
     category = await _get_category(dialog_manager)
     return dict(have_desc=category is not None)
 
+
 async def _on_start(start_data: dict, manager: DialogManager):
     manager.dialog_data["category_id"] = start_data["category_id"]
     category = await _get_category(manager)
+
     if category.is_favorite:
         m: ManagedCheckbox = manager.find(_FAVORITE_ID)
         await m.widget.set_checked(
-            manager.event.model_copy(update=dict(data=_ON_START_SET_DATA)),
+            # for identification and not update in service
+            # see _process_click_favorite
+            manager.event.model_copy(
+                update=dict(data=_ON_START_SET_DATA)
+            ),
             True,
             manager
         )
+
 
 category_edit_dialog = Dialog(
     Window(

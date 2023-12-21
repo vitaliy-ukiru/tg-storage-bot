@@ -11,7 +11,7 @@ from aiogram.types import TelegramObject, User as TgUser
 from app.core.domain.models.user import UserId
 from app.core.domain.services.user import UserService
 
-USER_KEY = "user_obj"
+USER_KEY = "user"
 
 
 class UserMiddleware(BaseMiddleware):

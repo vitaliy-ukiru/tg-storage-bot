@@ -12,11 +12,7 @@ from app.common.config import TgBot
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
 
 
-def configure_bot(cfg: TgBot) -> Bot:
-    bot = Bot(token=cfg.token, parse_mode=ParseMode.HTML)
-    return bot
-
-def configure_dispatcher(
+def _configure_dp(
     user_service: UserUsecase,
     category_service: CategoryUsecase,
     file_service: FileUsecase,
@@ -34,3 +30,18 @@ def configure_dispatcher(
     # dp.message.register(start, CommandStart())
     setup_dialogs(dp)
     return dp
+
+class BotModule:
+    def __init__(
+        self,
+        cfg: TgBot,
+        user_service: UserUsecase,
+        category_service: CategoryUsecase,
+        file_service: FileUsecase,
+        storage: Optional[BaseStorage] = None,
+    ):
+        self.bot = Bot(token=cfg.token, parse_mode=ParseMode.HTML)
+        self.dp = _configure_dp(user_service, category_service, file_service, storage)
+
+    async def run(self):
+        return await self.dp.start_polling(self.bot)

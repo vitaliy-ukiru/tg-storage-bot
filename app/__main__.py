@@ -1,27 +1,19 @@
 import asyncio
 import logging
-import os
 
-from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram_dialog import setup_dialogs
 from environs import Env
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from app.bot.handlers import dialogs, users
-from app.bot.middlewares import UserMiddleware
-from app.bot.middlewares import FileUploaderMiddleware
-from app.bot.middlewares.proxy_middlewares import (CategoryProxyMiddleware,
-                                                   FileProxyMiddleware)
-from app.bot.setup import configure_bot, configure_dispatcher
+from app.bot.setup import BotModule
 from app.common.config import Loader
+from app.core.domain.services.category import CategoryService
+from app.core.domain.services.file import FileService
+from app.core.domain.services.user import UserService
 from app.infrastructure.db.config import to_dsn
 from app.infrastructure.db.repo.category import CategoryStorage
 from app.infrastructure.db.repo.file import FileStorage
 from app.infrastructure.db.repo.user import UserStorage
-from app.core.domain.services.category import CategoryService
-from app.core.domain.services.file import FileService
-from app.core.domain.services.user import UserService
 
 
 async def main():
@@ -47,16 +39,17 @@ async def main():
     category_service = CategoryService(category_repo, file_repo)
     file_service = FileService(file_repo, category_service)
 
-    bot = configure_bot(cfg.tg_bot)
-    dp = configure_dispatcher(
-        user_service,
+    tg_bot = BotModule(
+        cfg.tg_bot, user_service,
         category_service,
         file_service,
         MemoryStorage(),
     )
 
-    await dp.start_polling(bot)
-
+    await tg_bot.run()
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.info("shutdown")

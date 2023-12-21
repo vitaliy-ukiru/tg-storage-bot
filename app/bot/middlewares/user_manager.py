@@ -9,13 +9,13 @@ from aiogram.dispatcher.middlewares.user_context import EVENT_FROM_USER_KEY
 from aiogram.types import TelegramObject, User as TgUser
 
 from app.core.domain.models.user import UserId
-from app.core.domain.services.user import UserService
+from app.core.interfaces.usecase import UserUsecase
 
 USER_KEY = "user"
 
 
 class UserMiddleware(BaseMiddleware):
-    def __init__(self, svc: UserService):
+    def __init__(self, svc: UserUsecase):
         self.svc = svc
 
     async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],

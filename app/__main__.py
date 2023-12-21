@@ -13,6 +13,7 @@ from app.bot.middlewares import UserMiddleware
 from app.bot.middlewares import FileUploaderMiddleware
 from app.bot.middlewares.proxy_middlewares import (CategoryProxyMiddleware,
                                                    FileProxyMiddleware)
+from app.bot.setup import configure_bot, configure_dispatcher
 from app.common.config import Loader
 from app.infrastructure.db.config import to_dsn
 from app.infrastructure.db.repo.category import CategoryStorage
@@ -38,10 +39,6 @@ async def main():
         logging.basicConfig(level=logging.INFO)
     logging.info(f"env is {cfg.env!r}")
 
-    storage = MemoryStorage()
-    bot = Bot(token=cfg.tg_bot.token)
-    dp = Dispatcher(storage=storage)
-
     user_repo = UserStorage(session_maker)
     category_repo = CategoryStorage(session_maker)
     file_repo = FileStorage(session_maker)
@@ -50,16 +47,14 @@ async def main():
     category_service = CategoryService(category_repo, file_repo)
     file_service = FileService(file_repo, category_service)
 
-    dp.update.middleware(UserMiddleware(user_service))
-    dp.update.middleware(FileProxyMiddleware(file_service))
-    dp.update.middleware(CategoryProxyMiddleware(category_service))
-    dp.message.middleware(FileUploaderMiddleware(file_service))
+    bot = configure_bot(cfg.tg_bot)
+    dp = configure_dispatcher(
+        user_service,
+        category_service,
+        file_service,
+        MemoryStorage(),
+    )
 
-    users.setup(dp)
-    dialogs.setup(dp)
-
-    # dp.message.register(start, CommandStart())
-    setup_dialogs(dp)
     await dp.start_polling(bot)
 
 

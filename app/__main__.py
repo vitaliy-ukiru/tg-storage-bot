@@ -53,7 +53,6 @@ async def main():
     dp.update.middleware(UserMiddleware(user_service))
     dp.update.middleware(FileProxyMiddleware(file_service))
     dp.update.middleware(CategoryProxyMiddleware(category_service))
-
     dp.message.middleware(FileUploaderMiddleware(file_service))
 
     users.setup(dp)

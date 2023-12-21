@@ -13,15 +13,11 @@ from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.file import FileRepository
 from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
+from ._base import BaseRepository
 from .filters import Registry
 
 
-class FileStorage(FileRepository):
-    _pool: async_sessionmaker
-
-    def __init__(self, session_maker: async_sessionmaker):
-        self._pool = session_maker
-
+class FileStorage(BaseRepository, FileRepository):
     async def save_file(self, file: File) -> FileId:
         async with self._pool() as session:
             db_file = models.File(

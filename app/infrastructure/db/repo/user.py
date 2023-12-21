@@ -9,14 +9,10 @@ from app.core.domain.models.user import User
 from app.core.domain.exceptions.user import UserAlreadyExists
 
 from app.infrastructure.db import models
+from app.infrastructure.db.repo._base import BaseRepository
 
 
-class UserStorage(UserRepository):
-    _pool: async_sessionmaker
-
-    def __init__(self, session_maker: async_sessionmaker):
-        self._pool = session_maker
-
+class UserStorage(BaseRepository, UserRepository):
     async def save_user(self, user_id: int) -> User:
         async with self._pool() as session:
             db_user = models.User(id=user_id)

@@ -1,7 +1,6 @@
 from typing import Optional, Sequence
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
@@ -9,13 +8,10 @@ from app.core.interfaces.repository.category import CategoryRepository
 from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
 from app.infrastructure.db.repo.filters import Registry
+from ._base import BaseRepository
 
 
-class CategoryStorage(CategoryRepository):
-    _pool: async_sessionmaker
-
-    def __init__(self, session_maker: async_sessionmaker):
-        self._pool = session_maker
+class CategoryStorage(BaseRepository, CategoryRepository):
 
     async def save_category(self, c: Category) -> CategoryId:
         async with self._pool() as session:

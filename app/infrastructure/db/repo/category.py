@@ -2,6 +2,7 @@ from typing import Optional, Sequence
 
 from sqlalchemy import select
 
+from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.interfaces.repository.category import CategoryRepository
@@ -33,11 +34,15 @@ class CategoryStorage(BaseRepository, CategoryRepository):
             )
             return category.to_domain() if category else None
 
-    async def find_categories(self, filters: Sequence[FilterField]) -> list[Category]:
+    async def find_categories(self,
+                              filters: Sequence[FilterField],
+                              paginate: Optional[Pagination] = None) -> list[Category]:
         async with self._pool() as session:
             sql = select(models.Category)
             for f in filters:
                 sql = sql.where(Registry.categories.convert(f))
+
+            sql = self.apply_pagination(sql, paginate)
 
             res = await session.execute(sql)
             categories = res.scalars()

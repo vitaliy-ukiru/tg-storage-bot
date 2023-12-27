@@ -3,8 +3,9 @@ __all__ = (
 )
 
 import abc
-from typing import Protocol, Sequence
+from typing import Protocol, Sequence, Optional
 
+from app.core.domain.dto.common import Pagination
 from app.core.domain.models.file import File, FileId
 from app.core.interfaces.repository.common import FilterField
 
@@ -19,7 +20,8 @@ class FileRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_files(self, filters: Sequence[FilterField]) -> list[File]:
+    async def find_files(self, filters: Sequence[FilterField],
+                         paginate: Optional[Pagination] = None) -> list[File]:
         raise NotImplementedError
 
     @abc.abstractmethod

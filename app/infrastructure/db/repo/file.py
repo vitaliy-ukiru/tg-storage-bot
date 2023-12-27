@@ -1,17 +1,17 @@
-from typing import Sequence
+from typing import Sequence, Optional
 
 from asyncpg import UniqueViolationError
 from sqlalchemy import select, delete
-from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.functions import count
 
+from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.file import FileRepository
 from app.core.interfaces.repository.common import FilterField
+from app.core.interfaces.repository.file import FileRepository
 from app.infrastructure.db import models
 from ._base import BaseRepository
 from .filters import Registry
@@ -50,12 +50,15 @@ class FileStorage(BaseRepository, FileRepository):
                 raise FileNotFound(file_id)
             return db_file.to_domain()
 
-    async def find_files(self, filters: Sequence[FilterField]) -> list[File]:
+    async def find_files(self,
+                         filters: Sequence[FilterField],
+                         paginate: Optional[Pagination] = None) -> list[File]:
         async with self._pool() as session:
             sql = select(models.File)
             for f in filters:
                 sql = sql.where(Registry.files.convert(f))
 
+            sql = self.apply_pagination(sql, paginate)
             sql = sql.options(joinedload(models.File.category))
             res = await session.execute(sql)
             files = res.scalars()

@@ -33,7 +33,7 @@ async def _process_reload_file(m: Message, _: MessageInput, manager: DialogManag
     file_service = manager.middleware_data["file_service"]
     user: User = manager.middleware_data[USER_KEY]
 
-    await file_service.reload_file(file_id, cred.to_reload_dto(), user)
+    await file_service.reload_file(file_id, cred.to_reload_dto(), user.id)
     await manager.switch_to(FileEditSG.main)
 
 

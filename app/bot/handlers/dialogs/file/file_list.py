@@ -1,19 +1,24 @@
+import math
 from typing import Any, NamedTuple
 
 from aiogram.enums import ContentType
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager, Data
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Start, Select, Back, ScrollingGroup, SwitchTo, Group, Multiselect, \
-    ManagedMultiselect, Button, Row
+from aiogram_dialog.widgets.kbd import (
+    Start, Select, Back, SwitchTo, Group, Multiselect,
+    ManagedMultiselect, Button, Row, StubScroll, Column
+)
 from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from magic_filter import F
 
 from app.bot.handlers.dialogs import execute
-from app.bot.widgets import BackTo, BACK_TEXT_RU
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_str import file_types_with_names, get_file_type_name
+from app.bot.widgets import BackTo, BACK_TEXT_RU
+from app.bot.widgets.scroll import Navigation
+from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import FilesFindDTO
 from app.core.domain.models.file import FileType
 from app.core.domain.models.user import User
@@ -95,15 +100,6 @@ async def _process_input_title(m: Message, _: MessageInput, dialog_manager: Dial
     await dialog_manager.switch_to(FileListSG.main)
 
 
-async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUsecase, **_):
-    user: User = dialog_manager.middleware_data[USER_KEY]
-    filters = _to_dto(user.id, dialog_manager.dialog_data.get("filters", {}))
-    files = await file_service.find_files(dto=filters)
-    return {
-        "files": files,
-    }
-
-
 async def _process_delete_category(_: CallbackQuery, __: Button, manager: DialogManager):
     filters = manager.dialog_data["filters"]
     del filters["category_id"]
@@ -126,6 +122,28 @@ def file_types_names(data: dict) -> list[str]:
         for ft in data["dialog_data"]["filters"]["file_types"]
     ]
 
+
+async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUsecase, **_):
+    user: User = dialog_manager.middleware_data[USER_KEY]
+    filters = _to_dto(user.id, dialog_manager.dialog_data.get("filters", {}))
+    current_page = await dialog_manager.find(FILE_LIST_ID).get_page()
+
+    files, total_files = await file_service.find_files(
+        dto=filters,
+        paginate=Pagination(
+            FILES_PER_PAGE,
+            current_page * FILES_PER_PAGE,
+        ),
+        total_count=True
+    )
+    return {
+        "pages": math.ceil(total_files / FILES_PER_PAGE),
+        "files": files,
+    }
+
+
+FILES_PER_PAGE = 7
+FILE_LIST_ID = "file_list"
 
 _filters = F["dialog_data"]["filters"]
 
@@ -243,7 +261,7 @@ file_list_dialog = Dialog(
 
     Window(
         Const("Выберите файл из списка"),
-        ScrollingGroup(
+        Column(
             Select(
                 Format("{item.title}"),
                 id="select_file",
@@ -251,10 +269,12 @@ file_list_dialog = Dialog(
                 on_click=_process_click_file,
                 item_id_getter=lambda file: file.id,
                 items="files",
-            ),
-            id="file_list",
-            width=1,
-            height=7
+            )
+        ),
+        Navigation(FILE_LIST_ID),
+        StubScroll(
+            id=FILE_LIST_ID,
+            pages="pages",
         ),
         BackTo(FileListSG.main, BACK_TEXT_RU),
         state=FileListSG.file_list,

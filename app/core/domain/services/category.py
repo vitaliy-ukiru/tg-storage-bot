@@ -64,7 +64,6 @@ class CategoryService(CategoryUsecase):
         return categories
 
     async def find_popular(self, user_id: UserId) -> list[Category]:
-        # return await self._repo.find_top_5_popular(user_id)
         categories = await self.find_categories(CategoryFilters.user_id(user_id))
         if len(categories) == 0:
             return categories
@@ -80,16 +79,11 @@ class CategoryService(CategoryUsecase):
         return categories
 
     async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
-        return await self.find_categories(
-            CategoryFilters.user_id(user_id),
-            CategoryFilters.title_match(title_mask)
-        )
+        return await self.find_categories(CategoryFilters.user_id(user_id),
+                                          CategoryFilters.title_match(title_mask))
 
     async def find_favorites(self, user_id: UserId) -> list[Category]:
-        return await self.find_categories(
-            CategoryFilters.user_id(user_id),
-            CategoryFilters.favorites()
-        )
+        return await self.find_categories(CategoryFilters.user_id(user_id), CategoryFilters.favorites())
 
     async def update_category(self, dto: UpdateCategoryDTO) -> Category:
         category = await self.get_category(dto.category_id)

@@ -51,7 +51,6 @@ category_create_dialog = Dialog(
         ),
         Group(
             Row(
-
                 SwitchTo(
                     Const("📝 Название"),
                     id="create_category_edit_title",

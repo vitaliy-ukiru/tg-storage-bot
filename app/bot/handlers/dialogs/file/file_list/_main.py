@@ -61,7 +61,7 @@ _main_menu_text = Multi(
         text="Категория: {category_name}",
         when="category_name"
     ),
-),
+)
 
 
 def setup_button(

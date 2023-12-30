@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel, ScrollingGroup
 from aiogram_dialog.widgets.text import Const, Format
 
-from app.bot.widgets import BackTo, CANCEL_TEXT_RU, BACK_TEXT_RU
+from app.bot.widgets import BackTo, CANCEL_TEXT, BACK_TEXT
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import CategoryFindSG
 from app.core.common.filters.category import CategoryFilters
@@ -88,14 +88,14 @@ find_category_dialog = Dialog(
                 id="category_exists_find",
                 state=CategoryFindSG.input_title,
             ),
-            Cancel(CANCEL_TEXT_RU),
+            Cancel(CANCEL_TEXT),
         ),
         state=CategoryFindSG.main,
     ),
     Window(
         Const("Выберите категорию"),
         _scroll_categories,
-        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
+        BackTo(CategoryFindSG.main, BACK_TEXT),
         getter=_category_top_getter,
         state=CategoryFindSG.top
     ),
@@ -103,7 +103,7 @@ find_category_dialog = Dialog(
     Window(
         Const("Выберите категорию"),
         _scroll_categories,
-        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
+        BackTo(CategoryFindSG.main, BACK_TEXT),
         getter=_category_fav_getter,
         state=CategoryFindSG.favorites
     ),
@@ -111,7 +111,7 @@ find_category_dialog = Dialog(
     Window(
         Const("Введите часть названия категории"),
         MessageInput(_process_input_title),
-        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
+        BackTo(CategoryFindSG.main, BACK_TEXT),
         state=CategoryFindSG.input_title,
     ),
     Window(
@@ -120,7 +120,7 @@ find_category_dialog = Dialog(
             _select_category,
             width=2
         ),
-        BackTo(CategoryFindSG.main, BACK_TEXT_RU),
+        BackTo(CategoryFindSG.main, BACK_TEXT),
         state=CategoryFindSG.find,
         getter=_category_find_getter,
     )

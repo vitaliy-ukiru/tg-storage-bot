@@ -16,7 +16,7 @@ from app.bot.handlers.dialogs import execute
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_str import file_types_with_names, get_file_type_name
-from app.bot.widgets import BackTo, BACK_TEXT_RU
+from app.bot.widgets import BackTo, BACK_TEXT
 from app.bot.widgets.scroll import Navigation
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import FilesFindDTO
@@ -240,7 +240,7 @@ file_list_dialog = Dialog(
             ),
             width=1,
         ),
-        Back(BACK_TEXT_RU),
+        Back(BACK_TEXT),
         state=FileListSG.input_file_type,
         getter={
             "file_types": [
@@ -255,7 +255,7 @@ file_list_dialog = Dialog(
             _process_input_title,
             content_types=ContentType.TEXT,
         ),
-        BackTo(FileListSG.main, BACK_TEXT_RU),
+        BackTo(FileListSG.main, BACK_TEXT),
         state=FileListSG.input_file_title,
     ),
 
@@ -276,7 +276,7 @@ file_list_dialog = Dialog(
             id=FILE_LIST_ID,
             pages="pages",
         ),
-        BackTo(FileListSG.main, BACK_TEXT_RU),
+        BackTo(FileListSG.main, BACK_TEXT),
         state=FileListSG.file_list,
         getter=_files_find_getter
     ),

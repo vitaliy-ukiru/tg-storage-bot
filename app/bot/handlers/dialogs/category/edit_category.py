@@ -8,7 +8,7 @@ from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Ro
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
 from app.bot.states.dialogs import CategoryEditSG
-from app.bot.widgets import BACK_TEXT_RU, BackTo, CLOSE_TEXT_RU
+from app.bot.widgets import BACK_TEXT, BackTo, CLOSE_TEXT
 from app.core.domain.dto.category import UpdateCategoryDTO
 from app.core.domain.models.category import CategoryId, Category
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -127,7 +127,7 @@ category_edit_dialog = Dialog(
                 on_state_changed=_process_click_favorite
 
             ),
-            Cancel(CLOSE_TEXT_RU)
+            Cancel(CLOSE_TEXT)
         ),
         getter=menu_getter,
         state=CategoryEditSG.main,
@@ -135,7 +135,7 @@ category_edit_dialog = Dialog(
 
     Window(
         Const("Отправьте название для категории"),
-        Back(BACK_TEXT_RU),
+        Back(BACK_TEXT),
         MessageInput(_input_title_handler),
         state=CategoryEditSG.title
     ),
@@ -149,7 +149,7 @@ category_edit_dialog = Dialog(
                 on_click=_process_delete_desc,
                 when="have_desc",
             ),
-            BackTo(CategoryEditSG.main, BACK_TEXT_RU),
+            BackTo(CategoryEditSG.main, BACK_TEXT),
         ),
         MessageInput(_input_desc_handler),
         getter=_desc_window_getter,

@@ -7,9 +7,9 @@ from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.kbd.state import BACK_TEXT as _BACK_TEXT
 from aiogram_dialog.widgets.text import Text, Const
 
-BACK_TEXT_RU = Const("⬅ Назад")
-CANCEL_TEXT_RU = Const("✖ Отмена")
-CLOSE_TEXT_RU = Const("Закрыть")
+BACK_TEXT = Const("⬅ Назад")
+CANCEL_TEXT = Const("✖ Отмена")
+CLOSE_TEXT = Const("Закрыть")
 
 class BackTo(SwitchTo):
     def __init__(self,

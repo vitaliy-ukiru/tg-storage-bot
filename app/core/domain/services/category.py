@@ -1,9 +1,10 @@
 import abc
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol
+from typing import Protocol, Optional
 
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
+from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
@@ -52,13 +53,14 @@ class CategoryService(CategoryUsecase):
 
     async def find_categories(self,
                               *filters: FilterField,
-                              dto: CategoriesFindDTO = None) -> list[Category]:
+                              dto: CategoriesFindDTO = None,
+                              paginate: Optional[Pagination] = None) -> list[Category]:
         dto_items = asdict(dto) if dto else None
 
         filters = FilterMerger.merge(dto_items, filters)
         FilterMerger.ensure_have_user_id(filters)
 
-        categories = await self._repo.find_categories(filters)
+        categories = await self._repo.find_categories(filters, paginate)
         return categories
 
     async def find_popular(self, user_id: UserId) -> list[Category]:

@@ -3,9 +3,10 @@ __all__ = (
 )
 
 import abc
-from typing import Protocol
+from typing import Protocol, Optional
 
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
+from app.core.domain.dto.common import Pagination
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.common import FilterField
@@ -39,5 +40,6 @@ class CategoryUsecase(Protocol):
     @abc.abstractmethod
     async def find_categories(self,
                               *filters: FilterField,
-                              dto: CategoriesFindDTO = None) -> list[Category]:
+                              dto: CategoriesFindDTO = None,
+                              paginate: Optional[Pagination] = None) -> list[Category]:
         raise NotImplementedError

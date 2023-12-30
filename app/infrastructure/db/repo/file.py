@@ -54,11 +54,10 @@ class FileStorage(BaseRepository, FileRepository):
                          filters: Sequence[FilterField],
                          paginate: Optional[Pagination] = None) -> list[File]:
         async with self._pool() as session:
-            sql = select(models.File)
-            for f in filters:
-                sql = sql.where(Registry.files.convert(f))
-
-            sql = self.apply_pagination(sql, paginate)
+            sql = self.apply_pagination(
+                self.apply_filters(select(models.File), Registry.files, filters),
+                paginate
+            ).order_by(models.File.id)
             sql = sql.options(joinedload(models.File.category))
             res = await session.execute(sql)
             files = res.scalars()

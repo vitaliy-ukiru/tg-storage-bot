@@ -38,11 +38,10 @@ class CategoryStorage(BaseRepository, CategoryRepository):
                               filters: Sequence[FilterField],
                               paginate: Optional[Pagination] = None) -> list[Category]:
         async with self._pool() as session:
-            sql = select(models.Category)
-            for f in filters:
-                sql = sql.where(Registry.categories.convert(f))
-
-            sql = self.apply_pagination(sql, paginate)
+            sql = self.apply_pagination(
+                self.apply_filters(select(models.Category), Registry.categories, filters),
+                paginate
+            ).order_by(models.Category.id)
 
             res = await session.execute(sql)
             categories = res.scalars()

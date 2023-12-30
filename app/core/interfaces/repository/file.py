@@ -25,6 +25,10 @@ class FileRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
+    async def get_files_count(self, filters: Sequence[FilterField]) -> int:
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def update_file(self, file: File):
         raise NotImplementedError
 

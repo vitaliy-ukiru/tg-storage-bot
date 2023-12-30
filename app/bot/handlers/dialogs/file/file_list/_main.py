@@ -119,7 +119,6 @@ main_window = Window(
         field_name="file_types",
         delete_callback=_process_delete_file_types,
     ),
-
     setup_button(
         SwitchTo(
             Const("📃 Название файла"),

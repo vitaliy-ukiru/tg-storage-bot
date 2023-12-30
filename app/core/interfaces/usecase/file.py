@@ -2,8 +2,9 @@ __all__ = (
     'FileUsecase',
 )
 import abc
-from typing import Protocol
+from typing import Protocol, Optional
 
+from app.core.domain.dto.common import Pagination
 from app.core.interfaces.repository.common import FilterField
 from app.core.domain.dto.file import CreateFileDTO, FilesFindDTO, ReloadFileDTO
 from app.core.domain.models.category import CategoryId
@@ -22,7 +23,11 @@ class FileUsecase(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_files(self, *filters: FilterField, dto: FilesFindDTO = None) -> list[File]:
+    async def find_files(self,
+                         *filters: FilterField,
+                         dto: FilesFindDTO = None,
+                         paginate: Optional[Pagination] = None,
+                         total_count: bool = False) -> tuple[list[File], Optional[int]]:
         raise NotImplementedError
 
     @abc.abstractmethod

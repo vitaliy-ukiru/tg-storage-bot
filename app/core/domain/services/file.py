@@ -1,8 +1,9 @@
 import abc
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol
+from typing import Protocol, Optional
 
+from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
 from app.core.domain.exceptions.category import CategoryViolation
 from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
@@ -98,10 +99,19 @@ class FileService(FileUsecase):
 
         await self._repo.delete_file(file_id)
 
-    async def find_files(self, *filters: FilterField, dto: FilesFindDTO = None) -> list[File]:
+    async def find_files(self,
+                         *filters: FilterField,
+                         dto: FilesFindDTO = None,
+                         paginate: Optional[Pagination] = None,
+                         total_count: bool = False) -> tuple[list[File], Optional[int]]:
+
         dto_items = asdict(dto) if dto else None
         filters = FilterMerger.merge(dto_items, filters)
         FilterMerger.ensure_have_user_id(filters)
 
-        files = await self._repo.find_files(filters)
-        return files
+        files = await self._repo.find_files(filters, paginate)
+        if not total_count:
+            return files, None
+
+        files_count = await self._repo.get_files_count(filters)
+        return files, files_count

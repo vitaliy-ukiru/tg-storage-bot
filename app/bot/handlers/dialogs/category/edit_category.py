@@ -2,7 +2,7 @@ from typing import Optional
 
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row, Checkbox, \
     Column, ManagedCheckbox
 from aiogram_dialog.widgets.text import Const, Format, Multi
@@ -50,13 +50,13 @@ async def _get_category(manager: DialogManager) -> Category:
     return category
 
 
-async def _input_title_handler(m: Message, _: MessageInput, manager: DialogManager):
-    await _update_category(manager, title=m.text)
+async def _input_title_handler(_, __, manager: DialogManager, text: str):
+    await _update_category(manager, title=text)
     await manager.switch_to(CategoryEditSG.main)
 
 
-async def _input_desc_handler(m: Message, _: MessageInput, manager: DialogManager):
-    await _update_category(manager, desc=m.text)
+async def _input_desc_handler(_, __, manager: DialogManager, text: str):
+    await _update_category(manager, desc=text)
     await manager.switch_to(CategoryEditSG.main)
 
 
@@ -136,7 +136,7 @@ category_edit_dialog = Dialog(
     Window(
         Const("Отправьте название для категории"),
         Back(BACK_TEXT),
-        MessageInput(_input_title_handler),
+        TextInput(id="edit__input_title", on_success=_input_title_handler),
         state=CategoryEditSG.title
     ),
 
@@ -151,7 +151,7 @@ category_edit_dialog = Dialog(
             ),
             BackTo(CategoryEditSG.main, BACK_TEXT),
         ),
-        MessageInput(_input_desc_handler),
+        TextInput(id="edit__input_desc", on_success=_input_desc_handler),
         getter=_desc_window_getter,
         state=CategoryEditSG.desc
     ),

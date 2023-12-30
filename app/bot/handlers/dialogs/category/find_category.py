@@ -1,8 +1,8 @@
-from typing import Any
+from typing import Any, cast
 
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Group, Cancel, ScrollingGroup
 from aiogram_dialog.widgets.text import Const, Format
 
@@ -14,18 +14,17 @@ from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
 
 
-async def process_click_category(_: CallbackQuery, __: Any, manager: DialogManager, item_id: str):
+async def process_click_category(_, __, manager: DialogManager, item_id: str):
     await manager.done(dict(category_id=int(item_id)))
 
 
-async def _process_input_title(m: Message, _: MessageInput, manager: DialogManager):
-    manager.dialog_data["title_mask"] = m.text
+async def _process_input_title(_, __, manager: DialogManager, ___):
     await manager.next()
 
 
 async def _category_find_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
     user: User = dialog_manager.middleware_data[USER_KEY]
-    title = dialog_manager.dialog_data["title_mask"]
+    title = cast(ManagedTextInput, dialog_manager.find(ID_INPUT_TITLE)).get_value()
     categories = await category_service.find_categories(
         CategoryFilters.user_id(user.id),
         CategoryFilters.title_match(title)
@@ -66,9 +65,11 @@ _scroll_categories = ScrollingGroup(
     _select_category,
     id="select_category_scroll",
     width=2,
-    height=2
+    height=2,
+    hide_on_single_page=True,
 )
 
+ID_INPUT_TITLE = "find_title"
 find_category_dialog = Dialog(
     Window(
         Const("Выберите раздел"),
@@ -110,16 +111,13 @@ find_category_dialog = Dialog(
 
     Window(
         Const("Введите часть названия категории"),
-        MessageInput(_process_input_title),
+        TextInput(id=ID_INPUT_TITLE, on_success=_process_input_title),
         BackTo(CategoryFindSG.main, BACK_TEXT),
         state=CategoryFindSG.input_title,
     ),
     Window(
         Const("Список найденных категорий"),
-        Group(
-            _select_category,
-            width=2
-        ),
+        _scroll_categories,
         BackTo(CategoryFindSG.main, BACK_TEXT),
         state=CategoryFindSG.find,
         getter=_category_find_getter,

@@ -2,7 +2,7 @@ from typing import Any
 
 from aiogram.types import Message
 from aiogram_dialog import Dialog, Window, DialogManager, Data
-from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 from aiogram_dialog.widgets.text import Const
 
@@ -17,8 +17,7 @@ from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
 
 
-async def _process_new_title(m: Message, _: MessageInput, manager: DialogManager):
-    title = m.text
+async def _process_new_title(_, __, manager: DialogManager, title: str):
     file_id: FileId = manager.start_data["file_id"]
     file_service: FileUsecase = manager.middleware_data["file_service"]
     user: User = manager.middleware_data[USER_KEY]
@@ -46,7 +45,7 @@ async def _on_start(start_data: dict | Any, manager: DialogManager):
         raise Exception("not provided file id")
 
 
-async def _process_result(start_data: Data, result: Any, manager: DialogManager):
+async def _process_result(_, result: Any, manager: DialogManager):
     if not result or not isinstance(result, dict):
         return
 
@@ -92,8 +91,9 @@ file_edit_dialog = Dialog(
     ),
     Window(
         Const("Введите новое название"),
-        MessageInput(
-            _process_new_title
+        TextInput(
+            id="new__title",
+            on_success=_process_new_title
         ),
         BackTo(FileEditSG.main, CANCEL_TEXT),
         state=FileEditSG.edit_title,

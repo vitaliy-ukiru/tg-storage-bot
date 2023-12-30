@@ -9,6 +9,7 @@ from aiogram_dialog.widgets.text import Const, Format
 from app.bot.widgets import BackTo, CANCEL_TEXT_RU, BACK_TEXT_RU
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import CategoryFindSG
+from app.core.common.filters.category import CategoryFilters
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
 
@@ -25,7 +26,10 @@ async def _process_input_title(m: Message, _: MessageInput, manager: DialogManag
 async def _category_find_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
     user: User = dialog_manager.middleware_data[USER_KEY]
     title = dialog_manager.dialog_data["title_mask"]
-    categories = await category_service.find_by_title(user.id, title)
+    categories = await category_service.find_categories(
+        CategoryFilters.user_id(user.id),
+        CategoryFilters.title_match(title)
+    )
     return {
         "categories": categories,
     }
@@ -41,7 +45,10 @@ async def _category_top_getter(dialog_manager: DialogManager, category_service: 
 
 async def _category_fav_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
     user: User = dialog_manager.middleware_data[USER_KEY]
-    categories = await category_service.find_favorites(user.id)
+    categories = await category_service.find_categories(
+        CategoryFilters.user_id(user.id),
+        CategoryFilters.favorites(True)
+    )
     return {
         "categories": categories,
     }

@@ -78,13 +78,6 @@ class CategoryService(CategoryUsecase):
         )
         return categories
 
-    async def find_by_title(self, user_id: UserId, title_mask: str) -> list[Category]:
-        return await self.find_categories(CategoryFilters.user_id(user_id),
-                                          CategoryFilters.title_match(title_mask))
-
-    async def find_favorites(self, user_id: UserId) -> list[Category]:
-        return await self.find_categories(CategoryFilters.user_id(user_id), CategoryFilters.favorites())
-
     async def update_category(self, dto: UpdateCategoryDTO) -> Category:
         category = await self.get_category(dto.category_id)
         if dto.title is not None:

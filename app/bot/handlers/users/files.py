@@ -37,7 +37,7 @@ async def file_cmd(msg: Message, command: CommandObject, dialog_manager: DialogM
     args = command.args
     try:
         file_id = int(args)
-    except Exception as _:
+    except ValueError as _:
         await msg.answer("invalid file_id")
         return
     await execute.file_view(dialog_manager, file_id, mode=StartMode.RESET_STACK)

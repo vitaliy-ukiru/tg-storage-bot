@@ -35,20 +35,16 @@ async def _main_window_getter(dialog_manager: DialogManager, category_service: C
     }
 
 
-def file_types_names(data: dict) -> list[str]:
-    return [
-        get_file_type_name(ft)
-        for ft in data["dialog_data"]["filters"]["file_types"]
-    ]
-
-
 _main_menu_text = Multi(
     Multi(
         Const("Типы файлов"),
         List(
             Format("{item}"),
             sep=', ',
-            items=file_types_names
+            items=lambda data: [
+                get_file_type_name(ft)
+                for ft in data["dialog_data"]["filters"]["file_types"]
+            ]
         ),
         sep=': ',
         when=_filters["file_types"],

@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.filters import Command, CommandStart
+from aiogram.filters import CommandStart
 from aiogram.types import (
     Message,
     InlineQuery,
@@ -54,7 +54,7 @@ async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase,
 
 @router.inline_query()
 async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsecase, user: User):
-    files = await file_service.find_files(
+    files, _ = await file_service.find_files(
         FileFilters.user_id(user.id),
         FileFilters.title_match(inline_query.query)
     )
@@ -79,6 +79,7 @@ async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsec
         # cache_time=10*60*60,  # 10 minutes
         is_personal=True,
     )
+
 
 # don't add return type, because it will be a big typing.Union
 # if add like InlineQueryResult type checker will say

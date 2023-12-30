@@ -1,6 +1,8 @@
+from typing import Optional
+
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
@@ -10,8 +12,7 @@ from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.interfaces.usecase.category import CategoryUsecase
 
 
-async def input_title_handler(m: Message, _: MessageInput, manager: DialogManager):
-    manager.dialog_data["title"] = m.text
+async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
     await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
@@ -20,27 +21,37 @@ async def input_desc_handler(m: Message, _: MessageInput, manager: DialogManager
     await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
+def _get_values(manager: DialogManager) -> tuple[str, Optional[str]]:
+    title_input: ManagedTextInput[str] = manager.find(ID_INPUT_TITLE)
+    desc_input: ManagedTextInput[Optional[str]] = manager.find(ID_INPUT_DESC)
+
+    return title_input.get_value(), desc_input.get_value()
+
+
 async def menu_getter(dialog_manager: DialogManager, **_):
-    title = dialog_manager.dialog_data["title"]
-    desc = dialog_manager.dialog_data.get("desc")
+    title, desc = _get_values(dialog_manager)
     return dict(title=title, desc=desc)
 
 
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
     category_service: CategoryUsecase = manager.middleware_data["category_service"]
+    title, desc = _get_values(manager)
     category = await category_service.save_category(CreateCategoryDTO(
-        title=manager.dialog_data["title"],
-        desc=manager.dialog_data.get("desc"),
+        title=title,
+        desc=desc,
         user_id=call.from_user.id
     ))
 
     await manager.done(dict(category_id=category.id, category=category))
 
 
+ID_INPUT_TITLE = "input_title"
+ID_INPUT_DESC = "input_desc"
+
 category_create_dialog = Dialog(
     Window(
         Const("Отправь название категории"),
-        MessageInput(input_title_handler),
+        TextInput(id=ID_INPUT_TITLE, on_success=_to_menu),
         state=CategoryCreateSG.input_title,
     ),
 
@@ -53,18 +64,18 @@ category_create_dialog = Dialog(
             Row(
                 SwitchTo(
                     Const("📝 Название"),
-                    id="create_category_edit_title",
+                    id="edit_title",
                     state=CategoryCreateSG.input_title
                 ),
                 SwitchTo(
                     Const("📝 Описание"),
-                    id="create_category_edit_desc",
+                    id="edit_desc",
                     state=CategoryCreateSG.input_desc
                 ),
             ),
             Button(
                 Const("✅ Создать"),
-                id="create_category",
+                id="create",
                 on_click=create_category,
             ),
             Cancel(CANCEL_TEXT)
@@ -76,8 +87,11 @@ category_create_dialog = Dialog(
     Window(
         Const("Отправьте описание для категории"),
         Back(BACK_TEXT),
-        MessageInput(input_desc_handler),
+        TextInput[Optional[str]](
+            id=ID_INPUT_DESC,
+            type_factory=lambda v: str(v) if v is not None else None,
+            on_success=_to_menu
+        ),
         state=CategoryCreateSG.input_desc
     ),
-
 )

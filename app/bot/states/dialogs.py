@@ -40,3 +40,11 @@ class FileListSG(StatesGroup):
     input_file_type = State()
     input_file_title = State()
     file_list = State()
+
+
+ALLOWED_STATES = frozenset({
+    FileViewSG.main,
+    FileListSG.main,
+    FileListSG.file_list,
+    CategoryEditSG.main,
+})

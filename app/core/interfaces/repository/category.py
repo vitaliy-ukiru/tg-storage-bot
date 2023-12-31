@@ -27,3 +27,7 @@ class CategoryRepository(Protocol):
     async def find_categories(self, filters: Sequence[FilterField],
                               paginate: Optional[Pagination] = None) -> list[Category]:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    async def get_category_count(self, filters: Sequence[FilterField]) -> int:
+        raise NotImplementedError

@@ -62,3 +62,12 @@ class CategoryStorage(BaseRepository, CategoryRepository):
                 model.is_favorite = category.is_favorite
 
             await session.commit()
+
+    async def get_category_count(self, filters: Sequence[FilterField]) -> int:
+        async with self._pool() as session:
+            return await self.get_count(
+                session,
+                models.Category,
+                filters,
+                Registry.categories
+            )

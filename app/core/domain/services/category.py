@@ -15,9 +15,9 @@ from app.core.internal.filter_merger import FilterMerger
 from app.core.common.filters.category import CategoryFilters
 
 
-class CategoryRate(Protocol):
+class CategoryRater(Protocol):
     @abc.abstractmethod
-    async def get_categories_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
+    async def get_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
         raise NotImplementedError
 
 
@@ -26,11 +26,11 @@ UNDEFINED_CATEGORY_ID = CategoryId(0)
 
 class CategoryService(CategoryUsecase):
     _repo: CategoryRepository
-    _counter: CategoryRate
+    _rater: CategoryRater
 
-    def __init__(self, repo: CategoryRepository, counter: CategoryRate):
+    def __init__(self, repo: CategoryRepository, rater: CategoryRater):
         self._repo = repo
-        self._counter = counter
+        self._rater = rater
 
     async def save_category(self, dto: CreateCategoryDTO) -> Category:
         c = Category(
@@ -68,7 +68,7 @@ class CategoryService(CategoryUsecase):
         if len(categories) == 0:
             return categories
 
-        categories_rates = await self._counter.get_categories_usage_rate(user_id)
+        categories_rates = await self._rater.get_usage_rate(user_id)
         if len(categories_rates) == 0:
             return categories
 

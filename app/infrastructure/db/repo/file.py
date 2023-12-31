@@ -102,16 +102,16 @@ class FileStorage(BaseRepository, FileRepository):
             await session.execute(sql)
             await session.commit()
 
-    async def get_categories_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
+    async def get_categories_usage(self, user_id: UserId) -> list[tuple[CategoryId, int]]:
         async with self._pool() as session:
+            rate = count().label("rate")
             sql = (
-                select(models.File.category_id, count().label("rate")).
+                select(models.File.category_id, rate).
                 where(models.File.user_id == user_id).
                 group_by(models.File.category_id)
             )
             res = await session.execute(sql)
-
-            return {
-                CategoryId(category_id): rate
+            return [
+                (CategoryId(category_id), rate)
                 for category_id, rate in res.all()
-            }
+            ]

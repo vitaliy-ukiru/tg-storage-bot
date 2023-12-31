@@ -69,13 +69,12 @@ class FileStorage(BaseRepository, FileRepository):
 
     async def get_files_count(self, filters: Sequence[FilterField]) -> int:
         async with self._pool() as session:
-            sql = self.apply_filters(
-                select(count()).select_from(models.File),
+            return await self.get_count(
+                session,
+                models.File,
                 Registry.files,
                 filters
             )
-            res = await session.scalar(sql)
-            return res
 
     async def update_file(self, file: File):
         async with self._pool() as session:

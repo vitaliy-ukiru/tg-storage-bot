@@ -13,7 +13,6 @@ from ._base import BaseRepository
 
 
 class CategoryStorage(BaseRepository, CategoryRepository):
-
     async def save_category(self, c: Category) -> CategoryId:
         async with self._pool() as session:
             db_category = models.Category(

@@ -25,7 +25,6 @@ class File:
     id: FileId
     title: Optional[str]
     type: FileType
-
     remote_file_id: RemoteFileId
     user_id: UserId
     created_at: datetime

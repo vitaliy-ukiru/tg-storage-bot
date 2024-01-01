@@ -15,6 +15,7 @@ from app.core.interfaces.repository.file import FileRepository
 from app.infrastructure.db import models
 from ._base import BaseRepository
 from .filters import Registry
+from .utils import apply_pagination, apply_filters
 
 
 class FileStorage(BaseRepository, FileRepository):
@@ -54,8 +55,8 @@ class FileStorage(BaseRepository, FileRepository):
                          filters: Sequence[FilterField],
                          paginate: Optional[Pagination] = None) -> list[File]:
         async with self._pool() as session:
-            sql = self.apply_pagination(
-                self.apply_filters(select(models.File), Registry.files, filters),
+            sql = apply_pagination(
+                apply_filters(select(models.File), Registry.files, filters),
                 paginate
             ).order_by(models.File.id)
             sql = sql.options(joinedload(models.File.category))

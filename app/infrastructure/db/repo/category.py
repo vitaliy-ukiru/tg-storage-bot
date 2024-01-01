@@ -10,6 +10,7 @@ from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
 from app.infrastructure.db.repo.filters import Registry
 from ._base import BaseRepository
+from .utils import apply_pagination, apply_filters
 
 
 class CategoryStorage(BaseRepository, CategoryRepository):
@@ -37,8 +38,8 @@ class CategoryStorage(BaseRepository, CategoryRepository):
                               filters: Sequence[FilterField],
                               paginate: Optional[Pagination] = None) -> list[Category]:
         async with self._pool() as session:
-            sql = self.apply_pagination(
-                self.apply_filters(select(models.Category), Registry.categories, filters),
+            sql = apply_pagination(
+                apply_filters(select(models.Category), Registry.categories, filters),
                 paginate
             ).order_by(models.Category.id)
 

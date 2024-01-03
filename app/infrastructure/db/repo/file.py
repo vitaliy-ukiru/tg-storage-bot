@@ -70,7 +70,7 @@ class FileStorage(BaseRepository, FileRepository):
 
     async def get_files_count(self, filters: Sequence[FilterField]) -> int:
         async with self._pool() as session:
-            return await self.get_count(
+            return await self._get_count(
                 session,
                 models.File,
                 Registry.files,

@@ -66,9 +66,9 @@ class CategoryStorage(BaseRepository, CategoryRepository):
 
     async def get_category_count(self, filters: Sequence[FilterField]) -> int:
         async with self._pool() as session:
-            return await self.get_count(
+            return await self._get_count(
                 session,
                 models.Category,
+                Registry.categories,
                 filters,
-                Registry.categories
             )

@@ -16,12 +16,11 @@ class BaseRepository:
     def __init__(self, session_maker: async_sessionmaker):
         self._pool = session_maker
 
-
-    async def get_count(self,
-                        session: AsyncSession,
-                        model: type[Base],
-                        filters: Sequence[FilterField],
-                        reg: Container) -> int:
+    @staticmethod
+    async def _get_count(session: AsyncSession,
+                         model: type[Base],
+                         reg: Container,
+                         filters: Sequence[FilterField], ) -> int:
         stmt = apply_filters(
             select(func.count()).select_from(model),
             reg,

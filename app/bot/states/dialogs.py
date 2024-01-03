@@ -14,10 +14,8 @@ class FileEditSG(StatesGroup):
 
 class CategoryFindSG(StatesGroup):
     main = State()
-    top = State()
-    favorites = State()
     input_title = State()
-    find = State()
+    select = State()
 
 
 class CategorySelectSG(StatesGroup):

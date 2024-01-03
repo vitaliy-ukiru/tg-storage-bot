@@ -2,11 +2,10 @@ __all__ = (
     'main_window',
 )
 
-from typing import Union
+from typing import Union, Callable, Awaitable
 
 from aiogram_dialog import Window, DialogManager
 from aiogram_dialog.widgets.kbd import Start, SwitchTo, Button, Row, Keyboard
-
 from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
@@ -15,24 +14,23 @@ from magic_filter import F
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_str import get_file_type_name
 from app.core.interfaces.usecase.category import CategoryUsecase
-from .common import SELECT_FILE_TYPES_ID
+from .filters_proxy import FiltersProxy
 
-_filters = F["dialog_data"]["filters"]
+_filters = F["filters"]
 
 
 async def _main_window_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
-    filters = dialog_manager.dialog_data.get("filters")
-    if not filters:
-        return {}
-
-    category_id = filters.get("category_id")
-    if category_id is None:
-        return {}
-
-    category = await category_service.get_category(category_id)
-    return {
-        "category_name": category.title
+    proxy = FiltersProxy(dialog_manager)
+    filters = proxy.extract_to_dict()
+    data = {
+        "filters": filters
     }
+
+    if (category_id := filters.get("category_id")) is not None:
+        category = await category_service.get_category(category_id)
+        data["category_name"] = category.title
+
+    return data
 
 
 _main_menu_text = Multi(
@@ -43,14 +41,14 @@ _main_menu_text = Multi(
             sep=', ',
             items=lambda data: [
                 get_file_type_name(ft)
-                for ft in data["dialog_data"]["filters"]["file_types"]
+                for ft in data["filters"]["file_types"]
             ]
         ),
         sep=': ',
         when=_filters["file_types"],
     ),
     Format(
-        text="Название: {dialog_data[filters][title]}",
+        text="Название: {filters[title]}",
         when=_filters["title"],
     ),
     Format(
@@ -80,16 +78,27 @@ def _delete_from_filters(manager: DialogManager, key: str):
     del filters[key]
 
 
-def new_delete_callback(key: str):
+def filters_proxy_wrap(fn: Callable[[FiltersProxy], Awaitable]) -> OnClick:
     async def wrapper(_, __, manager: DialogManager):
-        _delete_from_filters(manager, key)
+        proxy = FiltersProxy(manager)
+        return await fn(proxy)
 
     return wrapper
 
 
-async def _process_delete_file_types(_, __, manager: DialogManager):
-    _delete_from_filters(manager, "file_types")
-    await manager.find(SELECT_FILE_TYPES_ID).reset_checked()
+@filters_proxy_wrap
+async def _delete_file_types(proxy: FiltersProxy):
+    await proxy.delete_file_types()
+
+
+@filters_proxy_wrap
+async def _delete_title(proxy: FiltersProxy):
+    proxy.title = None
+
+
+@filters_proxy_wrap
+async def _delete_category(proxy: FiltersProxy):
+    proxy.category_id = None
 
 
 main_window = Window(
@@ -108,7 +117,7 @@ main_window = Window(
             id="category"
         ),
         field_name="category_id",
-        delete_callback=new_delete_callback("category_id")
+        delete_callback=_delete_category
     ),
     setup_button(
         SwitchTo(
@@ -117,7 +126,7 @@ main_window = Window(
             id="file_types"
         ),
         field_name="file_types",
-        delete_callback=_process_delete_file_types,
+        delete_callback=_delete_file_types,
     ),
     setup_button(
         SwitchTo(
@@ -125,7 +134,7 @@ main_window = Window(
             state=FileListSG.input_file_title,
             id="file_title"
         ),
-        delete_callback=new_delete_callback("title"),
+        delete_callback=_delete_title,
         field_name="title"
     ),
 

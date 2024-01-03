@@ -16,17 +16,12 @@ from app.bot.states.dialogs import FileListSG
 from app.bot.utils.file_type_str import file_types_with_names
 from app.bot.widgets import BACK_TEXT
 from app.core.domain.models.file import FileType
-from .common import SELECT_FILE_TYPES_ID
+from .common import ID_SELECT_FILE_TYPES
 
 
 class FileTypeItem(NamedTuple):
     name: str
     value: FileType
-
-
-async def _process_file_types(_, select: ManagedMultiselect, manager: DialogManager, __):
-    filters = manager.dialog_data.setdefault("filters", {})
-    filters["file_types"] = select.get_checked()
 
 
 file_types_window = Window(
@@ -35,9 +30,8 @@ file_types_window = Window(
         Multiselect(
             Format("✓ {item.name}"),
             Format("{item.name}"),
-            id=SELECT_FILE_TYPES_ID,
+            id=ID_SELECT_FILE_TYPES,
             type_factory=lambda s: FileType(s),
-            on_state_changed=_process_file_types,
             item_id_getter=lambda file_type: file_type.value,
             items="file_types",
         ),

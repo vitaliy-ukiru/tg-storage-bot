@@ -16,11 +16,6 @@ async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
     await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
-async def input_desc_handler(m: Message, _: MessageInput, manager: DialogManager):
-    manager.dialog_data["desc"] = m.text
-    await manager.switch_to(CategoryCreateSG.menu_idle)
-
-
 def _get_values(manager: DialogManager) -> tuple[str, Optional[str]]:
     title_input: ManagedTextInput[str] = manager.find(ID_INPUT_TITLE)
     desc_input: ManagedTextInput[Optional[str]] = manager.find(ID_INPUT_DESC)

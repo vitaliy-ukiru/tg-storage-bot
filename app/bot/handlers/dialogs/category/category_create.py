@@ -2,12 +2,13 @@ from typing import Optional
 
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.input import MessageInput, TextInput, ManagedTextInput
+from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
-from app.bot.widgets import CANCEL_TEXT, BACK_TEXT
 from app.bot.states.dialogs import CategoryCreateSG
+from app.bot.utils.optional_str import optional_str_factory
+from app.bot.widgets import CANCEL_TEXT, BACK_TEXT
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.interfaces.usecase.category import CategoryUsecase
 
@@ -84,7 +85,7 @@ category_create_dialog = Dialog(
         Back(BACK_TEXT),
         TextInput[Optional[str]](
             id=ID_INPUT_DESC,
-            type_factory=lambda v: str(v) if v is not None else None,
+            type_factory=optional_str_factory,
             on_success=_to_menu
         ),
         state=CategoryCreateSG.input_desc

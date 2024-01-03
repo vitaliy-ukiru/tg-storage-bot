@@ -12,15 +12,14 @@ from app.bot.utils.uploader import FileUploader
 router = Router()
 @router.message(Command("list"))
 async def command_list(msg: Message, dialog_manager: DialogManager):
-    del msg # unused
+    del msg  # unused
     await execute.file_list(dialog_manager, mode=StartMode.RESET_STACK)
 
 
 @router.message(MediaFilter(), StateFilter(None))
 async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manager: DialogManager):
-    ctx = dialog_manager.current_context()
-    if ctx is not None:
-        state = ctx.state
+    if dialog_manager.has_context():
+        state = dialog_manager.current_context().state
         if state not in ALLOWED_STATES:
             raise SkipHandler
 

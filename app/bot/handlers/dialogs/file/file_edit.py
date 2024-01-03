@@ -42,7 +42,7 @@ async def _on_start(start_data: dict | Any, manager: DialogManager):
         manager.dialog_data["file_id"] = file_id
 
     if file_id is None:
-        raise Exception("not provided file id")
+        raise ValueError("not provided file id")
 
 
 async def _process_result(_, result: Any, manager: DialogManager):

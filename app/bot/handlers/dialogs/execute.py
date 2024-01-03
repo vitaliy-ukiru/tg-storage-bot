@@ -33,7 +33,7 @@ async def file_list(manager: DialogManager,
         if data is None:
             data = {}
 
-        data["filters"] = filters
+        data |= filters
 
     await manager.start(
         FileListSG.main,

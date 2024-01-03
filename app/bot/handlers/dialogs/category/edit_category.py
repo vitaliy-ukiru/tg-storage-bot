@@ -68,7 +68,7 @@ async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, mana
     await manager.switch_to(CategoryEditSG.main)
 
 
-async def _process_delete_desc(_: CallbackQuery, __: Button, manager: DialogManager):
+async def _process_delete_desc(_, __, manager: DialogManager):
     await _update_category(manager, delete_desc=True)
     await manager.switch_to(CategoryEditSG.main)
 
@@ -157,3 +157,7 @@ category_edit_dialog = Dialog(
     ),
     on_start=_on_start
 )
+
+
+class CategoryDescription:
+    description: Optional[str]

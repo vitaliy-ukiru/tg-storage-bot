@@ -38,11 +38,10 @@ async def _process_reload_file(m: Message, _, manager: DialogManager):
 
 async def _on_start(start_data: dict | Any, manager: DialogManager):
     file_id = start_data["file_id"]
-    if not manager.dialog_data.get("file_id"):
-        manager.dialog_data["file_id"] = file_id
-
     if file_id is None:
         raise ValueError("not provided file id")
+
+    manager.dialog_data["file_id"] = file_id
 
 
 async def _process_result(_, result: Any, manager: DialogManager):

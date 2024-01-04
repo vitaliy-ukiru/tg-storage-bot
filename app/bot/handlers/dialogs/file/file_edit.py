@@ -26,7 +26,7 @@ async def _process_new_title(_, __, manager: DialogManager, title: str):
     await manager.switch_to(FileEditSG.main)
 
 
-async def _process_reload_file(m: Message, _: MessageInput, manager: DialogManager):
+async def _process_reload_file(m: Message, _, manager: DialogManager):
     cred = FileCredentials.from_message(m)
     file_id: int = manager.start_data["file_id"]
     file_service = manager.middleware_data["file_service"]

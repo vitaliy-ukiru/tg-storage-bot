@@ -9,7 +9,7 @@ from alembic import context
 
 from app.common.config import Loader
 from app.infrastructure.db.models import Base
-from app.infrastructure.db.config import to_dsn
+from app.infrastructure.db.connect import to_dsn
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

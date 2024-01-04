@@ -11,7 +11,7 @@ from app.core.domain.services.category import CategoryService, CategoryRater
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
 from app.infrastructure.adapters.category_rater import CategoryRaterAdapter
-from app.infrastructure.db.config import to_dsn
+from app.infrastructure.db import connect
 from app.infrastructure.db.repo.category import CategoryStorage
 from app.infrastructure.db.repo.file import FileStorage
 from app.infrastructure.db.repo.user import UserStorage
@@ -23,8 +23,8 @@ async def main():
 
     loader = Loader.read(env=env)
     cfg = loader.load()
-    engine = create_async_engine(to_dsn(cfg.db), echo=cfg.is_debug)
-    session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    engine = connect.connect_db(cfg)
+    session_maker = connect.new_session_maker(engine)
 
     if cfg.env == "dev":
         logging.basicConfig(level=logging.DEBUG)
@@ -37,12 +37,15 @@ async def main():
     file_repo = FileStorage(session_maker)
 
     user_service = UserService(user_repo)
+
     category_rater = CategoryRaterAdapter(file_repo)
     category_service = CategoryService(category_repo, category_rater)
+
     file_service = FileService(file_repo, category_service)
 
     tg_bot = BotModule(
-        cfg.tg_bot, user_service,
+        cfg.tg_bot,
+        user_service,
         category_service,
         file_service,
         MemoryStorage(),

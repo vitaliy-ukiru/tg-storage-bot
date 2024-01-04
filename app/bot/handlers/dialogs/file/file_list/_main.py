@@ -58,12 +58,12 @@ _main_menu_text = Multi(
 )
 
 
-def setup_button(
-    *buttons: Keyboard, field_name: str,
+def new_filter_btn(
+    button: Button, field_name: str,
     delete_callback: Union[OnClick, WidgetEventProcessor, None]
 ) -> Row:
     return Row(
-        *buttons,
+        button,
         Button(
             Const("❌"),
             id=f'delete_{field_name}',
@@ -100,12 +100,11 @@ main_window = Window(
     Case(
         {
             0: Const("Фильтры не установлены"),
-            None: Const("Фильтры не установлены"),
             ...: _main_menu_text
         },
         selector=_filters.len() or 0
     ),
-    setup_button(
+    new_filter_btn(
         Start(
             Const("🗂 Категория"),
             state=CategoryFindSG.main,
@@ -114,23 +113,23 @@ main_window = Window(
         field_name="category_id",
         delete_callback=_delete_category
     ),
-    setup_button(
+    new_filter_btn(
         SwitchTo(
             Const("🏷 Тип файла"),
             state=FileListSG.input_file_type,
             id="file_types"
         ),
         field_name="file_types",
-        delete_callback=_delete_file_types,
+        delete_callback=_delete_file_types
     ),
-    setup_button(
+    new_filter_btn(
         SwitchTo(
             Const("📃 Название файла"),
             state=FileListSG.input_file_title,
             id="file_title"
         ),
-        delete_callback=_delete_title,
-        field_name="title"
+        field_name="title",
+        delete_callback=_delete_title
     ),
 
     SwitchTo(

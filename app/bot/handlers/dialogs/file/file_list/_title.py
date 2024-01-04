@@ -12,7 +12,7 @@ from app.bot.utils.optional_str import optional_str_factory
 from app.bot.widgets import BackTo, BACK_TEXT
 
 
-async def _process_input_title(_, __, dialog_manager: DialogManager, title_pattern: str):
+async def _process_input_title(_, __, dialog_manager: DialogManager, ___):
     await dialog_manager.switch_to(FileListSG.main)
 
 

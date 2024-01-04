@@ -11,7 +11,7 @@ from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.category import CategoryRepository
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.category import CategoryUsecase
-from app.core.internal.filter_merger import FilterMerger
+from app.core.domain.services.internal.filter_merger import FilterMerger
 from app.core.common.filters.category import CategoryFilters
 
 

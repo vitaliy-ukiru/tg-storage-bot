@@ -13,7 +13,7 @@ from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.file import FileRepository
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.file import FileUsecase
-from app.core.internal.filter_merger import FilterMerger
+from app.core.domain.services.internal.filter_merger import FilterMerger
 
 
 class CategoryGetter(Protocol):

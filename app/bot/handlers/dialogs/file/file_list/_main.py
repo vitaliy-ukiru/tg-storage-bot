@@ -73,11 +73,6 @@ def setup_button(
     )
 
 
-def _delete_from_filters(manager: DialogManager, key: str):
-    filters = manager.dialog_data["filters"]
-    del filters[key]
-
-
 def filters_proxy_wrap(fn: Callable[[FiltersProxy], Awaitable]) -> OnClick:
     async def wrapper(_, __, manager: DialogManager):
         proxy = FiltersProxy(manager)

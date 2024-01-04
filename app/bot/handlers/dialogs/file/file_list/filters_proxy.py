@@ -58,14 +58,14 @@ class FiltersProxy:
 
         return items
 
-    async def set_file_types(self, file_types: list[FileType]):
+    async def set_file_types(self, file_types: Optional[list[FileType]]):
         widget = self.__get_file_types_widget()
+        if file_types is None:
+            await widget.reset_checked()
+            return
+
         for file_type in file_types:
             await widget.set_checked(file_type, False)
-
-    async def delete_file_types(self):
-        widget = self.__get_file_types_widget()
-        await widget.reset_checked()
 
     @property
     def category_id(self) -> Optional[CategoryId | int]:

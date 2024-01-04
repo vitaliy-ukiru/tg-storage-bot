@@ -3,7 +3,6 @@ from typing import Optional
 from aiogram.types import Message
 
 from app.bot.utils.files import FileCredentials
-from app.core.domain.dto.file import CreateFileDTO
 from app.core.domain.models.file import File
 from app.core.interfaces.usecase.file import FileUsecase
 
@@ -16,13 +15,7 @@ class FileUploader:
 
     async def upload(self, msg: Message, category_id: Optional[int] = None) -> File:
         cred = FileCredentials.from_message(msg)
-        return await self._uc.save_file(CreateFileDTO(
-            user_id=msg.from_user.id,
-            remote_id=cred.remote_id,
-            file_type=cred.file_type,
-            title=cred.title,
-            category_id=category_id
-        ))
+        return await self._uc.save_file(cred.to_create_dto(msg.from_user.id, category_id))
 
 
 

@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from aiogram.enums import ContentType
 from aiogram.types import Message
 
 from app.core.domain.models.file import FileType
-from app.core.domain.dto.file import ReloadFileDTO
+from app.core.domain.dto.file import ReloadFileDTO, CreateFileDTO
 
 
 @dataclass
@@ -15,6 +16,15 @@ class FileCredentials:
 
     def to_reload_dto(self) -> ReloadFileDTO:
         return ReloadFileDTO(self.remote_id, self.file_type, self.title)
+
+    def to_create_dto(self, user_id: int, category_id: Optional[int] = None) -> CreateFileDTO:
+        return CreateFileDTO(
+            user_id=user_id,
+            remote_id=self.remote_id,
+            file_type=self.file_type,
+            title=self.title,
+            category_id=category_id
+        )
 
     @classmethod
     def from_message(cls, m: Message) -> 'FileCredentials':

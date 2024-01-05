@@ -83,17 +83,17 @@ def filters_proxy_wrap(fn: Callable[[FiltersProxy], Awaitable]) -> OnClick:
 
 @filters_proxy_wrap
 async def _delete_file_types(proxy: FiltersProxy):
-    await proxy.set_file_types(None)
+    await proxy.delete_file_types()
 
 
 @filters_proxy_wrap
 async def _delete_title(proxy: FiltersProxy):
-    proxy.title = None
+    del proxy.title
 
 
 @filters_proxy_wrap
 async def _delete_category(proxy: FiltersProxy):
-    proxy.category_id = None
+    del proxy.category_id
 
 
 main_window = Window(

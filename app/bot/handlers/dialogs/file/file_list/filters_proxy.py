@@ -46,6 +46,10 @@ class FiltersProxy:
         managed = self.__get_title_widget()
         managed.widget.set_widget_data(managed.manager, value)
 
+    @title.deleter
+    def title(self):
+        self.title = None
+
     def __get_file_types_widget(self) -> ManagedMultiselect[FileType]:
         return self.manager.find(ID_SELECT_FILE_TYPES)
 
@@ -58,14 +62,14 @@ class FiltersProxy:
 
         return items
 
-    async def set_file_types(self, file_types: Optional[list[FileType]]):
+    async def set_file_types(self, file_types: list[FileType]):
         widget = self.__get_file_types_widget()
-        if file_types is None:
-            await widget.reset_checked()
-            return
-
         for file_type in file_types:
             await widget.set_checked(file_type, False)
+
+    async def delete_file_types(self):
+        widget = self.__get_file_types_widget()
+        await widget.reset_checked()
 
     @property
     def category_id(self) -> Optional[CategoryId | int]:
@@ -80,11 +84,11 @@ class FiltersProxy:
         :param value: Value of filters. Provide None if you want delete filter.
         :return:
         """
-        if value is None:
-            del self.manager.dialog_data[CATEGORY_ID_KEY]
-            return
-
         self.manager.dialog_data[CATEGORY_ID_KEY] = value
+
+    @category_id.deleter
+    def category_id(self):
+        del self.manager.dialog_data[CATEGORY_ID_KEY]
 
     def extract_to_dto(self, user_id: UserId) -> FilesFindDTO:
         return FilesFindDTO(

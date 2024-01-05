@@ -3,11 +3,10 @@ import logging
 
 from aiogram.fsm.storage.memory import MemoryStorage
 from environs import Env
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from app.bot.setup import BotModule
 from app.common.config import Loader
-from app.core.domain.services.category import CategoryService, CategoryRater
+from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
 from app.infrastructure.adapters.category_rater import CategoryRaterAdapter

@@ -14,14 +14,14 @@ from magic_filter import F
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_str import get_file_type_name
 from app.core.interfaces.usecase.category import CategoryUsecase
-from .filters_proxy import FiltersProxy
+from .filters_dao import FiltersDAO
 
 _filters = F["filters"]
 
 
 async def _main_window_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
-    proxy = FiltersProxy(dialog_manager)
-    filters = proxy.extract_to_dict()
+    filters_dao = FiltersDAO(dialog_manager)
+    filters = filters_dao.extract_to_dict()
     data = {
         "filters": filters
     }
@@ -73,27 +73,27 @@ def new_filter_btn(
     )
 
 
-def filters_proxy_wrap(fn: Callable[[FiltersProxy], Awaitable]) -> OnClick:
+def filters_proxy_wrap(fn: Callable[[FiltersDAO], Awaitable]) -> OnClick:
     async def wrapper(_, __, manager: DialogManager):
-        proxy = FiltersProxy(manager)
-        return await fn(proxy)
+        dao = FiltersDAO(manager)
+        return await fn(dao)
 
     return wrapper
 
 
 @filters_proxy_wrap
-async def _delete_file_types(proxy: FiltersProxy):
-    await proxy.file_types.delete()
+async def _delete_file_types(filters: FiltersDAO):
+    await filters.file_types.delete()
 
 
 @filters_proxy_wrap
-async def _delete_title(proxy: FiltersProxy):
-    del proxy.title
+async def _delete_title(filters: FiltersDAO):
+    del filters.title
 
 
 @filters_proxy_wrap
-async def _delete_category(proxy: FiltersProxy):
-    del proxy.category
+async def _delete_category(fitlers: FiltersDAO):
+    del fitlers.category
 
 
 main_window = Window(

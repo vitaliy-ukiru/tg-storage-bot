@@ -19,7 +19,7 @@ from app.core.domain.models.file import FileType
 from app.core.domain.models.user import UserId
 
 
-class FiltersProxy:
+class FiltersDAO:
     """
     Is proxy for filters that stores in internal dialog data.
     It gives clear access to all filters, w/o works with manager.

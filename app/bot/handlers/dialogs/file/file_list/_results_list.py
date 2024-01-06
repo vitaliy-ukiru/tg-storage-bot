@@ -9,7 +9,7 @@ from aiogram_dialog.widgets.kbd import Select, StubScroll, Column
 from aiogram_dialog.widgets.text import Const, Format
 
 from app.bot.handlers.dialogs import execute
-from app.bot.handlers.dialogs.file.file_list.filters_proxy import FiltersProxy
+from app.bot.handlers.dialogs.file.file_list.filters_dao import FiltersDAO
 from app.bot.states.dialogs import FileListSG
 from app.bot.widgets import BackTo, BACK_TEXT
 from app.bot.widgets.scroll import Navigation
@@ -22,8 +22,8 @@ FILES_PER_PAGE = 7
 
 
 async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUsecase, user: User, **_):
-    filters_proxy = FiltersProxy(dialog_manager)
-    filters = filters_proxy.extract_to_dto(user.id)
+    filters_dao = FiltersDAO(dialog_manager)
+    filters = filters_dao.extract_to_dto(user.id)
 
     current_page = await dialog_manager.find(FILE_LIST_ID).get_page()
 

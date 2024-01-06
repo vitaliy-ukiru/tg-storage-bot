@@ -11,7 +11,7 @@ from ._main import main_window
 from ._results_list import results_window
 from ._title import input_title_window
 from .common import FiltersDict
-from .filters_proxy import FiltersProxy
+from .filters_dao import FiltersDAO
 
 
 async def _on_start(start_data: dict | Any, manager: DialogManager):
@@ -22,13 +22,13 @@ async def _on_start(start_data: dict | Any, manager: DialogManager):
     if filters is None:
         return
 
-    proxy = FiltersProxy(manager)
-    await proxy.setup(filters)
+    filters_dao = FiltersDAO(manager)
+    await filters_dao.setup(filters)
 
 
 async def _on_process_result(_: Data, result: Any, manager: DialogManager):
     if result:
-        filters = FiltersProxy(manager)
+        filters = FiltersDAO(manager)
         filters.category = result["category_id"]
 
 

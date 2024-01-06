@@ -29,7 +29,7 @@ async def _on_start(start_data: dict | Any, manager: DialogManager):
 async def _on_process_result(_: Data, result: Any, manager: DialogManager):
     if result:
         filters = FiltersProxy(manager)
-        filters.category_id = result["category_id"]
+        filters.category = result["category_id"]
 
 
 file_list_dialog = Dialog(

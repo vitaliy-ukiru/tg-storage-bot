@@ -10,14 +10,18 @@ from app.bot.states.dialogs import ALLOWED_STATES
 from app.bot.utils.uploader import FileUploader
 
 router = Router()
+
+
 @router.message(Command("list"))
-async def command_list(msg: Message, dialog_manager: DialogManager):
+async def command_list(msg: Message, dialog_manager: DialogManager):  # noqa
     del msg  # unused
     await execute.file_list(dialog_manager, mode=StartMode.RESET_STACK)
 
 
 @router.message(MediaFilter(), StateFilter(None))
 async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manager: DialogManager):
+    # I don't have idea how get dialog_manager in filter
+    # therefore will filter this and skip handler
     if dialog_manager.has_context():
         state = dialog_manager.current_context().state
         if state not in ALLOWED_STATES:

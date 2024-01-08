@@ -1,9 +1,5 @@
 from typing import Optional
 
-from aiogram_dialog import DialogManager
-from aiogram_dialog.widgets.input import ManagedTextInput
-from aiogram_dialog.widgets.kbd import ManagedMultiselect
-
 from app.bot.handlers.dialogs.file.file_list.common import (
     ID_INPUT_TITLE,
     ID_SELECT_FILE_TYPES,
@@ -11,6 +7,7 @@ from app.bot.handlers.dialogs.file.file_list.common import (
     FiltersDict
 )
 from app.bot.widgets.dao import DialogDataProp
+from app.bot.widgets.dao.base_dao import BaseDAO
 from app.bot.widgets.dao.widgets import TextInputProp
 from app.bot.widgets.dao.widgets.multiselect import MultiselectProp
 from app.core.domain.dto.file import FilesFindDTO

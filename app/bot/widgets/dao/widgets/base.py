@@ -28,7 +28,7 @@ class WidgetDataObjectABC(Generic[T, ManagedWidgetT], DataObjectABC[T]):
         self._widget_id = widget_id
 
     @abstractmethod
-    def process_get(self, widget: ManagedWidgetT):
+    def process_get(self, widget: ManagedWidgetT) -> T:
         raise NotImplementedError
 
     @abstractmethod
@@ -53,7 +53,7 @@ class WidgetDataObjectABC(Generic[T, ManagedWidgetT], DataObjectABC[T]):
         manager = get_manager(provider)
         return self._find_widget(manager)
 
-    def __get__(self, obj: ManagerProviderVariant, owner=None) -> T | None:
+    def __get__(self, obj: ManagerProviderVariant, owner=None) -> T:
         widget = self._get_widget(obj)
         return self.process_get(widget)
 

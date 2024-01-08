@@ -5,7 +5,7 @@ __all__ = (
 from typing import Union, Callable, Awaitable
 
 from aiogram_dialog import Window, DialogManager
-from aiogram_dialog.widgets.kbd import Start, SwitchTo, Button, Row, Keyboard
+from aiogram_dialog.widgets.kbd import Start, SwitchTo, Button, Row
 from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from aiogram_dialog.widgets.widget_event import WidgetEventProcessor

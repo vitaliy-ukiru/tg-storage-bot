@@ -1,12 +1,10 @@
 __all__ = (
     'WidgetDataObjectABC',
-    'WidgetProperty',
-    'WidgetGetter',
-    'WidgetSetter',
-    'WidgetDeleter',
-    'TextInputProp'
+    'TextInputProp',
+    'MultiselectProp',
+    'MultiselectObjectProxy'
 )
 
 from .base import WidgetDataObjectABC
-from .generic import WidgetProperty, WidgetGetter, WidgetSetter, WidgetDeleter
 from .text_input import TextInputProp
+from .multiselect import MultiselectProp, MultiselectObjectProxy

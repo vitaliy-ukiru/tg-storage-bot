@@ -93,8 +93,8 @@ async def _delete_title(filters: FiltersDAO):
 
 
 @filters_proxy_wrap
-async def _delete_category(fitlers: FiltersDAO):
-    del fitlers.category
+async def _delete_category(filters: FiltersDAO):
+    del filters.category
 
 
 main_window = Window(

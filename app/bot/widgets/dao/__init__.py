@@ -4,6 +4,7 @@ __all__ = (
     'ManagerFieldProvider',
     'DialogManagerFieldProvider',
     'DialogDataProp',
+    'DialogDataRequiredProp',
     'get_manager'
 )
 
@@ -15,4 +16,4 @@ from .base import (
     DialogManagerFieldProvider,
     get_manager
 )
-from .dialog_data import DialogDataProp
+from .dialog_data import DialogDataProp, DialogDataRequiredProp

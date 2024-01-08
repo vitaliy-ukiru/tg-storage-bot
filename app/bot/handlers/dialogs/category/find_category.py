@@ -6,17 +6,17 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, Scrolli
 from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Const, Format
 
+from app.bot.states.dialogs import CategoryFindSG
 from app.bot.utils.category_finders import (CategoryFinder, TitleCategoriesFinder,
                                             PopularCategoriesFinder,
                                             FavoriteCategoriesFinder, FindMode)
-from app.bot.states.dialogs import CategoryFindSG
 from app.bot.widgets import BackTo, CANCEL_TEXT, BACK_TEXT
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
 
-
 FIND_MODE_KEY = "find_mode"
+
 
 async def _process_input_title(_, __, manager: DialogManager, ___):
     await manager.next()
@@ -121,5 +121,4 @@ find_category_dialog = Dialog(
         state=CategoryFindSG.select,
         getter=_category_generic_getter,
     )
-
 )

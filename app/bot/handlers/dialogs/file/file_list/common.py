@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Sequence
 
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileType
@@ -9,6 +9,6 @@ CATEGORY_ID_KEY = "category_id"
 
 
 class FiltersDict(TypedDict):
-    category_id: Optional[CategoryId | int]
+    category_id: Optional[CategoryId]
     title: Optional[str]
-    file_types: Optional[list[FileType]]
+    file_types: Optional[Sequence[FileType]]

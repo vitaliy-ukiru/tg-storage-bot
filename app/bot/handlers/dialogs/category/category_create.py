@@ -2,47 +2,47 @@ from typing import Optional
 
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
+from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
 from app.bot.states.dialogs import CategoryCreateSG
 from app.bot.utils.optional_str import optional_str_factory
 from app.bot.widgets import CANCEL_TEXT, BACK_TEXT
+from app.bot.widgets.dao.base_dao import BaseDAO
+from app.bot.widgets.dao.widgets import TextInputProp
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.interfaces.usecase.category import CategoryUsecase
+
+ID_INPUT_TITLE = "input_title"
+ID_INPUT_DESC = "input_desc"
+
+
+class CreateCategoryDAO(BaseDAO):
+    title = TextInputProp[str](ID_INPUT_TITLE)
+    desc = TextInputProp[str | None](ID_INPUT_DESC)
 
 
 async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
     await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
-def _get_values(manager: DialogManager) -> tuple[str, Optional[str]]:
-    title_input: ManagedTextInput[str] = manager.find(ID_INPUT_TITLE)
-    desc_input: ManagedTextInput[Optional[str]] = manager.find(ID_INPUT_DESC)
-
-    return title_input.get_value(), desc_input.get_value()
-
-
 async def menu_getter(dialog_manager: DialogManager, **_):
-    title, desc = _get_values(dialog_manager)
-    return dict(title=title, desc=desc)
+    dao = CreateCategoryDAO(dialog_manager)
+    return dict(title=dao.title, desc=dao.desc)
 
 
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
     category_service: CategoryUsecase = manager.middleware_data["category_service"]
-    title, desc = _get_values(manager)
+    dao = CreateCategoryDAO(manager)
     category = await category_service.save_category(CreateCategoryDTO(
-        title=title,
-        desc=desc,
+        title=dao.title,
+        desc=dao.desc,
         user_id=call.from_user.id
     ))
 
     await manager.done(dict(category_id=category.id, category=category))
 
-
-ID_INPUT_TITLE = "input_title"
-ID_INPUT_DESC = "input_desc"
 
 category_create_dialog = Dialog(
     Window(

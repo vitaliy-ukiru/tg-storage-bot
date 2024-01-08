@@ -46,6 +46,8 @@ class MultiselectObjectProxy(Generic[T]):
 
 
 class MultiselectProp(WidgetDataObjectABC[T, ManagedMultiselect[T]]):
+    def __get__(self, obj: ManagerProviderVariant, owner=None) -> MultiselectObjectProxy:  # type: ignore
+        return super().__get__(obj, owner)
 
     @staticmethod
     def process_get(widget: ManagedMultiselect[T]):

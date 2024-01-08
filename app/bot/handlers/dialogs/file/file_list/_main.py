@@ -23,7 +23,8 @@ async def _main_window_getter(dialog_manager: DialogManager, category_service: C
     filters_dao = FiltersDAO(dialog_manager)
     filters = filters_dao.extract_to_dict()
     data = {
-        "filters": filters
+        "filters": filters,
+        "have_filters": len(filters) > 0
     }
 
     if (category_id := filters.get("category_id")) is not None:
@@ -99,10 +100,10 @@ async def _delete_category(fitlers: FiltersDAO):
 main_window = Window(
     Case(
         {
-            0: Const("Фильтры не установлены"),
-            ...: _main_menu_text
+            False: Const("Фильтры не установлены"),
+            True: _main_menu_text
         },
-        selector=_filters.len() or 0
+        selector="have_filters"
     ),
     new_filter_btn(
         Start(

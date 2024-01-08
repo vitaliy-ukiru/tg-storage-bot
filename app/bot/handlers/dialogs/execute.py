@@ -15,7 +15,9 @@ async def file_view(manager: DialogManager,
                     data: Data = None,
                     mode: StartMode = StartMode.NORMAL,
                     show_mode: Optional[ShowMode] = None):
-    data = data or {}
+    if not isinstance(data, dict):
+        data = {}
+
     await manager.start(
         FileViewSG.main,
         dict(file_id=int(file_id)) | data,

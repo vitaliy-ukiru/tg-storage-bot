@@ -19,7 +19,7 @@ from app.core.domain.models.file import FileType
 from app.core.domain.models.user import UserId
 
 
-class FiltersDAO:
+class FiltersDAO(BaseDAO):
     """
     Is proxy for filters that stores in internal dialog data.
     It gives clear access to all filters, w/o works with manager.
@@ -28,13 +28,10 @@ class FiltersDAO:
     But methods set_file_types and delete_file_types is async
     and because I can't make it as property. It will be ugly.
     """
-    manager: DialogManager
+
     title = TextInputProp[Optional[str]](ID_INPUT_TITLE)
     file_types = MultiselectProp[FileType](ID_SELECT_FILE_TYPES)
     category = DialogDataProp[CategoryId](CATEGORY_ID_KEY)
-
-    def __init__(self, manager: DialogManager):
-        self.manager = manager
 
     def extract_to_dto(self, user_id: UserId) -> FilesFindDTO:
         return FilesFindDTO(

@@ -74,25 +74,25 @@ class DataObjectABC(ABC, Generic[T]):
 
 class ManagedDataObject(ABC, Generic[T]):
     @abstractmethod
-    def process_get(self, manager: DialogManager) -> T | None:
+    def get(self, manager: DialogManager) -> T | None:
         raise NotImplementedError
 
     @abstractmethod
-    def process_set(self, manager: DialogManager, value: T):
+    def set(self, manager: DialogManager, value: T):
         raise NotImplementedError
 
     @abstractmethod
-    def process_del(self, manager: DialogManager):
+    def delete(self, manager: DialogManager):
         raise NotImplementedError
 
     def __get__(self, obj: ManagerProviderVariant, owner=None) -> T | None:
         manager = get_manager(obj)
-        return self.process_get(manager)
+        return self.get(manager)
 
     def __set__(self, obj: ManagerProviderVariant, value: T):
         manager = get_manager(obj)
-        self.process_set(manager, value)
+        self.set(manager, value)
 
     def __delete__(self, obj: ManagerProviderVariant):
         manager = get_manager(obj)
-        self.process_del(manager)
+        self.delete(manager)

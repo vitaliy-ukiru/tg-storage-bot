@@ -50,11 +50,11 @@ class MultiselectProp(WidgetDataObjectABC[T, ManagedMultiselect[T]]):
         return super().__get__(obj, owner)
 
     @staticmethod
-    def process_get(widget: ManagedMultiselect[T]):
+    def get(widget: ManagedMultiselect[T]):
         return MultiselectObjectProxy(widget)
 
-    def process_set(self, widget: ManagedMultiselect[T], value: T):
+    def set(self, widget: ManagedMultiselect[T], value: T):
         raise AttributeError(f"Multiselect DAO setter in async, use async method set in proxy (getter)")
 
-    def process_del(self, widget: ManagedMultiselect[T]):
+    def delete(self, widget: ManagedMultiselect[T]):
         raise AttributeError(f"Multiselect DAO deleter in async, use async method delete (getter)")

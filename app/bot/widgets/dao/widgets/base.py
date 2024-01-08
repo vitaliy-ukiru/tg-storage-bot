@@ -28,15 +28,15 @@ class WidgetDataObjectABC(Generic[T, ManagedWidgetT], DataObjectABC[T]):
         self._widget_id = widget_id
 
     @abstractmethod
-    def process_get(self, widget: ManagedWidgetT) -> T:
+    def get(self, widget: ManagedWidgetT) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    def process_set(self, widget: ManagedWidgetT, value: T):
+    def set(self, widget: ManagedWidgetT, value: T):
         raise NotImplementedError
 
     @abstractmethod
-    def process_del(self, widget: ManagedWidgetT):
+    def delete(self, widget: ManagedWidgetT):
         raise NotImplementedError
 
     @property
@@ -55,12 +55,12 @@ class WidgetDataObjectABC(Generic[T, ManagedWidgetT], DataObjectABC[T]):
 
     def __get__(self, obj: ManagerProviderVariant, owner=None) -> T:
         widget = self._get_widget(obj)
-        return self.process_get(widget)
+        return self.get(widget)
 
     def __set__(self, obj: ManagerProviderVariant, value: T):
         widget = self._get_widget(obj)
-        self.process_set(widget, value)
+        self.set(widget, value)
 
     def __delete__(self, obj: ManagerProviderVariant):
         widget = self._get_widget(obj)
-        self.process_del(widget)
+        self.delete(widget)

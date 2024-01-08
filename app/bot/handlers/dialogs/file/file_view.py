@@ -23,7 +23,7 @@ async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogMa
     user: User = manager.middleware_data[USER_KEY]
 
     await file_service.delete_file(file_id, user.id)
-    await call.message.edit_text("Файл удалён")
+    await call.message.edit_text("Файл удалён")  # type: ignore
     await manager.done()
 
 

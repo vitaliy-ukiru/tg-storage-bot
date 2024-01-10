@@ -21,6 +21,9 @@ class UserMiddleware(BaseMiddleware):
     async def __call__(self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
                        event: TelegramObject, data: Dict[str, Any]) -> Any:
         tg_user = cast(TgUser | None, data.get(EVENT_FROM_USER_KEY))
+        if tg_user is None:
+            return await handler(event, data)
+
         user_id = tg_user.id
         user = await self.svc.get_user(UserId(user_id), True)
         data[USER_KEY] = user

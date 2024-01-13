@@ -13,7 +13,7 @@ files = Container()
 
 @files("file_type")
 def _file_type(value: FileType) -> ColumnExpressionArgument[bool]:
-    return FileModel.type_id == value
+    return FileModel.file_type == value
 
 
 @files("file_types")

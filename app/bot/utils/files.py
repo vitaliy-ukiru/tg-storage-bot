@@ -4,7 +4,7 @@ from typing import Optional
 from aiogram.enums import ContentType
 from aiogram.types import Message
 
-from app.core.domain.models.file import FileType
+from app.core.domain.models.file import FileCategory, SubFileCategory, FileType
 from app.core.domain.dto.file import ReloadFileDTO, CreateFileDTO
 
 
@@ -33,52 +33,73 @@ class FileCredentials:
                 photo = m.photo[-1]
                 return cls(
                     remote_id=photo.file_id,
-                    file_type=FileType.photo,
+                    file_type=FileType(FileCategory.photo),
                     title=m.caption
                 )
             case ContentType.DOCUMENT:
                 doc = m.document
                 return cls(
                     remote_id=doc.file_id,
-                    file_type=FileType.document,
+                    file_type=FileType(
+                        FileCategory.document,
+                        sub_file_type_from_mime(doc.mime_type)
+                    ),
                     title=m.caption or doc.file_name
                 )
             case ContentType.AUDIO:
                 audio = m.audio
                 return cls(
                     remote_id=audio.file_id,
-                    file_type=FileType.audio,
+                    file_type=FileType(FileCategory.audio),
                     title=m.caption or audio.file_name,
                 )
             case ContentType.VIDEO:
                 video = m.video
                 return cls(
                     remote_id=video.file_id,
-                    file_type=FileType.video,
+                    file_type=FileType(FileCategory.video),
                     title=m.caption or video.file_name,
                 )
             case ContentType.ANIMATION:
                 gif = m.animation
                 return cls(
                     remote_id=gif.file_id,
-                    file_type=FileType.gif,
+                    file_type=FileType(FileCategory.gif),
                     title=m.caption or gif.file_name,
                 )
             case _:
                 raise Exception("invalid media type")
 
 
-def content_type_from_file(file_type: FileType) -> ContentType:
+def content_type_from_category(file_type: FileCategory) -> ContentType:
     match file_type:
-        case FileType.photo:
+        case FileCategory.photo:
             return ContentType.PHOTO
-        case FileType.document:
+        case FileCategory.document:
             return ContentType.DOCUMENT
-        case FileType.video:
+        case FileCategory.video:
             return ContentType.VIDEO
-        case FileType.audio:
+        case FileCategory.audio:
             return ContentType.AUDIO
-        case FileType.gif:
+        case FileCategory.gif:
             return ContentType.ANIMATION
         case _:
             return ContentType.DOCUMENT
+
+
+def sub_file_type_from_mime(mime_type: Optional[str]) -> Optional[SubFileCategory]:
+    if mime_type is None:
+        return None
+
+    mime_base, *_ = mime_type.split('/', 2)
+    match mime_base:
+        case "image":
+            return SubFileCategory.doc_image
+        case "video":
+            return SubFileCategory.doc_image
+        case "audio":
+            return SubFileCategory.doc_audio
+        case "text":
+            return SubFileCategory.doc_text
+        case _:
+            return None

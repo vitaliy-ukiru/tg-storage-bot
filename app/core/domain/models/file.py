@@ -7,7 +7,7 @@ from .category import Category
 from .user import UserId
 
 
-class FileType(StrEnum):
+class FileCategory(StrEnum):
     unknown = auto()
     photo = auto()
     video = auto()
@@ -16,11 +16,17 @@ class FileType(StrEnum):
     gif = auto()
 
 
-class SubFileType(StrEnum):
+class SubFileCategory(StrEnum):
     doc_text = auto()
     doc_image = auto()
     doc_video = auto()
     doc_audio = auto()
+
+
+@dataclass
+class FileType:
+    category: FileCategory
+    sub: Optional[SubFileCategory] = None
 
 
 FileId = NewType("FileId", int)

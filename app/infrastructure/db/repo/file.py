@@ -24,7 +24,8 @@ class FileStorage(BaseRepository, FileRepository):
             db_file = models.File(
                 remote_id=file.remote_file_id,
                 user_id=file.user_id,
-                file_type=file.type,
+                file_type=file.type.category,
+                sub_type=file.type.sub,
                 title=file.title,
                 created_at=file.created_at,
             )
@@ -86,8 +87,12 @@ class FileStorage(BaseRepository, FileRepository):
             if file.category is not None and file.category.id != model.category_id:
                 model.category_id = file.category.id
 
-            if file.type != model.file_type:
-                model.file_type = file.type
+            file_type = file.type
+            if file_type.category != model.file_type:
+                model.file_type = file_type.category
+
+            if file_type.sub != model.sub_type:
+                model.sub_type = file_type.sub
 
             if file.remote_file_id != model.remote_id:
                 model.remote_id = str(file.remote_file_id)

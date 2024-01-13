@@ -12,12 +12,12 @@ files = Container()
 
 
 @files("file_type")
-def _file_type(value: FileType) -> ColumnExpressionArgument[bool]:
+def _file_type(value: FileType):
     return FileModel.type_id == value
 
 
 @files("file_types")
-def _file_types(value: Sequence[FileType]) -> ColumnExpressionArgument[bool]:
+def _file_types(value: Sequence[FileType]):
     return FileModel.type_id.in_(value)
 
 
@@ -27,12 +27,12 @@ def _user(value: UserId | int):
 
 
 @files("category_id")
-def _category(value: int | CategoryId | Category) -> ColumnExpressionArgument[bool]:
+def _category(value: int | CategoryId | Category):
     if isinstance(value, Category):
         value = value.id
     return FileModel.category_id == value
 
 
 @files("title_match")
-def _title(value: str) -> ColumnExpressionArgument[bool]:
+def _title(value: str):
     return FileModel.title.icontains(value)

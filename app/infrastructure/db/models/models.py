@@ -85,7 +85,7 @@ class File(Base):
     user: Mapped["User"] = relationship()
 
     file_type: Mapped[FileType]
-    # sub_type: Mapped[Optional[SubFileType]]
+    sub_type: Mapped[Optional[SubFileType]]
 
     category_id: Mapped[Optional[int]] = mapped_column(BigInteger, ForeignKey("categories.id"))
     category: Mapped[Optional[Category]] = relationship()

@@ -16,6 +16,13 @@ class FileType(StrEnum):
     gif = auto()
 
 
+class SubFileType(StrEnum):
+    doc_text = auto()
+    doc_image = auto()
+    doc_video = auto()
+    doc_audio = auto()
+
+
 FileId = NewType("FileId", int)
 RemoteFileId = NewType("RemoteFileId", str)
 

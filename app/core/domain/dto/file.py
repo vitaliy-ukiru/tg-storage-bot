@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from app.core.domain.models.file import FileType
+from app.core.domain.models.file import FileCategory, FileType
 
 
 @dataclass(frozen=True)
@@ -24,5 +24,5 @@ class ReloadFileDTO:
 class FilesFindDTO:
     user_id: int
     category_id: Optional[int] = None
-    file_types: Optional[Sequence[FileType]] = None
+    file_categories: Optional[Sequence[FileCategory]] = None
     title_match: Optional[str] = None

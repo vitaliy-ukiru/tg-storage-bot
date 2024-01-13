@@ -12,7 +12,7 @@ from aiogram.types import (
 
 from app.core.common.filters.file import FileFilters
 from app.core.domain.exceptions.file import FileException, FileNotFound
-from app.core.domain.models.file import File, FileType, FileId
+from app.core.domain.models.file import File, FileCategory, FileId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase import FileUsecase
 
@@ -35,7 +35,7 @@ async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase,
             user.id,
         )
         # seen something bad
-        if file.type == FileType.unknown:
+        if file.type.category == FileCategory.unknown:
             raise FileNotFound(file_id)
 
     except FileNotFound:
@@ -71,7 +71,7 @@ async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsec
     results = [
         _convert_to_result(file)
         for file in files
-        if file.type != FileType.unknown
+        if file.type.category != FileCategory.unknown
     ]
 
     await inline_query.answer(
@@ -86,21 +86,21 @@ async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsec
 # what InlineQuery.answer accepts Union[...]
 def _convert_to_result(file: File):
     __result_types = {
-        FileType.photo: InlineQueryResultCachedPhoto,
-        FileType.video: InlineQueryResultCachedVideo,
-        FileType.document: InlineQueryResultCachedDocument,
-        FileType.audio: InlineQueryResultCachedAudio,
-        FileType.gif: InlineQueryResultCachedGif,
+        FileCategory.photo: InlineQueryResultCachedPhoto,
+        FileCategory.video: InlineQueryResultCachedVideo,
+        FileCategory.document: InlineQueryResultCachedDocument,
+        FileCategory.audio: InlineQueryResultCachedAudio,
+        FileCategory.gif: InlineQueryResultCachedGif,
     }
 
     params = dict(id=f'{file.type}_{file.id}', title=file.title, caption=file.title)
 
-    inline_result_type = __result_types.get(file.type)
+    inline_result_type = __result_types.get(file.type.category)
     if inline_result_type is None:
         raise FileException(file.id, "file type is not supported for inline query")
 
-    if file.type == FileType.audio:
+    if file.type.category == FileCategory.audio:
         del params["title"]
 
-    params[f'{file.type}_file_id'] = file.remote_file_id
+    params[f'{file.type.category}_file_id'] = file.remote_file_id
     return inline_result_type(**params)

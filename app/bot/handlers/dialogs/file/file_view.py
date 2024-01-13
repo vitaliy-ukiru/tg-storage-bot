@@ -7,13 +7,13 @@ from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Const, Format
 
 from app.bot.states.dialogs import FileViewSG, FileEditSG
-from app.bot.utils.file_type_str import get_file_type_name
+from app.bot.utils.file_type_str import get_file_type_full_name
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
 
 from app.bot.middlewares.user_manager import USER_KEY
-from app.bot.utils.files import content_type_from_file
+from app.bot.utils.files import content_type_from_category
 from app.bot.widgets import StartWithData
 
 
@@ -40,7 +40,7 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
         file_id=file.id,
         file_title=file.name,
         file_type=file.type,
-        file_type_name=get_file_type_name(file.type),
+        file_type_name=get_file_type_full_name(file.type),
         file_category=category_name,
         upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
     )
@@ -56,7 +56,7 @@ async def _media_getter(dialog_manager: DialogManager, file_service: FileUsecase
     user: User = dialog_manager.middleware_data[USER_KEY]
 
     file = await file_service.get_file(file_id, user.id)
-    content_type = content_type_from_file(file.type)
+    content_type = content_type_from_category(file.type.category)
     media = MediaAttachment(content_type, file_id=MediaId(file.remote_file_id))
     return dict(file_media=media, file_id=file_id)
 

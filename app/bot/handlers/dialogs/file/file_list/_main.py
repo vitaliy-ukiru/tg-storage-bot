@@ -12,7 +12,7 @@ from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
 from magic_filter import F
 
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
-from app.bot.utils.file_type_str import get_file_type_name
+from app.bot.utils.file_type_str import get_file_category_name
 from app.core.interfaces.usecase.category import CategoryUsecase
 from .filters_dao import FiltersDAO
 
@@ -41,7 +41,7 @@ _main_menu_text = Multi(
             Format("{item}"),
             sep=', ',
             items=lambda data: [
-                get_file_type_name(ft)
+                get_file_category_name(ft)
                 for ft in data["filters"]["file_types"]
             ]
         ),

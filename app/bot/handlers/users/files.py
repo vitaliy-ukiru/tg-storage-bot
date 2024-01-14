@@ -38,9 +38,12 @@ async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manag
 @router.message(Command("file"))
 async def file_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager):
     args = command.args
+    if args is None:
+        await msg.answer("Send file id as argument")
+        return
     try:
         file_id = int(args)
     except ValueError as _:
         await msg.answer("invalid file_id")
-        return
-    await execute.file_view(dialog_manager, file_id, mode=StartMode.RESET_STACK)
+    else:
+        await execute.file_view(dialog_manager, file_id, mode=StartMode.RESET_STACK)

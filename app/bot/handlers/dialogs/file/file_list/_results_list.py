@@ -5,6 +5,7 @@ __all__ = (
 import math
 
 from aiogram_dialog import Window, DialogManager
+from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.kbd import Select, StubScroll, Column
 from aiogram_dialog.widgets.text import Const, Format
 
@@ -25,7 +26,8 @@ async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUs
     filters_dao = FiltersDAO(dialog_manager)
     filters = filters_dao.extract_to_dto(user.id)
 
-    current_page = await dialog_manager.find(FILE_LIST_ID).get_page()
+    pager: ManagedScroll = dialog_manager.find(FILE_LIST_ID)
+    current_page = await pager.get_page()
 
     files, total_files = await file_service.find_files(
         dto=filters,

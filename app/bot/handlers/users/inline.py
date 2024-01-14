@@ -54,7 +54,7 @@ async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase,
 
 @router.inline_query()
 async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsecase, user: User):
-    files, _ = await file_service.find_files(
+    files = await file_service.find_files(
         FileFilters.user_id(user.id),
         FileFilters.title_match(inline_query.query)
     )

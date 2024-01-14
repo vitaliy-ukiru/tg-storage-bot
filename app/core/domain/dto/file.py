@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from app.core.domain.models.file import FileType
+from app.core.domain.models.file import FileType, RemoteFileId
 
 
 @dataclass(frozen=True)
@@ -15,7 +15,7 @@ class CreateFileDTO:
 
 @dataclass(frozen=True)
 class ReloadFileDTO:
-    remote_id: str
+    remote_id: RemoteFileId
     file_type: FileType
     title: str | None
 

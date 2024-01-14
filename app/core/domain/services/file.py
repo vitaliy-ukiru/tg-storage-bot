@@ -1,7 +1,7 @@
 import abc
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol, Optional
+from typing import Protocol, Optional, overload, Literal
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
@@ -25,7 +25,7 @@ class CategoryGetter(Protocol):
 UNDEFINED_FILE_ID = FileId(0)
 
 
-def _ensure_owner(file: File, user_id: UserId = None):
+def _ensure_owner(file: File, user_id: Optional[UserId] = None):
     if user_id is None:
         return
 
@@ -54,7 +54,7 @@ class FileService(FileUsecase):
         file.id = await self._repo.save_file(file)
         return file
 
-    async def get_file(self, file_id: FileId, user_id: UserId = None) -> File:
+    async def get_file(self, file_id: FileId, user_id: Optional[UserId] = None) -> File:
         file = await self._repo.get_file(file_id)
         if file is None:
             raise FileNotFound(file_id)

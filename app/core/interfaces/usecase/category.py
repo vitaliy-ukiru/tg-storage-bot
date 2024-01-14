@@ -32,6 +32,6 @@ class CategoryUsecase(Protocol):
     @abc.abstractmethod
     async def find_categories(self,
                               *filters: FilterField,
-                              dto: CategoriesFindDTO = None,
+                              dto: Optional[CategoriesFindDTO] = None,
                               paginate: Optional[Pagination] = None) -> list[Category]:
         raise NotImplementedError

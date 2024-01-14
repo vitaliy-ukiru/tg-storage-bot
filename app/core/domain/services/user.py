@@ -1,3 +1,5 @@
+from typing import cast
+
 from app.core.interfaces.repository.user import UserRepository
 from app.core.interfaces.usecase.user import UserUsecase
 from app.core.domain.exceptions.user import UserNotFound, UserDeleted
@@ -28,4 +30,4 @@ class UserService(UserUsecase):
 
             user = await self._repo.restore_user(user_id)
 
-        return user
+        return cast(User, user)

@@ -25,7 +25,7 @@ class FileStorage(BaseRepository, FileRepository):
                 remote_id=file.remote_file_id,
                 user_id=file.user_id,
                 file_type=file.type.category,
-                sub_type=file.type.sub,
+                mime_type=file.type.mime,
                 title=file.title,
                 created_at=file.created_at,
             )
@@ -91,8 +91,8 @@ class FileStorage(BaseRepository, FileRepository):
             if file_type.category != model.file_type:
                 model.file_type = file_type.category
 
-            if file_type.sub != model.sub_type:
-                model.sub_type = file_type.sub
+            if file_type.mime != model.mime_type:
+                model.mime_type = file_type.mime
 
             if file.remote_file_id != model.remote_id:
                 model.remote_id = str(file.remote_file_id)

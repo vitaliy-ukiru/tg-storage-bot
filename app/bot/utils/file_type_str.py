@@ -43,15 +43,7 @@ SUB_CATEGORY_TEXT = "текст"
 SUB_CATEGORY_IMAGE = "изображение"
 SUB_CATEGORY_VIDEO = "видео"
 SUB_CATEGORY_AUDIO = "аудио"
-#
-# # TODO: replace by mime type
-# _SUB_CATEGORIES = {
-#     SubFileCategory.doc_text: SUB_CATEGORY_DOC_TEXT,
-#     SubFileCategory.doc_image: SUB_CATEGORY_DOC_IMAGE,
-#     SubFileCategory.doc_video: SUB_CATEGORY_DOC_VIDEO,
-#     SubFileCategory.doc_audio: SUB_CATEGORY_DOC_AUDIO,
-# }
-#
+
 
 def format_mime_type(mime: Optional[str]) -> Optional[str]:
     if mime is None:

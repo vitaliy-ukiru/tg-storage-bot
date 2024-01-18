@@ -16,17 +16,10 @@ class FileCategory(StrEnum):
     gif = auto()
 
 
-class SubFileCategory(StrEnum):
-    doc_text = auto()
-    doc_image = auto()
-    doc_video = auto()
-    doc_audio = auto()
-
-
 @dataclass
 class FileType:
     category: FileCategory
-    sub: Optional[SubFileCategory] = None
+    mime: Optional[str]
 
 
 FileId = NewType("FileId", int)

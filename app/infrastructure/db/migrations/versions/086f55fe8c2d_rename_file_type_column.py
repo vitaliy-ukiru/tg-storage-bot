@@ -20,9 +20,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.alter_column('files', 'type_id', new_column_name="file_type")
-    # ### end Alembic commands ###
+    op.execute("""ALTER TYPE filetype rename to filecategory""")
 
 
 def downgrade() -> None:
     op.alter_column('files', 'file_type', new_column_name="type_id")
-    # ### end Alembic commands ###
+    op.execute("""ALTER TYPE filecategory rename to filetype""")

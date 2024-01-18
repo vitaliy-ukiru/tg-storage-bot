@@ -4,7 +4,7 @@ from typing import Optional
 from aiogram.enums import ContentType
 from aiogram.types import Message
 
-from app.core.domain.models.file import FileCategory, SubFileCategory, FileType
+from app.core.domain.models.file import FileCategory, FileType
 from app.core.domain.dto.file import ReloadFileDTO, CreateFileDTO
 
 
@@ -42,7 +42,7 @@ class FileCredentials:
                     remote_id=doc.file_id,
                     file_type=FileType(
                         FileCategory.document,
-                        sub_file_type_from_mime(doc.mime_type)
+                        doc.mime_type,
                     ),
                     title=m.caption or doc.file_name
                 )
@@ -85,21 +85,3 @@ def content_type_from_category(file_type: FileCategory) -> ContentType:
             return ContentType.ANIMATION
         case _:
             return ContentType.DOCUMENT
-
-
-def sub_file_type_from_mime(mime_type: Optional[str]) -> Optional[SubFileCategory]:
-    if mime_type is None:
-        return None
-
-    mime_base, *_ = mime_type.split('/', 2)
-    match mime_base:
-        case "image":
-            return SubFileCategory.doc_image
-        case "video":
-            return SubFileCategory.doc_image
-        case "audio":
-            return SubFileCategory.doc_audio
-        case "text":
-            return SubFileCategory.doc_text
-        case _:
-            return None

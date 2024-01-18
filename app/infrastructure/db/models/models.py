@@ -12,7 +12,7 @@ from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-from app.core.domain.models.file import File as DFile, FileCategory, SubFileCategory, FileType
+from app.core.domain.models.file import File as DFile, FileCategory, FileType
 from app.core.domain.models.category import Category as DCategory
 from app.core.domain.models.user import User as DUser
 
@@ -85,7 +85,7 @@ class File(Base):
     user: Mapped["User"] = relationship()
 
     file_type: Mapped[FileCategory]
-    sub_type: Mapped[Optional[SubFileCategory]]
+    mime_type: Mapped[Optional[str]]
 
     category_id: Mapped[Optional[int]] = mapped_column(BigInteger, ForeignKey("categories.id"))
     category: Mapped[Optional[Category]] = relationship()
@@ -96,7 +96,10 @@ class File(Base):
     def to_domain(self, with_category=True) -> DFile:
         file = DFile(
             id=self.id,
-            type=FileType(self.file_type, self.sub_type),
+            type=FileType(
+                category=self.file_type,
+                mime=self.mime_type
+            ),
             remote_file_id=self.remote_id,
             user_id=self.user_id,
             created_at=self.created_at,

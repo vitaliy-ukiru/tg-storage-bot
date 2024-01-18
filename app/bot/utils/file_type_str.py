@@ -1,4 +1,7 @@
-from app.core.domain.models.file import FileCategory, SubFileCategory, FileType
+import mimetypes
+from typing import Optional
+
+from app.core.domain.models.file import FileCategory, FileType
 
 CATEGORY_PHOTO = "Фото"
 CATEGORY_VIDEO = "Видео"
@@ -36,28 +39,58 @@ def file_categories_with_names() -> tuple[tuple[str, FileCategory]]:
     return _CATEGORIES_NAMES
 
 
-SUB_CATEGORY_DOC_TEXT = "текст"
-SUB_CATEGORY_DOC_IMAGE = "изображение"
-SUB_CATEGORY_DOC_VIDEO = "video"
-SUB_CATEGORY_DOC_AUDIO = "аудио"
+SUB_CATEGORY_TEXT = "текст"
+SUB_CATEGORY_IMAGE = "изображение"
+SUB_CATEGORY_VIDEO = "видео"
+SUB_CATEGORY_AUDIO = "аудио"
+#
+# # TODO: replace by mime type
+# _SUB_CATEGORIES = {
+#     SubFileCategory.doc_text: SUB_CATEGORY_DOC_TEXT,
+#     SubFileCategory.doc_image: SUB_CATEGORY_DOC_IMAGE,
+#     SubFileCategory.doc_video: SUB_CATEGORY_DOC_VIDEO,
+#     SubFileCategory.doc_audio: SUB_CATEGORY_DOC_AUDIO,
+# }
+#
 
-_SUB_CATEGORIES = {
-    SubFileCategory.doc_text: SUB_CATEGORY_DOC_TEXT,
-    SubFileCategory.doc_image: SUB_CATEGORY_DOC_IMAGE,
-    SubFileCategory.doc_video: SUB_CATEGORY_DOC_VIDEO,
-    SubFileCategory.doc_audio: SUB_CATEGORY_DOC_AUDIO,
-}
+def format_mime_type(mime: Optional[str]) -> Optional[str]:
+    if mime is None:
+        return None
 
-def get_sub_category_name(sub_type: SubFileCategory) -> str:
-    return _SUB_CATEGORIES[sub_type]
+    not_common = all(
+        not mime.startswith(type_)
+        for type_ in ('text/plaint', "application/octet-stream")
+    )
+
+    if not_common:
+        ext = mimetypes.guess_extension(mime, strict=False)
+        if ext is not None:
+            if ext.startswith('.'):
+                ext = ext[1:]
+
+            return ext.upper()
+
+    base, *_ = mime.split('/', 2)
+    match base:
+        case "image":
+            return SUB_CATEGORY_IMAGE
+        case "video":
+            return SUB_CATEGORY_VIDEO
+        case "audio":
+            return SUB_CATEGORY_AUDIO
+        case "text":
+            return SUB_CATEGORY_TEXT
+        case _:
+            return None
+
 
 def get_file_category_name(category: FileCategory) -> str:
     return _FILE_CATEGORIES[category]
 
 def get_file_type_full_name(ft: FileType) -> str:
     category = get_file_category_name(ft.category)
-    if ft.sub is None:
+    sub = format_mime_type(ft.mime)
+    if sub is None:
         return category
 
-    sub_category = get_sub_category_name(ft.sub)
-    return f'{category} ({sub_category})'
+    return f'{category} ({sub})'

@@ -7,13 +7,19 @@ from .category import Category
 from .user import UserId
 
 
-class FileType(StrEnum):
+class FileCategory(StrEnum):
     unknown = auto()
     photo = auto()
     video = auto()
     document = auto()
     audio = auto()
     gif = auto()
+
+
+@dataclass
+class FileType:
+    category: FileCategory
+    mime: Optional[str]
 
 
 FileId = NewType("FileId", int)

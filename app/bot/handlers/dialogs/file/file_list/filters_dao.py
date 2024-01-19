@@ -12,7 +12,7 @@ from app.bot.widgets.dao.widgets import TextInputProp
 from app.bot.widgets.dao.widgets.multiselect import MultiselectProp
 from app.core.domain.dto.file import FilesFindDTO
 from app.core.domain.models.category import CategoryId
-from app.core.domain.models.file import FileType
+from app.core.domain.models.file import FileCategory
 from app.core.domain.models.user import UserId
 
 
@@ -27,7 +27,7 @@ class FiltersDAO(BaseDAO):
     """
 
     title = TextInputProp[Optional[str]](ID_INPUT_TITLE)
-    file_types = MultiselectProp[FileType](ID_SELECT_FILE_TYPES)
+    file_types = MultiselectProp[FileCategory](ID_SELECT_FILE_TYPES)
     category = DialogDataProp[CategoryId](CATEGORY_ID_KEY)
 
     def extract_to_dto(self, user_id: UserId) -> FilesFindDTO:
@@ -35,7 +35,7 @@ class FiltersDAO(BaseDAO):
             user_id=user_id,
             category_id=self.category,
             title_match=self.title,
-            file_types=self.file_types.items,
+            file_categories=self.file_types.items,
         )
 
     def extract_to_dict(self) -> FiltersDict:

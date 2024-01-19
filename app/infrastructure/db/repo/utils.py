@@ -28,7 +28,7 @@ def apply_filters(stmt: Select, reg: Container, filters: Sequence[FilterField]) 
 _COLUMNS = {
     OrderFields.file_id: File.id,
     OrderFields.file_title: File.title,
-    OrderFields.file_type: File.type_id,
+    OrderFields.file_type: File.file_type,
     OrderFields.file_user: File.user_id,
     OrderFields.file_created_at: File.created_at,
     OrderFields.file_category: File.category_id,

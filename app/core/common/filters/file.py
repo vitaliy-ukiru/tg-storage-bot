@@ -1,14 +1,14 @@
 from typing import Sequence
 
 from app.core.domain.models.category import CategoryId
-from app.core.domain.models.file import FileType
+from app.core.domain.models.file import FileCategory
 from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.common import FilterField
 
 
 class FileFilters:
     @classmethod
-    def file_types(cls, *value: FileType) -> FilterField[Sequence[FileType]]:
+    def file_categories(cls, *value: FileCategory) -> FilterField[Sequence[FileCategory]]:
         return FilterField("file_types", value)
 
     @classmethod

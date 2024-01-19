@@ -1,4 +1,3 @@
-from aiogram import F
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, StartMode
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
@@ -37,9 +36,7 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
         category_name = file.category.title
 
     return dict(
-        file_id=file.id,
         file_title=file.name,
-        file_type=file.type,
         file_type_name=get_file_type_full_name(file.type),
         file_category=category_name,
         upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
@@ -69,7 +66,10 @@ async def _process_back_to_menu_click(__: CallbackQuery, _: Button, manager: Dia
 file_view_dialog = Dialog(
     Window(
         Format("Название: {file_title}"),
-        Format("Категория: {file_category}", when=F["file_category"]),
+        Format(
+            "Категория: {file_category}",
+            when="file_category"
+        ),
         Format("Тип: {file_type_name}"),
         Format("Дата загрузки: {upload_time}"),
         Column(

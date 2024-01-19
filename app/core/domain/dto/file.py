@@ -6,7 +6,7 @@ from app.core.domain.models.file import FileCategory, FileType
 @dataclass(frozen=True)
 class CreateFileDTO:
     user_id: int
-    remote_id: RemoteFileId
+    remote_id: str
     file_type: FileType
     title: str | None
     category_id: int | None

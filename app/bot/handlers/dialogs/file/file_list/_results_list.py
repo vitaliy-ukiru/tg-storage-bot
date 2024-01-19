@@ -51,7 +51,7 @@ results_window = Window(
     Const("Выберите файл из списка"),
     Column(
         Select(
-            Format("{item.title}"),
+            Format("{item.name}"),
             id="select_file",
             type_factory=int,
             on_click=_process_click_file,

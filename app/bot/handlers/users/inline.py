@@ -10,7 +10,8 @@ from aiogram.types import (
     InlineQueryResultCachedGif,
 )
 
-from app.core.common.filters.file import FileFilters
+from app.core.domain.dto.common import Pagination
+from app.core.domain.dto.file import FilesFindDTO
 from app.core.domain.exceptions.file import FileException, FileNotFound
 from app.core.domain.models.file import File, FileCategory, FileId
 from app.core.domain.models.user import User
@@ -52,11 +53,28 @@ async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase,
     )
 
 
+ITEMS_PER_PAGE = 50
+
+
 @router.inline_query()
 async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsecase, user: User):
-    files = await file_service.find_files(
-        FileFilters.user_id(user.id),
-        FileFilters.title_match(inline_query.query)
+    page = 0
+    # in offset stores page number
+    # it give more capacity.
+    if inline_query.offset:
+        page = int(inline_query.offset)
+
+    start = page * ITEMS_PER_PAGE
+    files, total = await file_service.find_files(
+        dto=FilesFindDTO(
+            user_id=user.id,
+            title_match=inline_query.query if inline_query.query else None  # for find files w/o title
+        ),
+        paginate=Pagination(
+            limit=ITEMS_PER_PAGE,
+            offset=start
+        ),
+        total_count=True,
     )
 
     if len(files) == 0:
@@ -68,6 +86,11 @@ async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsec
         )
         return
 
+    next_offset = None
+    end = min(start + ITEMS_PER_PAGE, total)
+    if end < total:
+        next_offset = str(page + 1)
+
     results = [
         _convert_to_result(file)
         for file in files
@@ -78,6 +101,7 @@ async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsec
         results=results,
         # cache_time=10*60*60,  # 10 minutes
         is_personal=True,
+        next_offset=next_offset
     )
 
 
@@ -93,7 +117,7 @@ def _convert_to_result(file: File):
         FileCategory.gif: InlineQueryResultCachedGif,
     }
 
-    params = dict(id=f'{file.type}_{file.id}', title=file.title, caption=file.title)
+    params = dict(id=f'{file.type.category}_{file.id}', title=file.title, caption=file.title)
 
     inline_result_type = __result_types.get(file.type.category)
     if inline_result_type is None:

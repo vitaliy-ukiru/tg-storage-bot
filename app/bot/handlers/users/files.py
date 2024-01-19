@@ -5,6 +5,7 @@ from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
 
 from app.bot.filters.media import MediaFilter
+from app.bot.filters.via_self import ViaSelfRestrict
 from app.bot.handlers.dialogs import execute
 from app.bot.states.dialogs import ALLOWED_STATES
 from app.bot.utils.uploader import FileUploader
@@ -18,7 +19,7 @@ async def command_list(msg: Message, dialog_manager: DialogManager):  # noqa
     await execute.file_list(dialog_manager, mode=StartMode.RESET_STACK)
 
 
-@router.message(MediaFilter(), StateFilter(None))
+@router.message(MediaFilter(), ViaSelfRestrict(), StateFilter(None))
 async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manager: DialogManager):
     # I don't have idea how get dialog_manager in filter
     # therefore will filter this and skip handler

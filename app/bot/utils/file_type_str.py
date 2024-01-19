@@ -51,7 +51,7 @@ def format_mime_type(mime: Optional[str]) -> Optional[str]:
 
     not_common = all(
         not mime.startswith(type_)
-        for type_ in ('text/plaint', "application/octet-stream")
+        for type_ in ('text/plain', "application/octet-stream")
     )
 
     if not_common:

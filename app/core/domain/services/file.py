@@ -1,7 +1,7 @@
 import abc
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol, Optional
+from typing import Protocol, Optional, overload, Literal
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
@@ -25,7 +25,7 @@ class CategoryGetter(Protocol):
 UNDEFINED_FILE_ID = FileId(0)
 
 
-def _ensure_owner(file: File, user_id: UserId = None):
+def _ensure_owner(file: File, user_id: Optional[UserId] = None):
     if user_id is None:
         return
 
@@ -54,7 +54,7 @@ class FileService(FileUsecase):
         file.id = await self._repo.save_file(file)
         return file
 
-    async def get_file(self, file_id: FileId, user_id: UserId = None) -> File:
+    async def get_file(self, file_id: FileId, user_id: Optional[UserId] = None) -> File:
         file = await self._repo.get_file(file_id)
         if file is None:
             raise FileNotFound(file_id)
@@ -99,19 +99,53 @@ class FileService(FileUsecase):
 
         await self._repo.delete_file(file_id)
 
-    async def find_files(self,
-                         *filters: FilterField,
-                         dto: FilesFindDTO = None,
-                         paginate: Optional[Pagination] = None,
-                         total_count: bool = False) -> tuple[list[File], Optional[int]]:
+    # mypy not found issues in this file
+    # noinspection PyMethodOverriding,PyProtocol
+    @overload
+    async def find_files(
+        self,
+        *filters: FilterField,
+        dto: Optional[FilesFindDTO] = None,
+        paginate: Optional[Pagination] = None,
+        total_count: Literal[True]
+    ) -> tuple[list[File], int]:
+        raise NotImplementedError
 
+    # noinspection PyMethodOverriding,PyProtocol
+    @overload
+    async def find_files(
+        self,
+        *filters: FilterField,
+        dto: Optional[FilesFindDTO] = None,
+        paginate: Optional[Pagination] = None,
+        total_count: Literal[False]
+    ) -> list[File]:
+        raise NotImplementedError
+
+    @overload
+    async def find_files(
+        self,
+        *filters: FilterField,
+        dto: Optional[FilesFindDTO] = None,
+        paginate: Optional[Pagination] = None,
+        total_count: Optional[bool] = None
+    ) -> list[File] | tuple[list[File], int]:
+        raise NotImplementedError
+
+    async def find_files(
+        self,
+        *filters: FilterField,
+        dto: Optional[FilesFindDTO] = None,
+        paginate: Optional[Pagination] = None,
+        total_count: Optional[bool] = None
+    ) -> tuple[list[File], int] | list[File]:
         dto_items = asdict(dto) if dto else None
         filters = FilterMerger.merge(dto_items, filters)
         FilterMerger.ensure_have_user_id(filters)
 
         files = await self._repo.find_files(filters, paginate)
         if not total_count:
-            return files, None
+            return files
 
         files_count = await self._repo.get_files_count(filters)
         return files, files_count

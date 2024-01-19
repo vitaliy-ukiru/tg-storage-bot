@@ -53,7 +53,7 @@ class CategoryService(CategoryUsecase):
 
     async def find_categories(self,
                               *filters: FilterField,
-                              dto: CategoriesFindDTO = None,
+                              dto: Optional[CategoriesFindDTO] = None,
                               paginate: Optional[Pagination] = None) -> list[Category]:
         dto_items = asdict(dto) if dto else None
 

@@ -7,6 +7,7 @@ from typing import Optional
 from aiogram_dialog import DialogManager, ShowMode, StartMode, Data
 
 from app.bot.states.dialogs import FileViewSG, FileListSG, CategoryEditSG
+from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileId
 
 
@@ -46,7 +47,7 @@ async def file_list(manager: DialogManager,
 
 
 async def category_edit(manager: DialogManager,
-                        category_id: int | FileId,
+                        category_id: int | CategoryId,
                         data: Data = None,
                         mode: StartMode = StartMode.NORMAL,
                         show_mode: Optional[ShowMode] = None):

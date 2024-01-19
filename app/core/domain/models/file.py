@@ -19,7 +19,7 @@ class FileCategory(StrEnum):
 @dataclass
 class FileType:
     category: FileCategory
-    mime: Optional[str]
+    mime: Optional[str] = None
 
 
 FileId = NewType("FileId", int)
@@ -41,4 +41,4 @@ class File:
         if self.title:
             return self.title
 
-        return self.remote_file_id[:50]
+        return self.remote_file_id[-15:]

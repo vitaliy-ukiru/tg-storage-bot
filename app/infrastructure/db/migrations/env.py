@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -7,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from app.common.config import Loader
+from app.common.config import Config
 from app.infrastructure.db.models import Base
 from app.infrastructure.db.connect import to_dsn
 
@@ -31,12 +32,18 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-dsn = to_dsn(Loader.read().load_db_config())
+config_path = config.get_main_option("app_config_path")
+if not config_path:
+    config_path = os.environ.get("CONFIG_PATH")
+
+assert config_path, "Config path must be in CONFIG_PATH env var or in alembic.ini as app_config_path"
+dsn = to_dsn(Config(_yaml_file=config_path).db)
 
 config.set_main_option(
     'sqlalchemy.url',
     dsn.render_as_string(hide_password=False)
 )
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

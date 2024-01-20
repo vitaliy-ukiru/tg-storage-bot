@@ -20,3 +20,9 @@ for rollback
 ```
 alembic downgrade -1
 ```
+
+### Provide config path via env var or alembic.ini
+example
+```
+CONFIG_PATH=your/path/config.yaml alembic upgrade +1
+```

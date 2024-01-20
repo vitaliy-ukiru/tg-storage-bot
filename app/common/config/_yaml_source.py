@@ -44,7 +44,7 @@ class YamlConfigSettingsSource(PydanticBaseSettingsSource):
         path = Path(yaml_file)
 
         if not path.exists():
-            raise FileNotFoundError(f"Could not open yaml settings file at: {path}")
+            raise FileNotFoundError(f"Could not open yaml settings file at: {path.absolute()}")
 
         return yaml.safe_load(path.read_text("utf-8"))
 

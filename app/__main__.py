@@ -1,11 +1,11 @@
 import asyncio
 import logging
+from argparse import ArgumentParser
 
 from aiogram.fsm.storage.memory import MemoryStorage
-from environs import Env
 
 from app.bot.setup import BotModule
-from app.common.config import Loader
+from app.common.config import Config
 from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
@@ -17,11 +17,15 @@ from app.infrastructure.db.repo.user import UserStorage
 
 
 async def main():
-    env = Env()
-    env.read_env()
+    parser = ArgumentParser(description="Telegram bot for stores files")
+    parser.add_argument(
+        "--config", help="path to config file",
+        default="configs/local.yaml"
+    )
+    args = parser.parse_args()
 
-    loader = Loader.read(env=env)
-    cfg = loader.load()
+    cfg = Config(_yaml_file=args.config)
+
     engine = connect.connect_db(cfg)
     session_maker = connect.new_session_maker(engine)
 
@@ -43,7 +47,7 @@ async def main():
     file_service = FileService(file_repo, category_service)
 
     tg_bot = BotModule(
-        cfg.tg_bot,
+        cfg.bot,
         user_service,
         category_service,
         file_service,

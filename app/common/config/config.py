@@ -1,34 +1,40 @@
-from dataclasses import dataclass
-from typing import Any, Optional, Callable
+__all__ = (
+    'Config',
+    'DatabaseConfig',
+    'TelegramConfig',
+)
 
-from environs import Env
+from typing import Optional
+
+from pydantic import SecretStr, Field, AliasChoices
+from pydantic_settings import BaseSettings
+
+from ._yaml_source import YamlBaseSettings, YamlSettingsConfigDict
 
 
-@dataclass
-class DbConfig:
-    password: Optional[str]
+class DatabaseConfig(BaseSettings):
+    password: Optional[SecretStr] = None
     username: str
     database: str
-    host: Optional[str]
-    port: Optional[int]
-@dataclass
-class TgBot:
-    token: str
+    host: Optional[str] = None
+    port: Optional[int] = None
 
 
-@dataclass
-class Config:
-    tg_bot: TgBot
-    db: DbConfig
-    env: str
+class TelegramConfig(BaseSettings):
+    token: SecretStr
+
+
+class Config(YamlBaseSettings):
+    bot: TelegramConfig
+    db: DatabaseConfig = Field(validation_alias=AliasChoices("db", "database"))
+    env: str = "local"
 
     @property
     def is_debug(self) -> bool:
         return self.env != "prod"
 
-
-
-
-
-
-
+    model_config = YamlSettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="_",
+    )

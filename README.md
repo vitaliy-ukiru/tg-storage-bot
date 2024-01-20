@@ -1,20 +1,20 @@
-## Конфигурация
-Путь до конфига передаётся через переменную окружения CONFIG_PATH.
-При настройке приоритет отдаётся переменным окружения.
-Настройка в конфиг файле yaml:
+## Configuration
+The path to the config is passed through the command line args.
+When configuring, priority is given to environment variables.
+Settings in the yaml config file:
 ```yaml
-env: "Среда запуска. Допустимы значения: dev, local, prod. По умолчанию local"
+env: "Launch environment. Valid values: dev, local, prod. Default local"
 bot:
-  token: Токен бота 
+  token: Token of BotAPI
 db:
-  password: Пароль [Необязательно]
-  username: Пользователь БД
-  database: Имя БД
-  host: Хост [необязательно]
-  port: Порт, должно быть числом [необязательно] 
+  password: Password [Optional]
+  username: DB User
+  database: DB name
+  host: Host [Optional]
+  port: Port, must be integer [Optional] 
 ```
-Переменные окружения:
-- BOT_TOKEN - токен бота
+Environment variables:
+- BOT_TOKEN
 - DB_PASSWORD
 - DB_USERNAME
 - DB_DATABASE

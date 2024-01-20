@@ -1,4 +1,4 @@
-database:
+db:
   username: "py-tg"
   database: "tg-storage"
   password: "py-tg"

@@ -4,9 +4,9 @@
 Настройка в конфиг файле yaml:
 ```yaml
 env: "Среда запуска. Допустимы значения: dev, local, prod. По умолчанию local"
-tgbot:
-  bot_token: Токен бота 
-database:
+bot:
+  token: Токен бота 
+db:
   password: Пароль [Необязательно]
   username: Пользователь БД
   database: Имя БД
@@ -32,6 +32,17 @@ pip install -r requirements
 alembic upgrade head
 ```
 ### Запустите
+#### Аргументы командной строки
+```
+usage: app [-h] [--config CONFIG]
+
+Telegram bot for stores files
+
+options:
+  -h, --help       show this help message and exit
+  --config CONFIG  path to config file
+
+```
 ```
 python -m app
 ```

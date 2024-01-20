@@ -8,7 +8,7 @@ from aiogram_dialog import setup_dialogs
 from app.bot.handlers import users, dialogs
 from app.bot.middlewares import UserMiddleware, FileProxyMiddleware, CategoryProxyMiddleware, \
     FileUploaderMiddleware
-from app.common.config import TgBot
+from app.common.config import TelegramConfig
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
 
 
@@ -34,13 +34,13 @@ def _configure_dp(
 class BotModule:
     def __init__(
         self,
-        cfg: TgBot,
+        cfg: TelegramConfig,
         user_service: UserUsecase,
         category_service: CategoryUsecase,
         file_service: FileUsecase,
         storage: Optional[BaseStorage] = None,
     ):
-        self.bot = Bot(token=cfg.token, parse_mode=ParseMode.HTML)
+        self.bot = Bot(token=cfg.token.get_secret_value(), parse_mode=ParseMode.HTML)
         self.dp = _configure_dp(user_service, category_service, file_service, storage)
 
     async def run(self):

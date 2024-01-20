@@ -21,18 +21,23 @@ Environment variables:
 - DB_HOST
 - DB_PORT
 
-## Запуск
-### Установите зависимости и конфигурацию приложения.
+## How to run
+### Create and activate venv
+```
+python -m venv venv
+source venv/bin/activate
+```
+### Install dependencies
 ```
 pip install -r requirements
 ```
-### Установите миграции.
-[Подробные инструкции](./app/infrastructure/db/migrations/README.md)
+### Apply migrations
+[Details](./app/infrastructure/db/migrations/README.md)
 ```
 alembic upgrade head
 ```
-### Запустите
-#### Аргументы командной строки
+### Run
+#### Command line args
 ```
 usage: app [-h] [--config CONFIG]
 

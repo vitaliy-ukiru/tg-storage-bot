@@ -52,24 +52,24 @@ options:
 python -m app
 ```
 
-## Структура директории app
+## App directory structure
 
-- core: Содержит ядро и домен приложения
+- core: Contains the core and application domain
   - domain:
-    - dto: Разные объекты для транспорта DTO
-    - exceptions: Ошибки доменного уровня
-    - models: Доменные модели данных
-    - services: Реализация сервисов приложения (бизнес логика)
-  - interfaces: Интерфейсы используемые в домене
-    - repository: Интерфейсы репозиториев данных
-    - usecase: Интерфейсы бизнес логики
+    - dto: Miscellaneous transport Objects (DTO)
+    - exceptions: Domain level errors
+    - models: Domain data models
+    - services:Implementation of application services (business logic)
+  - interfaces: Interfaces used in the domain
+    - repository: Data Repository Interfaces
+    - usecase: Business logic interfaces
 - infrastructure:
-  - db: для SQL СУБД
-    - migrations: Миграции alembic
-    - models: Модели sqlalchemy
-    - repo: Адаптеры для БД, реализующие интерфейсы core/interfaces/repo
-- bot: Реализация бота
-  - widgets: Виджеты для диалогов
-  - handlers:
-    - dialogs: Все диалоги лежат здесь
-      - execute.py: Для удобного запуска диалогов
+  - db: for SQL DBMS
+    - migrations: Migrations alembic
+    - models: sqlalchemy models
+    - repo: Adapters for databases that implement core/interfaces/repo interfaces
+- bot: Bot implementation
+  - widgets: Widgets for aiogram-dialogs
+  - - handlers:
+    - dialogs: All dialogs are here
+      - execute.py: For convenient dialogs launch 

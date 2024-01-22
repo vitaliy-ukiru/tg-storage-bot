@@ -13,9 +13,9 @@ from app.infrastructure.db.repo._base import BaseRepository
 
 
 class UserStorage(BaseRepository, UserRepository):
-    async def save_user(self, user_id: int) -> User:
+    async def save_user(self, user_id: int, locale: Optional[str] = None) -> User:
         async with self._pool() as session:
-            db_user = models.User(id=user_id)
+            db_user = models.User(id=user_id, locale=locale)
             try:
                 session.add(db_user)
                 await session.commit()

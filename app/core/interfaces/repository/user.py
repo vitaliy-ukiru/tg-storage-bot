@@ -10,7 +10,7 @@ from app.core.domain.models.user import UserId, User
 class UserRepository(Protocol):
 
     @abc.abstractmethod
-    async def save_user(self, user_id: UserId) -> User:
+    async def save_user(self, user_id: UserId, locale: Optional[str] = None) -> User:
         raise NotImplementedError
 
     @abc.abstractmethod

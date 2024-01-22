@@ -4,6 +4,7 @@ from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button, Back
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Format
+from aiogram_i18n import I18nContext
 
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileViewSG, FileEditSG
@@ -12,6 +13,7 @@ from app.bot.utils.files import content_type_from_category
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import Template, KeyJoiner, Topic, CancelI18n
+from app.bot.widgets.i18n.template import I18N_KEY
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
@@ -23,9 +25,10 @@ async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogMa
     file_id: FileId = manager.start_data["file_id"]
     file_service: FileUsecase = manager.middleware_data["file_service"]
     user: User = manager.middleware_data[USER_KEY]
+    i18n: I18nContext = manager.middleware_data[I18N_KEY]
 
     await file_service.delete_file(file_id, user.id)
-    await call.message.edit_text("Файл удалён")  # type: ignore
+    await call.message.edit_text(i18n.get(lc_file_view.removed()))  # type: ignore
     await manager.done()
 
 

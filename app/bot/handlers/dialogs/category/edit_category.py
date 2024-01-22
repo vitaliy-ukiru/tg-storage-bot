@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Optional, Any, Callable, TypeAlias, Awaitable
+from typing import Optional, Any, Callable, TypeAlias, Awaitable, LiteralString, Literal
 
 from aiogram.fsm.state import State
 from aiogram.types import CallbackQuery
@@ -11,7 +11,9 @@ from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Ro
 from aiogram_dialog.widgets.text import Const, Format, Multi
 
 from app.bot.states.dialogs import CategoryEditSG
-from app.bot.widgets import BACK_TEXT, BackTo, CLOSE_TEXT
+from app.bot.widgets import BackTo
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, Template, LC, Topic
 from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp
 from app.bot.widgets.dao.base_dao import BaseDAO
 from app.core.domain.dto.category import UpdateCategoryDTO
@@ -92,6 +94,7 @@ def switcher(state: State):
 async def _input_title_handler(_, __, manager: DialogManager, text: str):
     await _update_category(manager, title=text)
 
+
 @switcher(CategoryEditSG.main)
 async def _input_desc_handler(_, __, manager: DialogManager, text: str):
     await _update_category(manager, desc=text)
@@ -138,29 +141,33 @@ async def _on_start(start_data: dict, manager: DialogManager):
         )
 
 
+lc = LC.category.edit
+
+favorite_template = Template(lc.btn.favorite)
+
 category_edit_dialog = Dialog(
     Window(
         Multi(
-            Format("Название: {title}"),
-            Format("Описание: {desc}", when="desc")
+            Topic(LC.category.title, Format("{title}")),
+            Topic(LC.category.desc, Format("{desc}"), when="desc")
         ),
         Group(
             Row(
 
                 SwitchTo(
-                    Const("📝 Название"),
+                    Emoji("📝", Template(lc.btn.title)),
                     id="create_category_edit_title",
                     state=CategoryEditSG.title
                 ),
                 SwitchTo(
-                    Const("📝 Описание"),
+                    Emoji("📝", Template(lc.btn.desc)),
                     id="create_category_edit_desc",
                     state=CategoryEditSG.desc
                 ),
             ),
             Checkbox(
-                Const("✅ Избранное"),
-                Const("❌ Избранное"),
+                Emoji("✅", favorite_template),
+                Emoji("❌", favorite_template),
                 id=_FAVORITE_ID,
                 on_state_changed=_process_click_favorite
 
@@ -172,22 +179,22 @@ category_edit_dialog = Dialog(
     ),
 
     Window(
-        Const("Отправьте название для категории"),
+        Template(lc.input.title),
         Back(BACK_TEXT),
         TextInput(id="edit__input_title", on_success=_input_title_handler),
         state=CategoryEditSG.title
     ),
 
     Window(
-        Const("Отправьте описание для категории"),
+        Template(lc.input.desc),
         Column(
             Button(
-                Const("Удалить описание"),
+                Template(lc.btn.delete.desc),
                 id="delete_desc",
                 on_click=_process_delete_desc,
                 when="have_desc",
             ),
-            BackTo(CategoryEditSG.main, BACK_TEXT),
+            BackTo(CategoryEditSG.main),
         ),
         TextInput(id="edit__input_desc", on_success=_input_desc_handler),
         getter=_desc_window_getter,

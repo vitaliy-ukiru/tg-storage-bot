@@ -10,12 +10,13 @@ from aiogram_dialog.widgets.kbd import (
     Back, Group, Multiselect
 )
 from aiogram_dialog.widgets.text import Const, Format
+from aiogram_i18n import I18nContext
 
 from app.bot.states.dialogs import FileListSG
-from app.bot.utils.file_type_str import file_categories_with_names
-from app.bot.widgets import BACK_TEXT
+from app.bot.utils.file_type_i18n import file_categories_with_names
+from app.bot.widgets.i18n import BACK_TEXT, Template
 from app.core.domain.models.file import FileCategory
-from .common import ID_SELECT_FILE_TYPES
+from .common import ID_SELECT_FILE_TYPES, lc_file_list
 
 
 class FileTypeItem(NamedTuple):
@@ -23,8 +24,17 @@ class FileTypeItem(NamedTuple):
     value: FileCategory
 
 
+async def _file_types_getter(i18n: I18nContext, **_):
+    return {
+        "file_types": [
+            FileTypeItem(name=name, value=file_type_category)
+            for name, file_type_category in file_categories_with_names(i18n)
+        ]
+    }
+
+
 file_types_window = Window(
-    Const("Выберите тип файла"),
+    Template(lc_file_list.type.select),
     Group(
         Multiselect(
             Format("✓ {item.name}"),
@@ -38,10 +48,5 @@ file_types_window = Window(
     ),
     Back(BACK_TEXT),
     state=FileListSG.input_file_type,
-    getter={
-        "file_types": [
-            FileTypeItem(name=name, value=file_type_category)
-            for name, file_type_category in file_categories_with_names()
-        ]
-    },
+    getter=_file_types_getter
 )

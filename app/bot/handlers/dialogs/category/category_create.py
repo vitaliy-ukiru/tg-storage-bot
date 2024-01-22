@@ -3,15 +3,15 @@ from typing import Optional
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput
-from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row
-from aiogram_dialog.widgets.text import Const, Format, Multi
+from aiogram_dialog.widgets.kbd import Button, SwitchTo, Group, Cancel, Row
+from aiogram_dialog.widgets.text import Format, Multi
 
 from app.bot.states.dialogs import CategoryCreateSG
 from app.bot.utils.optional_str import optional_str_factory
-from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, LC, Template, Topic, BackI18n
 from app.bot.widgets.dao.base_dao import BaseDAO
 from app.bot.widgets.dao.widgets import TextInputProp
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import CANCEL_TEXT, LC, Template, Topic, BackI18n
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.interfaces.usecase.category import CategoryUsecase
 
@@ -57,11 +57,11 @@ category_create_dialog = Dialog(
     Window(
         Multi(
             Topic(
-                lc.title,
+                LC.category.title,
                 Format("{title}")
             ),
             Topic(
-                lc.desc,
+                LC.category.desc,
                 Format("{desc}"),
                 when="desc"
             )

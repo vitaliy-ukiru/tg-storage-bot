@@ -10,7 +10,9 @@ from app.bot.states.dialogs import CategoryFindSG
 from app.bot.utils.category_finders import (CategoryFinder, TitleCategoriesFinder,
                                             PopularCategoriesFinder,
                                             FavoriteCategoriesFinder, FindMode)
-from app.bot.widgets import BackTo, CANCEL_TEXT, BACK_TEXT
+from app.bot.widgets import BackTo
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, LC, Template, BackToI18n
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -78,24 +80,28 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
 
 
 ID_INPUT_TITLE = "find_title"
+
+
+lc = LC.category.find
+
 find_category_dialog = Dialog(
     Window(
-        Const("Выберите раздел"),
+        Template(lc.select.method),
         Column(
             SwitchTo(
-                Const("🔝 Самые используемые"),
+                Emoji("🔝", Template(lc.btn.popular)),
                 id="category_exists_top",
                 on_click=_switch_mode_on_click(FindMode.popular),
                 state=CategoryFindSG.select,
             ),
             SwitchTo(
-                Const("⭐ Избранные"),
+                Emoji("⭐", Template(lc.btn.favorites)),
                 id="category_exists_favorites",
                 on_click=_switch_mode_on_click(FindMode.favorite),
                 state=CategoryFindSG.select
             ),
             SwitchTo(
-                Const("🔎 Поиск по названию"),
+                Emoji("🔎", Template(lc.btn.title)),
                 id="category_exists_find",
                 on_click=_switch_mode_on_click(FindMode.title),
                 state=CategoryFindSG.input_title,
@@ -105,17 +111,16 @@ find_category_dialog = Dialog(
         state=CategoryFindSG.main,
     ),
     Window(
-        Const("Введите часть названия категории"),
+        Template(lc.input.title),
         TextInput(id=ID_INPUT_TITLE, on_success=_process_input_title),
         BackTo(CategoryFindSG.main, BACK_TEXT),
         state=CategoryFindSG.input_title,
     ),
     Window(
-        Const("Список найденных категорий"),
+        Template(lc.result),
         _scroll_categories,
-        BackTo(
+        BackToI18n(
             CategoryFindSG.main,
-            BACK_TEXT,
             on_click=_on_click_back
         ),
         state=CategoryFindSG.select,

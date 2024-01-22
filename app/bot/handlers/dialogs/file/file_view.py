@@ -1,19 +1,22 @@
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, StartMode
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button, Cancel, Back
+from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button, Back
 from aiogram_dialog.widgets.media import DynamicMedia
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Format
 
+from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileViewSG, FileEditSG
 from app.bot.utils.file_type_str import get_file_type_full_name
+from app.bot.utils.files import content_type_from_category
+from app.bot.widgets import StartWithData
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import Template, KeyJoiner, Topic, CancelI18n
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
 
-from app.bot.middlewares.user_manager import USER_KEY
-from app.bot.utils.files import content_type_from_category
-from app.bot.widgets import StartWithData
+lc_file_view = KeyJoiner('file-view')
 
 
 async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogManager):
@@ -65,39 +68,49 @@ async def _process_back_to_menu_click(__: CallbackQuery, _: Button, manager: Dia
 
 file_view_dialog = Dialog(
     Window(
-        Format("Название: {file_title}"),
-        Format(
-            "Категория: {file_category}",
+        Topic(
+            lc_file_view.topic.title,
+            Format("{file_title}"),
+        ),
+        Topic(
+            lc_file_view.topic.title,
+            Format("{file_category}"),
             when="file_category"
         ),
-        Format("Тип: {file_type_name}"),
-        Format("Дата загрузки: {upload_time}"),
+        Topic(
+            lc_file_view.topic.type,
+            Format("{file_type_name}")
+        ),
+        Topic(
+            lc_file_view.topic.created,
+            Format("{upload_time}")
+        ),
         Column(
             SwitchTo(
-                Const("📥 Отправить файл"),
+                Emoji("📥", Template(lc_file_view.btn.send)),
                 id="send_file",
                 state=FileViewSG.send_file,
             ),
             StartWithData(
-                Const("✏️ Редактировать файл"),
+                Emoji("✏️", Template(lc_file_view.btn.edit)),
                 id="edit_file",
                 state=FileEditSG.main,
                 getter=_file_edit_getter
             ),
             Button(
-                Const("❌ Удалить файл"),
+                Emoji("❌", Template(lc_file_view.btn.delete)),
                 id="delete_file",
                 on_click=_process_delete_file
             )
         ),
-        Cancel(Const("Закрыть")),
+        CancelI18n(),
         getter=_view_getter,
         state=FileViewSG.main,
     ),
     Window(
         DynamicMedia("file_media"),
         Back(
-            Const("Меню"),
+            Template(lc_file_view.btn.menu),
             id="show_menu",
         ),
         getter=_media_getter,

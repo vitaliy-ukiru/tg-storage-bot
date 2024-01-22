@@ -3,9 +3,8 @@ __all__ = (
     'KeyJoiner',
     'Topic',
     'LC',
-    'BACK_TEXT',
-    'CANCEL_TEXT',
-    'CLOSE_TEXT',
+    'BACK_TEXT', 'CANCEL_TEXT', 'CLOSE_TEXT',
+    'CancelI18n', 'CloseI18n', 'BackI18n', 'BackToI18n',
 )
 
 from .key import KeyJoiner

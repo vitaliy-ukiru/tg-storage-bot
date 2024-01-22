@@ -24,15 +24,6 @@ class KeyJoiner:
         return self.key_separator.join(self._query)
 
 
-class Values(Protocol):
-    def __getitem__(self, item: Any) -> Any:
-        raise NotImplementedError
-
-
-def default_format_text(text: str, data: Values) -> str:
-    return text.format_map(data)
-
-
 class I18NFormat(Text):
     def __init__(self, key: str | KeyJoiner, default_text: str = None, when: WhenCondition = None):
         super().__init__(when)

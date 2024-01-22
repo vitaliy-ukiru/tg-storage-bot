@@ -8,7 +8,7 @@ from aiogram_i18n import I18nContext
 
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileViewSG, FileEditSG
-from app.bot.utils.file_type_str import get_file_type_full_name
+from app.bot.utils.file_type_i18n import locale_file_type
 from app.bot.utils.files import content_type_from_category
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
@@ -32,7 +32,7 @@ async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogMa
     await manager.done()
 
 
-async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase, **_):
+async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase, i18n: I18nContext, **_):
     file_id: FileId = dialog_manager.start_data["file_id"]
     user: User = dialog_manager.middleware_data[USER_KEY]
 
@@ -43,7 +43,7 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
 
     return dict(
         file_title=file.name,
-        file_type_name=get_file_type_full_name(file.type),
+        file_type_name=locale_file_type(file.type, i18n),
         file_category=category_name,
         upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
     )

@@ -33,7 +33,7 @@ class UserStorage(BaseRepository, UserRepository):
 
     async def update_locale(self, user: User):
         async with self._pool() as session:
-            model: models.User | None = await session.get(models.User, model.id)
+            model: models.User | None = await session.get(models.User, user.id)
             if model is None:
                 return
 

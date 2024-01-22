@@ -1,4 +1,10 @@
-from typing import Any, Dict, Protocol, TypeAlias, List, Self, Tuple
+__all__ = (
+    'Template',
+    'KeyJoiner',
+    'LC'
+)
+
+from typing import Dict, Self
 
 from aiogram_dialog.api.protocols import DialogManager
 from aiogram_dialog.widgets.common import WhenCondition
@@ -22,6 +28,9 @@ class KeyJoiner:
 
     def __call__(self) -> str:
         return self.key_separator.join(self._query)
+
+
+LC = KeyJoiner()
 
 
 class Template(Text):

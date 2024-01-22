@@ -18,6 +18,10 @@ class UserRepository(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
+    async def update_locale(self, user: User):
+        raise NotImplementedError
+
+    @abc.abstractmethod
     async def restore_user(self, user_id: UserId) -> Optional[User]:
         raise NotImplementedError
 

@@ -14,12 +14,12 @@ category-select-btn-create = Create new
 
 category-find-select-method = Select a category search method
 
-category-find-btn-most-popular =Most used
+category-find-btn-popular =Most used
 category-find-btn-favorites = Favorites
-category-find-btn-search-title = Search by name
+category-find-btn-title = Search by name
 
 category-find-input-tile = Enter part of the category name
-category-find-result-list = List of categories found
+category-find-result = List of categories found
 
 category-edit-btn-title = Title
 category-edit-btn-desc = Description

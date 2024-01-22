@@ -14,12 +14,12 @@ category-select-btn-create = Создать
 
 category-find-select-method = Выберите способ поиска категории
 
-category-find-btn-most-popular = Самые используемые
+category-find-btn-popular = Самые используемые
 category-find-btn-favorites = Избранные
-category-find-btn-search-title = Поиск по названию
+category-find-btn-title = Поиск по названию
 
 category-find-input-tile = Введите часть названия категории
-category-find-result-list = Список найденных категорий
+category-find-result = Список найденных категорий
 
 category-edit-btn-title = Название
 category-edit-btn-desc = Описание

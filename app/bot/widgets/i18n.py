@@ -24,7 +24,7 @@ class KeyJoiner:
         return self.key_separator.join(self._query)
 
 
-class I18NFormat(Text):
+class Template(Text):
     def __init__(self, key: str | KeyJoiner, default_text: str = None, when: WhenCondition = None):
         super().__init__(when)
         if isinstance(key, KeyJoiner):

@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Optional, Any, Callable, TypeAlias, Awaitable, LiteralString, Literal
+from typing import Optional, Any, Callable, TypeAlias, Awaitable
 
 from aiogram.fsm.state import State
 from aiogram.types import CallbackQuery
@@ -8,14 +8,14 @@ from aiogram_dialog.widgets.common import ManagedWidget
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row, Checkbox, \
     Column, ManagedCheckbox
-from aiogram_dialog.widgets.text import Const, Format, Multi
+from aiogram_dialog.widgets.text import Format, Multi
 
 from app.bot.states.dialogs import CategoryEditSG
 from app.bot.widgets import BackTo
-from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, Template, LC, Topic
 from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp
 from app.bot.widgets.dao.base_dao import BaseDAO
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, Template, LC, Topic
 from app.core.domain.dto.category import UpdateCategoryDTO
 from app.core.domain.models.category import CategoryId, Category
 from app.core.interfaces.usecase.category import CategoryUsecase

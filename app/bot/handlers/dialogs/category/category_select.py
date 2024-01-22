@@ -1,12 +1,13 @@
 from typing import Any
 
 from aiogram_dialog import Dialog, Window, Data, DialogManager
-from aiogram_dialog.widgets.kbd import Column, Start, Cancel
-from aiogram_dialog.widgets.text import Const
+from aiogram_dialog.widgets.kbd import Column, Start
 
-from app.bot.widgets import CANCEL_TEXT
 from app.bot.states.dialogs import CategoryFindSG, CategorySelectSG, CategoryCreateSG
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import Template, LC, CancelI18n
 
+lc = LC.category.select
 
 async def _process_result(_: Data, result: Any, manager: DialogManager):
     if result:
@@ -15,19 +16,19 @@ async def _process_result(_: Data, result: Any, manager: DialogManager):
 
 category_select_dialog = Dialog(
     Window(
-        Const("Выберите источник категории"),
+        Template(lc.target),
         Column(
             Start(
-                Const("🔎 Существующая"),
+                Emoji("🔎", Template(lc.exists)),
                 id="category_exists",
                 state=CategoryFindSG.main,
             ),
             Start(
-                Const("🆕 Создать"),
+                Emoji("🆕", Template(lc.btn.create)),
                 id="category_create",
                 state=CategoryCreateSG.input_title
             ),
-            Cancel(CANCEL_TEXT)
+            CancelI18n()
         ),
         state=CategorySelectSG.start,
     ),

@@ -71,11 +71,11 @@ class LazyGatewayLocaleManager(BaseManager):
 
     @property
     def default_locale(self) -> str:
-        return super().default_locale
+        return self._default_locale
 
     @default_locale.setter
     def default_locale(self, value: str):
-        super().default_locale = value
+        self._default_locale = value
         self.ctx_manager.default_locale = value
         self.gateway_manager.locale_setter = value
 

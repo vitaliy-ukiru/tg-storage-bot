@@ -11,14 +11,14 @@ from app.bot.utils.optional_str import optional_str_factory
 from app.bot.widgets.dao.base_dao import BaseDAO
 from app.bot.widgets.dao.widgets import TextInputProp
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import CANCEL_TEXT, LC, Template, Topic, BackI18n
+from app.bot.widgets.i18n import CANCEL_TEXT, Topic, BackI18n, TL
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.interfaces.usecase.category import CategoryUsecase
 
 ID_INPUT_TITLE = "input_title"
 ID_INPUT_DESC = "input_desc"
 
-lc = LC.category.create
+tl = TL.category.create
 
 
 class CreateCategoryDAO(BaseDAO):
@@ -49,7 +49,7 @@ async def create_category(call: CallbackQuery, _: Button, manager: DialogManager
 
 category_create_dialog = Dialog(
     Window(
-        Template(lc.input.title),
+        tl.input.title(),
         TextInput(id=ID_INPUT_TITLE, on_success=_to_menu),
         state=CategoryCreateSG.input_title,
     ),
@@ -57,11 +57,11 @@ category_create_dialog = Dialog(
     Window(
         Multi(
             Topic(
-                LC.category.title,
+                TL.category.title(),
                 Format("{title}")
             ),
             Topic(
-                LC.category.desc,
+                TL.category.desc(),
                 Format("{desc}"),
                 when="desc"
             )
@@ -69,18 +69,18 @@ category_create_dialog = Dialog(
         Group(
             Row(
                 SwitchTo(
-                    Emoji("📝", Template(lc.btn.title)),
+                    Emoji("📝", tl.btn.title()),
                     id="edit_title",
                     state=CategoryCreateSG.input_title
                 ),
                 SwitchTo(
-                    Emoji("📝", Template(lc.btn.desc)),
+                    Emoji("📝", tl.btn.desc()),
                     id="edit_desc",
                     state=CategoryCreateSG.input_desc
                 ),
             ),
             Button(
-                Emoji("✅", Template(lc.btn.create)),
+                Emoji("✅", tl.btn.create()),
                 id="create",
                 on_click=create_category,
             ),
@@ -91,7 +91,7 @@ category_create_dialog = Dialog(
     ),
 
     Window(
-        Template(lc.input.desc),
+        tl.input.desc(),
         BackI18n(),
         TextInput[Optional[str]](
             id=ID_INPUT_DESC,

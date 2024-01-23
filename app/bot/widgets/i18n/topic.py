@@ -1,19 +1,19 @@
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.text import Multi, Text
-
-from app.bot.widgets.i18n import KeyJoiner
-from app.bot.widgets.i18n.template import Template
+from .template import Template, TemplateProxy
 
 
 class Topic(Multi):
     def __init__(self,
-                 tmpl: str | KeyJoiner | Template,
+                 tmpl: str | TemplateProxy | Template,
                  value: Text,
                  sep: str = ": ",
                  when: WhenCondition = None
                  ):
-        if not isinstance(tmpl, Template):
+        if isinstance(tmpl, str):
             tmpl = Template(tmpl)
+        elif isinstance(tmpl, TemplateProxy):
+            tmpl = tmpl()
 
         self.tmpl = tmpl
         self.value = value

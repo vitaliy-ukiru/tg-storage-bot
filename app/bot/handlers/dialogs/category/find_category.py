@@ -4,7 +4,7 @@ from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup
 from aiogram_dialog.widgets.kbd.button import OnClick
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Format
 
 from app.bot.states.dialogs import CategoryFindSG
 from app.bot.utils.category_finders import (CategoryFinder, TitleCategoriesFinder,
@@ -12,7 +12,7 @@ from app.bot.utils.category_finders import (CategoryFinder, TitleCategoriesFinde
                                             FavoriteCategoriesFinder, FindMode)
 from app.bot.widgets import BackTo
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, LC, Template, BackToI18n
+from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, TL, BackToI18n
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -82,26 +82,26 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
 ID_INPUT_TITLE = "find_title"
 
 
-lc = LC.category.find
+tl = TL.category.find
 
 find_category_dialog = Dialog(
     Window(
-        Template(lc.select.method),
+        tl.select.method(),
         Column(
             SwitchTo(
-                Emoji("🔝", Template(lc.btn.popular)),
+                Emoji("🔝", tl.btn.popular()),
                 id="category_exists_top",
                 on_click=_switch_mode_on_click(FindMode.popular),
                 state=CategoryFindSG.select,
             ),
             SwitchTo(
-                Emoji("⭐", Template(lc.btn.favorites)),
+                Emoji("⭐", tl.btn.favorites()),
                 id="category_exists_favorites",
                 on_click=_switch_mode_on_click(FindMode.favorite),
                 state=CategoryFindSG.select
             ),
             SwitchTo(
-                Emoji("🔎", Template(lc.btn.title)),
+                Emoji("🔎", tl.btn.title()),
                 id="category_exists_find",
                 on_click=_switch_mode_on_click(FindMode.title),
                 state=CategoryFindSG.input_title,
@@ -111,13 +111,13 @@ find_category_dialog = Dialog(
         state=CategoryFindSG.main,
     ),
     Window(
-        Template(lc.input.title),
+        tl.input.title(),
         TextInput(id=ID_INPUT_TITLE, on_success=_process_input_title),
         BackTo(CategoryFindSG.main, BACK_TEXT),
         state=CategoryFindSG.input_title,
     ),
     Window(
-        Template(lc.result),
+        tl.result(),
         _scroll_categories,
         BackToI18n(
             CategoryFindSG.main,

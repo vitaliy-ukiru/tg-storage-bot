@@ -1,20 +1,20 @@
-from typing import Dict
+
+from typing import Dict, Self, Callable, Union
 
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.text import Text
 from aiogram_i18n import I18nContext
 
-from app.bot.widgets.i18n import KeyJoiner
 
 I18N_KEY = "i18n"
 
 
 class Template(Text):
-    def __init__(self, key: str | KeyJoiner, default_text: Text = None, when: WhenCondition = None):
+    def __init__(self, key: Union[str, "TemplateProxy"], default_text: Text = None, when: WhenCondition = None):
         super().__init__(when)
-        if isinstance(key, KeyJoiner):
-            key = key()
+        if not isinstance(key, str):
+            key = str(key)
 
         self.key = key
         self.default_text = default_text
@@ -28,3 +28,27 @@ class Template(Text):
             return f'<fail get translator>: {self.key}'
 
         return i18n.get(self.key)
+
+class TemplateProxy:
+    __key_separator: str
+    __query: tuple[str, ...]
+
+    def __init__(self, *parts: str, key_separator: str = "-", ) -> None:
+        self.__key_separator = key_separator
+        self.__query = parts
+
+    def __getattr__(self, item: str) -> Self:
+        query = self.__query + (item,)
+        return TemplateProxy(*query, key_separator=self.__key_separator)
+
+    def __call__(self, default_text: Text = None, when: WhenCondition = None) -> Template:
+        return self.get_template(default_text, when)
+
+    def __str__(self):
+        return self.get_key()
+
+    def get_key(self) -> str:
+        return self.__key_separator.join(self.__query)
+
+    def get_template(self, default_text: Text = None, when: WhenCondition = None) -> Template:
+        return Template(self.get_key(), default_text=default_text, when=when)

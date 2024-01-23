@@ -9,14 +9,14 @@ from aiogram_dialog import Window
 from aiogram_dialog.widgets.kbd import (
     Back, Group, Multiselect
 )
-from aiogram_dialog.widgets.text import Const, Format
+from aiogram_dialog.widgets.text import Format
 from aiogram_i18n import I18nContext
 
 from app.bot.states.dialogs import FileListSG
 from app.bot.utils.file_type_i18n import file_categories_with_names
-from app.bot.widgets.i18n import BACK_TEXT, Template
+from app.bot.widgets.i18n import BACK_TEXT
 from app.core.domain.models.file import FileCategory
-from .common import ID_SELECT_FILE_TYPES, lc_file_list
+from .common import ID_SELECT_FILE_TYPES, tl_file_list
 
 
 class FileTypeItem(NamedTuple):
@@ -34,7 +34,7 @@ async def _file_types_getter(i18n: I18nContext, **_):
 
 
 file_types_window = Window(
-    Template(lc_file_list.type.select),
+    tl_file_list.type.select(),
     Group(
         Multiselect(
             Format("✓ {item.name}"),

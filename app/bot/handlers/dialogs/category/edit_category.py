@@ -11,11 +11,10 @@ from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Ro
 from aiogram_dialog.widgets.text import Format, Multi
 
 from app.bot.states.dialogs import CategoryEditSG
-from app.bot.widgets import BackTo
 from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp
 from app.bot.widgets.dao.base_dao import BaseDAO
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, Template, LC, Topic
+from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, TL, Topic, BackToI18n
 from app.core.domain.dto.category import UpdateCategoryDTO
 from app.core.domain.models.category import CategoryId, Category
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -141,26 +140,26 @@ async def _on_start(start_data: dict, manager: DialogManager):
         )
 
 
-lc = LC.category.edit
+tl = TL.category.edit
 
-favorite_template = Template(lc.btn.favorite)
+favorite_template = tl.btn.favorite()
 
 category_edit_dialog = Dialog(
     Window(
         Multi(
-            Topic(LC.category.title, Format("{title}")),
-            Topic(LC.category.desc, Format("{desc}"), when="desc")
+            Topic(TL.category.title(), Format("{title}")),
+            Topic(TL.category.desc(), Format("{desc}"), when="desc")
         ),
         Group(
             Row(
 
                 SwitchTo(
-                    Emoji("📝", Template(lc.btn.title)),
+                    Emoji("📝", tl.btn.title()),
                     id="create_category_edit_title",
                     state=CategoryEditSG.title
                 ),
                 SwitchTo(
-                    Emoji("📝", Template(lc.btn.desc)),
+                    Emoji("📝", tl.btn.desc()),
                     id="create_category_edit_desc",
                     state=CategoryEditSG.desc
                 ),
@@ -179,22 +178,22 @@ category_edit_dialog = Dialog(
     ),
 
     Window(
-        Template(lc.input.title),
+        tl.input.title(),
         Back(BACK_TEXT),
         TextInput(id="edit__input_title", on_success=_input_title_handler),
         state=CategoryEditSG.title
     ),
 
     Window(
-        Template(lc.input.desc),
+        tl.input.desc(),
         Column(
             Button(
-                Template(lc.btn.delete.desc),
+                tl.btn.delete.desc(),
                 id="delete_desc",
                 on_click=_process_delete_desc,
                 when="have_desc",
             ),
-            BackTo(CategoryEditSG.main),
+            BackToI18n(CategoryEditSG.main),
         ),
         TextInput(id="edit__input_desc", on_success=_input_desc_handler),
         getter=_desc_window_getter,

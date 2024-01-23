@@ -1,6 +1,6 @@
 from typing import Optional, TypedDict, Sequence
 
-from app.bot.widgets.i18n import KeyJoiner
+from app.bot.widgets.i18n import TemplateProxy
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileCategory
 
@@ -15,4 +15,4 @@ class FiltersDict(TypedDict):
     file_types: Optional[Sequence[FileCategory]]
 
 
-lc_file_list = KeyJoiner('file-list')
+tl_file_list = TemplateProxy('file-list')

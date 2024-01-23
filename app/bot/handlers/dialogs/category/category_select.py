@@ -5,9 +5,9 @@ from aiogram_dialog.widgets.kbd import Column, Start
 
 from app.bot.states.dialogs import CategoryFindSG, CategorySelectSG, CategoryCreateSG
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import Template, LC, CancelI18n
+from app.bot.widgets.i18n import TL, CancelI18n
 
-lc = LC.category.select
+tl = TL.category.select
 
 async def _process_result(_: Data, result: Any, manager: DialogManager):
     if result:
@@ -16,15 +16,15 @@ async def _process_result(_: Data, result: Any, manager: DialogManager):
 
 category_select_dialog = Dialog(
     Window(
-        Template(lc.target),
+        tl.target(),
         Column(
             Start(
-                Emoji("🔎", Template(lc.exists)),
+                Emoji("🔎", tl.btn.exists()),
                 id="category_exists",
                 state=CategoryFindSG.main,
             ),
             Start(
-                Emoji("🆕", Template(lc.btn.create)),
+                Emoji("🆕", tl.btn.create()),
                 id="category_create",
                 state=CategoryCreateSG.input_title
             ),

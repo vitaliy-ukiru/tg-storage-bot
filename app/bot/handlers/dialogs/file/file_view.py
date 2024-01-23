@@ -12,13 +12,13 @@ from app.bot.utils.file_type_i18n import locale_file_type
 from app.bot.utils.files import content_type_from_category
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import Template, KeyJoiner, Topic, CancelI18n
+from app.bot.widgets.i18n import TemplateProxy, Topic, CancelI18n
 from app.bot.widgets.i18n.template import I18N_KEY
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
 
-lc_file_view = KeyJoiner('file-view')
+tl_file_view = TemplateProxy('file-view')
 
 
 async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogManager):
@@ -28,7 +28,7 @@ async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogMa
     i18n: I18nContext = manager.middleware_data[I18N_KEY]
 
     await file_service.delete_file(file_id, user.id)
-    await call.message.edit_text(i18n.get(lc_file_view.removed()))  # type: ignore
+    await call.message.edit_text(i18n.get(str(tl_file_view.removed)))  # type: ignore
     await manager.done()
 
 
@@ -72,36 +72,36 @@ async def _process_back_to_menu_click(__: CallbackQuery, _: Button, manager: Dia
 file_view_dialog = Dialog(
     Window(
         Topic(
-            lc_file_view.topic.title,
+            tl_file_view.topic.title(),
             Format("{file_title}"),
         ),
         Topic(
-            lc_file_view.topic.title,
+            tl_file_view.topic.title(),
             Format("{file_category}"),
             when="file_category"
         ),
         Topic(
-            lc_file_view.topic.type,
+            tl_file_view.topic.type(),
             Format("{file_type_name}")
         ),
         Topic(
-            lc_file_view.topic.created,
+            tl_file_view.topic.created(),
             Format("{upload_time}")
         ),
         Column(
             SwitchTo(
-                Emoji("📥", Template(lc_file_view.btn.send)),
+                Emoji("📥", tl_file_view.btn.send()),
                 id="send_file",
                 state=FileViewSG.send_file,
             ),
             StartWithData(
-                Emoji("✏️", Template(lc_file_view.btn.edit)),
+                Emoji("✏️", tl_file_view.btn.edit()),
                 id="edit_file",
                 state=FileEditSG.main,
                 getter=_file_edit_getter
             ),
             Button(
-                Emoji("❌", Template(lc_file_view.btn.delete)),
+                Emoji("❌", tl_file_view.btn.delete()),
                 id="delete_file",
                 on_click=_process_delete_file
             )
@@ -113,7 +113,7 @@ file_view_dialog = Dialog(
     Window(
         DynamicMedia("file_media"),
         Back(
-            Template(lc_file_view.btn.menu),
+            tl_file_view.btn.menu(),
             id="show_menu",
         ),
         getter=_media_getter,

@@ -5,10 +5,10 @@ __all__ = (
 from aiogram_dialog import DialogManager, Window
 from aiogram_dialog.widgets.input import TextInput
 
-from app.bot.handlers.dialogs.file.file_list.common import ID_INPUT_TITLE, lc_file_list
+from app.bot.handlers.dialogs.file.file_list.common import ID_INPUT_TITLE, tl_file_list
 from app.bot.states.dialogs import FileListSG
 from app.bot.utils.optional_str import optional_str_factory
-from app.bot.widgets.i18n import BackToI18n, Template
+from app.bot.widgets.i18n import BackToI18n
 
 
 async def _process_input_title(_, __, dialog_manager: DialogManager, ___):
@@ -16,7 +16,7 @@ async def _process_input_title(_, __, dialog_manager: DialogManager, ___):
 
 
 input_title_window = Window(
-    Template(lc_file_list.title.input),
+    tl_file_list.title.input(),
     TextInput(
         id=ID_INPUT_TITLE,
         on_success=_process_input_title,

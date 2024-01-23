@@ -10,11 +10,11 @@ from aiogram_dialog.widgets.kbd import Select, StubScroll, Column
 from aiogram_dialog.widgets.text import Format
 
 from app.bot.handlers.dialogs import execute
-from app.bot.handlers.dialogs.file.file_list.common import lc_file_list
+from app.bot.handlers.dialogs.file.file_list.common import tl_file_list
 from app.bot.handlers.dialogs.file.file_list.filters_dao import FiltersDAO
 from app.bot.states.dialogs import FileListSG
 from app.bot.widgets import BackTo
-from app.bot.widgets.i18n import BACK_TEXT, Template
+from app.bot.widgets.i18n import BACK_TEXT
 from app.bot.widgets.scroll import Navigation
 from app.core.domain.dto.common import Pagination
 from app.core.domain.models.user import User
@@ -50,7 +50,7 @@ async def _process_click_file(_, __, manager: DialogManager, item_id: int):
 
 
 results_window = Window(
-    Template(lc_file_list.result.select),
+    tl_file_list.result.select(),
     Column(
         Select(
             Format("{item.name}"),

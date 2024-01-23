@@ -15,13 +15,13 @@ from magic_filter import F
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils.file_type_i18n import get_file_category_name
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import Template, Topic
+from app.bot.widgets.i18n import Topic
 from app.core.interfaces.usecase.category import CategoryUsecase
-from .common import lc_file_list
+from .common import tl_file_list
 from .filters_dao import FiltersDAO
 
 _filters = F["filters"]
-lc = lc_file_list.main
+tl = tl_file_list.main
 
 
 async def _main_window_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
@@ -41,7 +41,7 @@ async def _main_window_getter(dialog_manager: DialogManager, category_service: C
 
 _main_menu_text = Multi(
     Multi(
-        Template(lc.topic.file.types),
+        tl.topic.file.types(),
         List(
             Format("{item}"),
             sep=', ',
@@ -54,11 +54,11 @@ _main_menu_text = Multi(
         when=_filters["file_types"],
     ),
     Topic(
-        lc.topic.title, Format("{filters[title]}"),
+        tl.topic.title, Format("{filters[title]}"),
         when=_filters["title"],
     ),
     Topic(
-        lc.topic.category, Format("{category_name}"),
+        tl.topic.category, Format("{category_name}"),
         when="category_name"
     ),
 )
@@ -105,14 +105,14 @@ async def _delete_category(filters: FiltersDAO):
 main_window = Window(
     Case(
         {
-            False: Template(lc.topic.empty),
+            False: tl.topic.empty(),
             True: _main_menu_text
         },
         selector="have_filters"
     ),
     new_filter_btn(
         Start(
-            Emoji("🗂", Template(lc.btn.category)),
+            Emoji("🗂", tl.btn.category()),
             state=CategoryFindSG.main,
             id="category"
         ),
@@ -121,7 +121,7 @@ main_window = Window(
     ),
     new_filter_btn(
         SwitchTo(
-            Emoji("🏷", Template(lc.btn.file.type)),
+            Emoji("🏷", tl.btn.file.type()),
             state=FileListSG.input_file_type,
             id="file_types"
         ),
@@ -130,7 +130,7 @@ main_window = Window(
     ),
     new_filter_btn(
         SwitchTo(
-            Emoji("📃", Template(lc.btn.title)),
+            Emoji("📃", tl.btn.title()),
             state=FileListSG.input_file_title,
             id="file_title"
         ),
@@ -139,7 +139,7 @@ main_window = Window(
     ),
 
     SwitchTo(
-        Emoji("🔎", Template(lc.btn.search)),
+        Emoji("🔎", tl.btn.search()),
         state=FileListSG.file_list,
         id="find_files",
     ),

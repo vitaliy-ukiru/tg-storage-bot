@@ -9,6 +9,7 @@ from aiogram.types import (
     InlineQueryResultCachedAudio,
     InlineQueryResultCachedGif,
 )
+from aiogram_i18n import I18nContext
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import FilesFindDTO
@@ -21,14 +22,15 @@ router = Router()
 
 _FILES_NOT_FOUND = "__files_not_found"
 
+HINT_NOT_FOUND_KEY = 'files-not-found-hint'
 
 @router.message(CommandStart(deep_link=True, magic=F.args == _FILES_NOT_FOUND))
-async def _files_not_found(m: Message):
-    await m.answer("По такому запросу файлов не найдено")
+async def _files_not_found(m: Message,  i18n: I18nContext):
+    await m.answer(i18n.get('files-not-found-details'))
 
 
 @router.inline_query(F.query.cast(int))
-async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase, user: User):
+async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase, user: User,i18n: I18nContext):
     file_id = FileId(int(inline_query.query))
     try:
         file = await file_service.get_file(
@@ -43,7 +45,7 @@ async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase,
         await inline_query.answer(
             [],
             is_personal=True,
-            switch_pm_text="Ничего не найдено",
+            switch_pm_text=i18n.get(HINT_NOT_FOUND_KEY),
             switch_pm_parameter=_FILES_NOT_FOUND
         )
         return
@@ -57,7 +59,7 @@ ITEMS_PER_PAGE = 50
 
 
 @router.inline_query()
-async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsecase, user: User):
+async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsecase, user: User, i18n: I18nContext):
     page = 0
     # in offset stores page number
     # it give more capacity.
@@ -81,7 +83,7 @@ async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsec
         await inline_query.answer(
             [],
             is_personal=True,
-            switch_pm_text="Ничего не найдено",
+            switch_pm_text=i18n.get(HINT_NOT_FOUND_KEY),
             switch_pm_parameter=_FILES_NOT_FOUND
         )
         return

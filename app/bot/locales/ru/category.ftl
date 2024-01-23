@@ -18,7 +18,7 @@ category-find-btn-popular = Самые используемые
 category-find-btn-favorites = Избранные
 category-find-btn-title = Поиск по названию
 
-category-find-input-tile = Введите часть названия категории
+category-find-input-title = Введите часть названия категории
 category-find-result = Список найденных категорий
 
 category-edit-btn-title = Название

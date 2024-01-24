@@ -27,5 +27,4 @@ class UserMiddleware(BaseMiddleware):
         user_id = tg_user.id
         user = await self.svc.get_user(UserId(user_id), True)
         data[USER_KEY] = user
-        data["user_service"] = self.svc
         return await handler(event, data)

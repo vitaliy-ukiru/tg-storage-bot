@@ -9,7 +9,6 @@ from aiogram import BaseMiddleware
 from aiogram.dispatcher.middlewares.user_context import EVENT_FROM_USER_KEY
 from aiogram.types import TelegramObject, User as TgUser
 
-from app.bot.locales import ensure_locale
 from app.core.domain.dto.user import CreateUserDTO
 from app.core.domain.exceptions.user import UserNotFound
 from app.core.domain.models.user import UserId
@@ -30,7 +29,7 @@ class UserMiddleware(BaseMiddleware):
             user = await self.svc.create_user(
                 CreateUserDTO(
                     user_id=user_id,
-                    locale=ensure_locale(tg_user.language_code),
+                    locale=tg_user.language_code,
                 )
             )
 

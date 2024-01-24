@@ -1,5 +1,6 @@
 from typing import cast
 
+from app.core.common.locales import ensure_locale
 from app.core.domain.dto.user import CreateUserDTO, UpdateLocaleDTO
 from app.core.interfaces.repository.user import UserRepository
 from app.core.interfaces.usecase.user import UserUsecase
@@ -14,7 +15,8 @@ class UserService(UserUsecase):
         self._repo = repo
 
     async def create_user(self, dto: CreateUserDTO) -> User:
-        return await self._repo.save_user(UserId(dto.user_id), dto.locale)
+        locale = ensure_locale(dto.locale)
+        return await self._repo.save_user(UserId(dto.user_id), locale)
 
     async def get_user(self, user_id: UserId, restore: bool = False) -> User:
         user = await self._repo.get_user(user_id)
@@ -31,6 +33,6 @@ class UserService(UserUsecase):
 
     async def update_locale(self, dto: UpdateLocaleDTO) -> User:
         user = await self._repo.get_user(UserId(dto.user_id))
-        user.locale = dto.locale
+        user.locale = ensure_locale(dto.locale)
         await self._repo.update_locale(user)
         return user

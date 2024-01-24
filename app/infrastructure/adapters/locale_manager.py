@@ -17,7 +17,7 @@ class UserGateway(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_user(self, user_id: UserId, force_find: bool = False) -> User:
+    async def get_user(self, user_id: UserId, restore: bool = False) -> User:
         raise NotImplementedError
 
 
@@ -38,7 +38,7 @@ class GatewayLocaleManager(BaseManager):
         if not event_from_user:
             return self.default_locale
 
-        user = await self._user_gateway.get_user(UserId(event_from_user.id), force_find=True)
+        user = await self._user_gateway.get_user(UserId(event_from_user.id), restore=True)
         return user.locale
 
 

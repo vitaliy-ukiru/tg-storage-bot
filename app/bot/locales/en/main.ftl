@@ -36,3 +36,6 @@ missed-category-id-hint = Send category id as argument
 
 invalid-file-id-hint = Invalid file id
 invalid-category-id-hint = Invalid category id
+
+
+users-locale-select = Choose language. The current language is marked with a check mark.

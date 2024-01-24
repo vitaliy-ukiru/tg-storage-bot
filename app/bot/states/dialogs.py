@@ -46,3 +46,7 @@ ALLOWED_STATES = frozenset({
     FileListSG.file_list,
     CategoryEditSG.main,
 })
+
+
+class UserChangeLocaleSG(StatesGroup):
+    main = State()

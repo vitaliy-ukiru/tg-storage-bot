@@ -41,8 +41,6 @@ class BotBuilder:
     fsm_strategy: FSMStrategy | None = None
     event_isolation: BaseEventIsolation | None = None
 
-
-
     def with_fsm_storage(self, storage: BaseStorage):
         self.fsm_storage = storage
         return self

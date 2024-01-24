@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from app.bot.setup import BotModule
+from app.bot.builder import BotBuilder
 from app.common.config import Config
 from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
@@ -46,12 +46,11 @@ async def main():
 
     file_service = FileService(file_repo, category_service)
 
-    tg_bot = BotModule(
-        cfg.bot,
-        user_service,
-        category_service,
-        file_service,
-        MemoryStorage(),
+    tg_bot = (
+        BotBuilder(cfg=cfg, user_service=user_service).
+        with_fsm_storage(MemoryStorage()).
+        build_deps(file_service, category_service).
+        build()
     )
 
     await tg_bot.run()

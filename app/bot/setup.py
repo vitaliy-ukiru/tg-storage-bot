@@ -29,7 +29,7 @@ def _configure_dp(
     dp.message.middleware(FileUploaderMiddleware(file_service))
     i18n_middleware = I18nMiddleware(
         core=FluentRuntimeCore(
-            path="app/bot/locales/LC_MESSAGES/{locale}"
+            path="app/bot/locales/{locale}"
         ),
         manager=LazyGatewayLocaleManager(
             GatewayLocaleManager(user_service),

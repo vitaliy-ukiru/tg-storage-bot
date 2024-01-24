@@ -6,16 +6,16 @@ from aiogram_dialog.widgets.kbd import Radio, ManagedRadio
 from aiogram_dialog.widgets.text import Format
 from aiogram_i18n import I18nContext
 
-from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import UserChangeLocaleSG
 from app.bot.widgets.i18n import TL, CloseI18n
 from app.bot.widgets.i18n.template import I18N_KEY
+from app.core.common.locales import RU, EN
 
 ID_SELECT_LOCALE = "select_lang"
 
 LOCALES = (
-    ("🇷🇺 Русский", "ru"),
-    ("🇺🇸 English", "en")
+    ("🇷🇺 Русский", RU),
+    ("🇺🇸 English", EN)
 )
 
 

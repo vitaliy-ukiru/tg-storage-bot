@@ -1,21 +1,22 @@
 from typing import Any
 
 from aiogram.types import Message
-from aiogram_dialog import Dialog, Window, DialogManager, Data
+from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
-from aiogram_dialog.widgets.text import Const
 
 from app.bot.filters.media import MediaFilter
-from app.bot.widgets import BackTo, CANCEL_TEXT, CLOSE_TEXT
-from app.bot.widgets import StartWithData
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileEditSG, CategorySelectSG
 from app.bot.utils.files import FileCredentials
+from app.bot.widgets import StartWithData
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import CANCEL_TEXT, CLOSE_TEXT, BackToI18n, TemplateProxy
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
 
+tl = TemplateProxy("file-edit")
 
 async def _process_new_title(_, __, manager: DialogManager, title: str):
     file_id: FileId = manager.start_data["file_id"]
@@ -66,21 +67,21 @@ async def _set_category_getter(dialog_manager: DialogManager, **_):
 
 file_edit_dialog = Dialog(
     Window(
-        Const("Выберите пункт"),
+        tl.main(),
         Column(
             SwitchTo(
-                Const("📝 Изменить название"),
+                Emoji("📝", tl.title()),
                 id="file_edit_title",
                 state=FileEditSG.edit_title
             ),
             StartWithData(
-                Const("🗂 Изменить категорию"),
+                Emoji("🗂", tl.category()),
                 id="file_edit_c",
                 state=CategorySelectSG.start,
                 getter=_set_category_getter
             ),
             SwitchTo(
-                Const("🔄 Перезагрузить файл"),
+                Emoji("🔄", tl.reload()),
                 id="file_edit_reload",
                 state=FileEditSG.reload_file
             ),
@@ -89,22 +90,22 @@ file_edit_dialog = Dialog(
         state=FileEditSG.main,
     ),
     Window(
-        Const("Введите новое название"),
+        tl.input.title(),
         TextInput(
             id="new__title",
             on_success=_process_new_title
         ),
-        BackTo(FileEditSG.main, CANCEL_TEXT),
+        BackToI18n(FileEditSG.main, CANCEL_TEXT),
         state=FileEditSG.edit_title,
     ),
 
     Window(
-        Const("Отправьте новый файл"),
+        tl.send.new(),
         MessageInput(
             _process_reload_file,
             filter=MediaFilter()
         ),
-        BackTo(FileEditSG.main, CANCEL_TEXT),
+        BackToI18n(FileEditSG.main, CANCEL_TEXT),
         state=FileEditSG.reload_file,
     ),
     on_process_result=_process_result,

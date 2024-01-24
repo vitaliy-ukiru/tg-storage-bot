@@ -21,6 +21,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
+    locale: Mapped[str] = mapped_column(server_default="en")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
@@ -29,19 +30,20 @@ class User(Base):
 
     def to_domain(self) -> DUser:
         return DUser(
-            self.id,
-            self.created_at,
-            self.deleted_at,
+            id=self.id,
+            locale=self.locale,
+            created_at=self.created_at,
+            deleted_at=self.deleted_at,
         )
 
     @classmethod
     def from_domain(cls, u: DUser) -> 'User':
         return User(
             id=u.id,
+            locale=u.locale,
             created_at=u.created_at,
             deleted_at=u.deleted_at
         )
-
 
 class Category(Base):
     __tablename__ = "categories"

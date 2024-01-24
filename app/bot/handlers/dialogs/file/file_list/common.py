@@ -1,5 +1,6 @@
 from typing import Optional, TypedDict, Sequence
 
+from app.bot.widgets.i18n import TemplateProxy
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileCategory
 
@@ -12,3 +13,6 @@ class FiltersDict(TypedDict):
     category_id: Optional[CategoryId]
     title: Optional[str]
     file_types: Optional[Sequence[FileCategory]]
+
+
+tl_file_list = TemplateProxy('file-list')

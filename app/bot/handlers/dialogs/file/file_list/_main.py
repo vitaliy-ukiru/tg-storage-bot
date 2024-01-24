@@ -9,14 +9,19 @@ from aiogram_dialog.widgets.kbd import Start, SwitchTo, Button, Row
 from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Const, Format, Case, Multi, List
 from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
+from aiogram_i18n import I18nContext
 from magic_filter import F
 
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
-from app.bot.utils.file_type_str import get_file_category_name
+from app.bot.utils.file_type_i18n import get_file_category_name
+from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.i18n import Topic
 from app.core.interfaces.usecase.category import CategoryUsecase
+from .common import tl_file_list
 from .filters_dao import FiltersDAO
 
 _filters = F["filters"]
+tl = tl_file_list.main
 
 
 async def _main_window_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
@@ -36,24 +41,24 @@ async def _main_window_getter(dialog_manager: DialogManager, category_service: C
 
 _main_menu_text = Multi(
     Multi(
-        Const("Типы файлов"),
+        tl.topic.file.types(),
         List(
             Format("{item}"),
             sep=', ',
             items=lambda data: [
-                get_file_category_name(ft)
+                get_file_category_name(ft, I18nContext.get_current())
                 for ft in data["filters"]["file_types"]
             ]
         ),
         sep=': ',
         when=_filters["file_types"],
     ),
-    Format(
-        text="Название: {filters[title]}",
+    Topic(
+        tl.topic.title, Format("{filters[title]}"),
         when=_filters["title"],
     ),
-    Format(
-        text="Категория: {category_name}",
+    Topic(
+        tl.topic.category, Format("{category_name}"),
         when="category_name"
     ),
 )
@@ -100,14 +105,14 @@ async def _delete_category(filters: FiltersDAO):
 main_window = Window(
     Case(
         {
-            False: Const("Фильтры не установлены"),
+            False: tl.topic.empty(),
             True: _main_menu_text
         },
         selector="have_filters"
     ),
     new_filter_btn(
         Start(
-            Const("🗂 Категория"),
+            Emoji("🗂", tl.btn.category()),
             state=CategoryFindSG.main,
             id="category"
         ),
@@ -116,7 +121,7 @@ main_window = Window(
     ),
     new_filter_btn(
         SwitchTo(
-            Const("🏷 Тип файла"),
+            Emoji("🏷", tl.btn.file.type()),
             state=FileListSG.input_file_type,
             id="file_types"
         ),
@@ -125,7 +130,7 @@ main_window = Window(
     ),
     new_filter_btn(
         SwitchTo(
-            Const("📃 Название файла"),
+            Emoji("📃", tl.btn.title()),
             state=FileListSG.input_file_title,
             id="file_title"
         ),
@@ -134,7 +139,7 @@ main_window = Window(
     ),
 
     SwitchTo(
-        Const("🔎 Поиск"),
+        Emoji("🔎", tl.btn.search()),
         state=FileListSG.file_list,
         id="find_files",
     ),

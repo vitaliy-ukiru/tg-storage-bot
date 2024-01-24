@@ -6,7 +6,7 @@ from typing import Optional
 
 from aiogram_dialog import DialogManager, ShowMode, StartMode, Data
 
-from app.bot.states.dialogs import FileViewSG, FileListSG, CategoryEditSG
+from app.bot.states.dialogs import FileViewSG, FileListSG, CategoryEditSG, UserChangeLocaleSG
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileId
 
@@ -14,7 +14,7 @@ from app.core.domain.models.file import FileId
 async def file_view(manager: DialogManager,
                     file_id: int | FileId,
                     data: Data = None,
-                    mode: StartMode = StartMode.NORMAL,
+                    mode: StartMode = StartMode.RESET_STACK,
                     show_mode: Optional[ShowMode] = None):
     if not isinstance(data, dict):
         data = {}
@@ -30,7 +30,7 @@ async def file_view(manager: DialogManager,
 async def file_list(manager: DialogManager,
                     filters: dict = None,
                     data: Data = None,
-                    mode: StartMode = StartMode.NORMAL,
+                    mode: StartMode = StartMode.RESET_STACK,
                     show_mode: Optional[ShowMode] = None):
     if filters is not None:
         if data is None:
@@ -55,6 +55,18 @@ async def category_edit(manager: DialogManager,
     await manager.start(
         CategoryEditSG.main,
         dict(category_id=category_id) | data,
+        mode=mode,
+        show_mode=show_mode,
+    )
+
+
+async def change_locale(manager: DialogManager,
+                        data: Data = None,
+                        mode: StartMode = StartMode.RESET_STACK,
+                        show_mode: Optional[ShowMode] = None):
+    await manager.start(
+        UserChangeLocaleSG.main,
+        data=data,
         mode=mode,
         show_mode=show_mode,
     )

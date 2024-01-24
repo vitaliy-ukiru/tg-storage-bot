@@ -2,20 +2,18 @@ from datetime import datetime
 from typing import Optional
 
 from asyncpg import UniqueViolationError
-from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.core.interfaces.repository.user import UserRepository
-from app.core.domain.models.user import User
 from app.core.domain.exceptions.user import UserAlreadyExists
-
+from app.core.domain.models.user import User
+from app.core.interfaces.repository.user import UserRepository
 from app.infrastructure.db import models
 from app.infrastructure.db.repo._base import BaseRepository
 
 
 class UserStorage(BaseRepository, UserRepository):
-    async def save_user(self, user_id: int) -> User:
+    async def save_user(self, user_id: int, locale: Optional[str] = None) -> User:
         async with self._pool() as session:
-            db_user = models.User(id=user_id)
+            db_user = models.User(id=user_id, locale=locale)
             try:
                 session.add(db_user)
                 await session.commit()
@@ -32,6 +30,15 @@ class UserStorage(BaseRepository, UserRepository):
                 return None
 
             return db_user.to_domain()
+
+    async def update_locale(self, user: User):
+        async with self._pool() as session:
+            model: models.User | None = await session.get(models.User, user.id)
+            if model is None:
+                return
+
+            model.locale = user.locale
+            await session.commit()
 
     async def restore_user(self, user_id: int) -> Optional[User]:
         async with self._pool() as session:

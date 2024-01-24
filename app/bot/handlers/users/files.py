@@ -3,6 +3,7 @@ from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.filters import Command, CommandObject, StateFilter
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
+from aiogram_i18n import I18nContext
 
 from app.bot.filters.media import MediaFilter
 from app.bot.filters.via_self import ViaSelfRestrict
@@ -37,14 +38,14 @@ async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manag
 
 
 @router.message(Command("file"))
-async def file_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager):
+async def file_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager, i18n: I18nContext):
     args = command.args
     if args is None:
-        await msg.answer("Send file id as argument")
+        await msg.answer(i18n.get('missed-file-id-hint'))
         return
     try:
         file_id = int(args)
     except ValueError as _:
-        await msg.answer("invalid file_id")
+        await msg.answer(i18n.get('invalid-file-id-hint'))
     else:
         await execute.file_view(dialog_manager, file_id, mode=StartMode.RESET_STACK)

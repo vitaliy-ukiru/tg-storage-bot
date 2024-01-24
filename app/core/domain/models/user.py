@@ -7,6 +7,7 @@ UserId = NewType("UserId", int)
 @dataclass
 class User:
     id: UserId
+    locale: str
     created_at: datetime
     deleted_at: Optional[datetime] = None
 

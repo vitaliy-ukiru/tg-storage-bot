@@ -39,12 +39,11 @@ def _configure_dp(
 
     users.setup(dp)
     dialogs.setup(dp)
+    i18n_middleware.setup(dp)
 
     # dp.message.register(start, CommandStart())
-    i18n_middleware.setup(dp)
     setup_dialogs(dp)
     return dp
-
 
 class BotModule:
     def __init__(

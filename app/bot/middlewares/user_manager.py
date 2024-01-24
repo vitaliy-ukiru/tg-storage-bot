@@ -43,5 +43,4 @@ class UserMiddleware(BaseMiddleware):
 
         user = await self._get_user(tg_user)
         data[USER_KEY] = user
-        data["user_service"] = self.svc
         return await handler(event, data)

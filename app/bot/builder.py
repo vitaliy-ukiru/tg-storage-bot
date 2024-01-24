@@ -6,17 +6,34 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.base import BaseStorage, BaseEventIsolation
 from aiogram.fsm.strategy import FSMStrategy
 from aiogram_dialog import setup_dialogs
+from aiogram_i18n import I18nMiddleware
+from aiogram_i18n.cores import FluentRuntimeCore
 
 from app.bot.handlers import users, dialogs
 from app.bot.middlewares import UserMiddleware
 from app.bot.utils.uploader import FileUploader
 from app.common.config import Config
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
+from app.infrastructure.adapters.locale_manager import (
+    LazyGatewayLocaleManager,
+    GatewayLocaleManager,
+    ContextLocaleManager
+)
 
 
 def _configure_dp(dp: Dispatcher, user_service: UserUsecase):
     dp.update.middleware(UserMiddleware(user_service))
 
+    i18n_middleware = I18nMiddleware(
+        core=FluentRuntimeCore(
+            path="app/bot/locales/{locale}"
+        ),
+        manager=LazyGatewayLocaleManager(
+            GatewayLocaleManager(user_service),
+            ContextLocaleManager()
+        )
+    )
+    i18n_middleware.setup(dp)
     users.setup(dp)
     dialogs.setup(dp)
 

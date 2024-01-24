@@ -1,6 +1,7 @@
 from operator import itemgetter
 from typing import Any
 
+from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.kbd import Radio, ManagedRadio
 from aiogram_dialog.widgets.text import Format
@@ -18,6 +19,8 @@ LOCALES = (
     ("🇺🇸 English", EN)
 )
 
+tl = TL.users.locale
+
 
 async def _on_change_locale(_: ChatEvent, __: ManagedRadio, manager: DialogManager, locale: str):
     i18n: I18nContext = manager.middleware_data[I18N_KEY]
@@ -25,6 +28,14 @@ async def _on_change_locale(_: ChatEvent, __: ManagedRadio, manager: DialogManag
         return
 
     await i18n.set_locale(locale)
+
+
+async def _on_click_close(call: CallbackQuery, __, manager: DialogManager):
+    i18n: I18nContext = manager.middleware_data[I18N_KEY]
+    if len(manager.current_stack().intents) > 1:
+        return
+
+    await call.message.edit_text(i18n.get(str(tl.chosen)))
 
 
 async def _on_start(_: Any, manager: DialogManager):
@@ -35,7 +46,7 @@ async def _on_start(_: Any, manager: DialogManager):
 
 user_change_locale = Dialog(
     Window(
-        TL.users.locale.select(),
+        tl.select(),
         Radio(
             checked_text=Format("✓ {item[0]}"),
             unchecked_text=Format("{item[0]}"),
@@ -44,7 +55,9 @@ user_change_locale = Dialog(
             id=ID_SELECT_LOCALE,
             on_state_changed=_on_change_locale
         ),
-        CloseI18n(),
+        CloseI18n(
+            on_click=_on_click_close
+        ),
         state=UserChangeLocaleSG.main,
     ),
     on_start=_on_start

@@ -38,3 +38,4 @@ invalid-file-id-hint = Некорректный ид файла
 invalid-category-id-hint = Некорректный ид категории
 
 users-locale-select = Выберите язык. Текущий язык отмечен галочкой.
+users-locale-chosen = Выбран русский язык

@@ -39,3 +39,4 @@ invalid-category-id-hint = Invalid category id
 
 
 users-locale-select = Choose language. The current language is marked with a check mark.
+users-locale-chosen = English language chosen

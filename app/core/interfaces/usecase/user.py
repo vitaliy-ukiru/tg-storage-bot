@@ -14,7 +14,7 @@ class UserUsecase(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_user(self, user_id: UserId, force_find: bool = False) -> User:
+    async def get_user(self, user_id: UserId, restore: bool = False) -> User:
         raise NotImplementedError
 
     @abstractmethod

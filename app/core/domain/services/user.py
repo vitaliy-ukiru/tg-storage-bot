@@ -16,17 +16,13 @@ class UserService(UserUsecase):
     async def create_user(self, dto: CreateUserDTO) -> User:
         return await self._repo.save_user(UserId(dto.user_id), dto.locale)
 
-    async def get_user(self, user_id: UserId, force_find: bool = False) -> User:
+    async def get_user(self, user_id: UserId, restore: bool = False) -> User:
         user = await self._repo.get_user(user_id)
         if user is None:
-            if not force_find:
-                raise UserNotFound(user_id)
-
-            user = await self._repo.save_user(user_id)
-            return user
+            raise UserNotFound(user_id)
 
         if user.is_deleted:
-            if not force_find:
+            if not restore:
                 raise UserDeleted(user_id)
 
             user = await self._repo.restore_user(user_id)

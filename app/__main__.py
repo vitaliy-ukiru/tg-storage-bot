@@ -9,10 +9,9 @@ from app.common.config import Config
 from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
-from app.infrastructure.adapters.category_rater import CategoryRaterAdapter
 from app.infrastructure.db import connect
-from app.infrastructure.db.repo.category import CategoryStorage
-from app.infrastructure.db.repo.file import FileStorage
+from app.infrastructure.db.repo.category import CategoryStorageGateway
+from app.infrastructure.db.repo.file import FileStorageGateway, FileCategoryUsageRater
 from app.infrastructure.db.repo.user import UserStorage
 
 
@@ -35,16 +34,34 @@ async def main():
         logging.basicConfig(level=logging.INFO)
     logging.info(f"env is {cfg.env!r}")
 
+    # ugly, but i think it will better in future
     user_repo = UserStorage(session_maker)
-    category_repo = CategoryStorage(session_maker)
-    file_repo = FileStorage(session_maker)
+    user_service = UserService(
+        saver=user_repo,
+        getter=user_repo,
+        updater=user_repo,
+        deleter=user_repo,
+    )
 
-    user_service = UserService(user_repo)
+    category_repo = CategoryStorageGateway(session_maker)
+    category_rater = FileCategoryUsageRater(session_maker)
+    category_service = CategoryService(
+        saver=category_repo,
+        getter=category_repo,
+        finder=category_repo,
+        updater=category_repo,
+        rater=category_rater,
+    )
 
-    category_rater = CategoryRaterAdapter(file_repo)
-    category_service = CategoryService(category_repo, category_rater)
-
-    file_service = FileService(file_repo, category_service)
+    file_repo = FileStorageGateway(session_maker)
+    file_service = FileService(
+        saver=file_repo,
+        getter=file_repo,
+        finder=file_repo,
+        updater=file_repo,
+        deleter=file_repo,
+        category_getter=category_service
+    )
 
     tg_bot = (
         BotBuilder(cfg=cfg, user_service=user_service).

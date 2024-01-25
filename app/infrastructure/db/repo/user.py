@@ -6,14 +6,14 @@ from asyncpg import UniqueViolationError
 from app.core.domain.exceptions.user import UserAlreadyExists
 from app.core.domain.models.user import User
 from app.core.interfaces.repository.user import (
-    UserSaver, UserGetter, UserUpdater, UserDeleter
+    UserRepoSaver, UserRepoGetter, UserRepoUpdater, UserRepoDeleter
 )
 from app.infrastructure.db import models
 from app.infrastructure.db.repo._base import BaseRepository
 
 
 class UserStorage(
-    UserSaver, UserGetter, UserUpdater, UserDeleter,
+    UserRepoSaver, UserRepoGetter, UserRepoUpdater, UserRepoDeleter,
     BaseRepository
 ):
     async def save_user(self, user_id: int, locale: Optional[str] = None) -> User:

@@ -1,8 +1,8 @@
 __all__ = (
-    'UserSaver',
-    'UserGetter',
-    'UserUpdater',
-    'UserDeleter',
+    'UserRepoSaver',
+    'UserRepoGetter',
+    'UserRepoUpdater',
+    'UserRepoDeleter',
 )
 
 import abc
@@ -11,26 +11,26 @@ from typing import Protocol, Optional
 from app.core.domain.models.user import UserId, User
 
 
-class UserSaver(Protocol):
+class UserRepoSaver(Protocol):
 
     @abc.abstractmethod
     async def save_user(self, user_id: UserId, locale: Optional[str] = None) -> User:
         raise NotImplementedError
 
 
-class UserGetter(Protocol):
+class UserRepoGetter(Protocol):
     @abc.abstractmethod
     async def get_user(self, user_id: UserId) -> Optional[User]:
         raise NotImplementedError
 
 
-class UserUpdater(Protocol):
+class UserRepoUpdater(Protocol):
     @abc.abstractmethod
     async def update_locale(self, user: User):
         raise NotImplementedError
 
 
-class UserDeleter(Protocol):
+class UserRepoDeleter(Protocol):
     @abc.abstractmethod
     async def restore_user(self, user_id: UserId) -> Optional[User]:
         raise NotImplementedError

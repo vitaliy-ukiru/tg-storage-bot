@@ -1,9 +1,9 @@
 __all__ = (
-    'CategorySaver',
-    'CategoryFinder',
-    'CategoryGetter',
-    'CategoryUpdater',
-    'CategoryUsageRater',
+    'CategoryRepoSaver',
+    'CategoryRepoFinder',
+    'CategoryRepoGetter',
+    'CategoryRepoUpdater',
+    'CategoryRepoUsageRater',
 )
 
 from abc import abstractmethod
@@ -15,22 +15,22 @@ from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.common import FilterField
 
 
-class CategorySaver(Protocol):
+class CategoryRepoSaver(Protocol):
     @abstractmethod
     async def save_category(self, c: Category) -> CategoryId:
         raise NotImplementedError
 
-class CategoryGetter(Protocol):
+class CategoryRepoGetter(Protocol):
     @abstractmethod
     async def get_category(self, category_id: CategoryId) -> Optional[Category]:
         raise NotImplementedError
 
-class CategoryUpdater(Protocol):
+class CategoryRepoUpdater(Protocol):
     @abstractmethod
     async def update_category(self, category: Category):
         raise NotImplementedError
 
-class CategoryFinder(Protocol):
+class CategoryRepoFinder(Protocol):
     @abstractmethod
     async def find_categories(self, filters: Sequence[FilterField],
                               paginate: Optional[Pagination] = None) -> list[Category]:
@@ -40,7 +40,7 @@ class CategoryFinder(Protocol):
     async def get_category_count(self, filters: Sequence[FilterField]) -> int:
         raise NotImplementedError
 
-class CategoryUsageRater(Protocol):
+class CategoryRepoUsageRater(Protocol):
     @abstractmethod
     async def get_categories_usage(self, user_id: UserId) -> dict[CategoryId, int]:
         raise NotImplementedError

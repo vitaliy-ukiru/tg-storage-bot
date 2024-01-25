@@ -1,40 +1,38 @@
-import abc
-import operator
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol, Optional
+from typing import Optional
 
+from app.core.common.filters.category import CategoryFilters
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
+from app.core.domain.services.internal.filter_merger import FilterMerger
 from app.core.interfaces.repository.category import (
-    CategorySaver, CategoryGetter, CategoryFinder, CategoryUpdater, CategoryUsageRater
+    CategoryRepoSaver, CategoryRepoGetter, CategoryRepoFinder, CategoryRepoUpdater,
+    CategoryRepoUsageRater
 )
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.category import CategoryUsecase
-from app.core.domain.services.internal.filter_merger import FilterMerger
-from app.core.common.filters.category import CategoryFilters
-
 
 UNDEFINED_CATEGORY_ID = CategoryId(0)
 
 
 class CategoryService(CategoryUsecase):
-    _saver: CategorySaver
-    _getter: CategoryGetter
-    _finder: CategoryFinder
-    _updater: CategoryUpdater
-    _rater: CategoryUsageRater
+    _saver: CategoryRepoSaver
+    _getter: CategoryRepoGetter
+    _finder: CategoryRepoFinder
+    _updater: CategoryRepoUpdater
+    _rater: CategoryRepoUsageRater
 
     def __init__(
         self,
-        saver: CategorySaver,
-        getter: CategoryGetter,
-        finder: CategoryFinder,
-        updater: CategoryUpdater,
-        rater: CategoryUsageRater,
+        saver: CategoryRepoSaver,
+        getter: CategoryRepoGetter,
+        finder: CategoryRepoFinder,
+        updater: CategoryRepoUpdater,
+        rater: CategoryRepoUsageRater,
     ):
 
         self._saver = saver

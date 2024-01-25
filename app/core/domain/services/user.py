@@ -3,7 +3,7 @@ from typing import cast
 from app.core.common.locales import ensure_locale
 from app.core.domain.dto.user import CreateUserDTO, UpdateLocaleDTO
 from app.core.interfaces.repository.user import (
-    UserSaver, UserGetter, UserDeleter, UserUpdater
+    UserRepoSaver, UserRepoGetter, UserRepoDeleter, UserRepoUpdater
 )
 from app.core.interfaces.usecase.user import UserUsecase
 from app.core.domain.exceptions.user import UserNotFound, UserDeleted
@@ -11,17 +11,17 @@ from app.core.domain.models.user import User, UserId
 
 
 class UserService(UserUsecase):
-    _saver: UserSaver
-    _getter: UserGetter
-    _updater: UserUpdater
-    _deleter: UserDeleter
+    _saver: UserRepoSaver
+    _getter: UserRepoGetter
+    _updater: UserRepoUpdater
+    _deleter: UserRepoDeleter
 
     def __init__(
         self,
-        saver: UserSaver,
-        getter: UserGetter,
-        updater: UserUpdater,
-        deleter: UserDeleter
+        saver: UserRepoSaver,
+        getter: UserRepoGetter,
+        updater: UserRepoUpdater,
+        deleter: UserRepoDeleter
     ):
 
         self._saver = saver

@@ -1,7 +1,6 @@
-import abc
 from dataclasses import asdict
 from datetime import datetime
-from typing import Protocol, Optional, overload, Literal
+from typing import Optional, overload, Literal
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
@@ -10,19 +9,13 @@ from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.file import File, FileId, RemoteFileId
 from app.core.domain.models.user import UserId
+from app.core.domain.services.internal.filter_merger import FilterMerger
+from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.repository.file import (
-    FileSaver, FileGetter, FileFinder, FileUpdater, FileDeleter
+    FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileDeleter
 )
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.file import FileUsecase
-from app.core.domain.services.internal.filter_merger import FilterMerger
-
-
-class CategoryGetter(Protocol):
-    @abc.abstractmethod
-    async def get_category(self, category_id: CategoryId) -> Category:
-        raise NotImplementedError
-
 
 UNDEFINED_FILE_ID = FileId(0)
 
@@ -38,10 +31,10 @@ def _ensure_owner(file: File, user_id: Optional[UserId] = None):
 class FileService(FileUsecase):
     def __init__(
         self,
-        saver: FileSaver,
-        getter: FileGetter,
-        finder: FileFinder,
-        updater: FileUpdater,
+        saver: FileRepoSaver,
+        getter: FileRepoGetter,
+        finder: FileRepoFinder,
+        updater: FileRepoUpdater,
         deleter: FileDeleter,
         category_getter: CategoryGetter
     ):
@@ -143,8 +136,7 @@ class FileService(FileUsecase):
         *filters: FilterField,
         dto: Optional[FilesFindDTO] = None,
         paginate: Optional[Pagination] = None,
-        total_count: Optional[bool] = None
-    ) -> list[File] | tuple[list[File], int]:
+    ) -> list[File]:
         raise NotImplementedError
 
     async def find_files(

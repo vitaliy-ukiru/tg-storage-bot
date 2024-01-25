@@ -1,8 +1,8 @@
 __all__ = (
-    'FileSaver',
-    'FileGetter',
-    'FileFinder',
-    'FileUpdater',
+    'FileRepoSaver',
+    'FileRepoGetter',
+    'FileRepoFinder',
+    'FileRepoUpdater',
     'FileDeleter',
 )
 
@@ -14,19 +14,19 @@ from app.core.domain.models.file import File, FileId
 from app.core.interfaces.repository.common import FilterField
 
 
-class FileSaver(Protocol):
+class FileRepoSaver(Protocol):
     @abstractmethod
     async def save_file(self, file: File) -> FileId:
         raise NotImplementedError
 
 
-class FileGetter(Protocol):
+class FileRepoGetter(Protocol):
     @abstractmethod
     async def get_file(self, file_id: FileId) -> File:
         raise NotImplementedError
 
 
-class FileFinder(Protocol):
+class FileRepoFinder(Protocol):
     @abstractmethod
     async def find_files(self, filters: Sequence[FilterField],
                          paginate: Optional[Pagination] = None) -> list[File]:
@@ -37,7 +37,7 @@ class FileFinder(Protocol):
         raise NotImplementedError
 
 
-class FileUpdater(Protocol):
+class FileRepoUpdater(Protocol):
     @abstractmethod
     async def update_file(self, file: File):
         raise NotImplementedError

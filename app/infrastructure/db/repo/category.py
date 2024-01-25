@@ -6,10 +6,10 @@ from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.interfaces.repository.category import (
-    CategorySaver,
-    CategoryGetter,
-    CategoryFinder,
-    CategoryUpdater
+    CategoryRepoSaver,
+    CategoryRepoGetter,
+    CategoryRepoFinder,
+    CategoryRepoUpdater
 )
 from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
@@ -19,10 +19,10 @@ from .utils import apply_pagination, apply_filters
 
 
 class CategoryStorageGateway(
-    CategorySaver,
-    CategoryGetter,
-    CategoryFinder,
-    CategoryUpdater,
+    CategoryRepoSaver,
+    CategoryRepoGetter,
+    CategoryRepoFinder,
+    CategoryRepoUpdater,
 
     BaseRepository
 ):

@@ -10,10 +10,10 @@ from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.category import CategoryUsageRater
+from app.core.interfaces.repository.category import CategoryRepoUsageRater
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.repository.file import (
-    FileSaver, FileGetter, FileFinder, FileUpdater, FileDeleter
+    FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileDeleter
 )
 from app.infrastructure.db import models
 from ._base import BaseRepository
@@ -22,10 +22,10 @@ from .utils import apply_pagination, apply_filters
 
 
 class FileStorageGateway(
-    FileSaver,
-    FileGetter,
-    FileFinder,
-    FileUpdater,
+    FileRepoSaver,
+    FileRepoGetter,
+    FileRepoFinder,
+    FileRepoUpdater,
     FileDeleter,
     BaseRepository
 ):
@@ -119,7 +119,7 @@ class FileStorageGateway(
             await session.commit()
 
 class FileCategoryUsageRater(
-    CategoryUsageRater,
+    CategoryRepoUsageRater,
     BaseRepository,
 ):
     async def get_categories_usage(self, user_id: UserId) -> dict[CategoryId, int]:

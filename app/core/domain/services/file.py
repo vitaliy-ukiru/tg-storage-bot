@@ -10,7 +10,9 @@ from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.file import File, FileId, RemoteFileId
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.file import FileRepository
+from app.core.interfaces.repository.file import (
+    FileSaver, FileGetter, FileFinder, FileUpdater, FileDeleter
+)
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.file import FileUsecase
 from app.core.domain.services.internal.filter_merger import FilterMerger
@@ -34,8 +36,21 @@ def _ensure_owner(file: File, user_id: Optional[UserId] = None):
 
 
 class FileService(FileUsecase):
-    def __init__(self, repo: FileRepository, category_getter: CategoryGetter):
-        self._repo = repo
+    def __init__(
+        self,
+        saver: FileSaver,
+        getter: FileGetter,
+        finder: FileFinder,
+        updater: FileUpdater,
+        deleter: FileDeleter,
+        category_getter: CategoryGetter
+    ):
+
+        self._saver = saver
+        self._getter = getter
+        self._finder = finder
+        self._updater = updater
+        self._deleter = deleter
         self._category_getter = category_getter
 
     async def save_file(self, dto: CreateFileDTO) -> File:
@@ -51,11 +66,11 @@ class FileService(FileUsecase):
         if dto.category_id is not None:
             file.category = await self._category_getter.get_category(CategoryId(dto.category_id))
 
-        file.id = await self._repo.save_file(file)
+        file.id = await self._saver.save_file(file)
         return file
 
     async def get_file(self, file_id: FileId, user_id: Optional[UserId] = None) -> File:
-        file = await self._repo.get_file(file_id)
+        file = await self._getter.get_file(file_id)
         if file is None:
             raise FileNotFound(file_id)
 
@@ -70,7 +85,7 @@ class FileService(FileUsecase):
             raise CategoryViolation(category_id, user_id)
 
         file.category = category
-        await self._repo.update_file(file)
+        await self._updater.update_file(file)
         return file
 
     async def update_title(self, file_id: FileId, title: str, user_id: UserId) -> File:
@@ -78,7 +93,7 @@ class FileService(FileUsecase):
         _ensure_owner(file, user_id)
 
         file.title = title
-        await self._repo.update_file(file)
+        await self._updater.update_file(file)
         return file
 
     async def reload_file(self, file_id: FileId, dto: ReloadFileDTO, user_id: UserId) -> File:
@@ -90,14 +105,14 @@ class FileService(FileUsecase):
         if dto.title is not None:
             file.title = dto.title
 
-        await self._repo.update_file(file)
+        await self._updater.update_file(file)
         return file
 
     async def delete_file(self, file_id: FileId, user_id: UserId):
         file = await self.get_file(file_id, user_id)
         _ensure_owner(file, user_id)
 
-        await self._repo.delete_file(file_id)
+        await self._deleter.delete_file(file_id)
 
     # mypy not found issues in this file
     # noinspection PyMethodOverriding,PyProtocol
@@ -143,9 +158,9 @@ class FileService(FileUsecase):
         filters = FilterMerger.merge(dto_items, filters)
         FilterMerger.ensure_have_user_id(filters)
 
-        files = await self._repo.find_files(filters, paginate)
+        files = await self._finder.find_files(filters, paginate)
         if not total_count:
             return files
 
-        files_count = await self._repo.get_files_count(filters)
+        files_count = await self._finder.get_files_count(filters)
         return files, files_count

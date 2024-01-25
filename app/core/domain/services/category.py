@@ -1,4 +1,5 @@
 import abc
+import operator
 from dataclasses import asdict
 from datetime import datetime
 from typing import Protocol, Optional
@@ -8,28 +9,38 @@ from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
-from app.core.interfaces.repository.category import CategoryRepository
+from app.core.interfaces.repository.category import (
+    CategorySaver, CategoryGetter, CategoryFinder, CategoryUpdater, CategoryUsageRater
+)
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.usecase.category import CategoryUsecase
 from app.core.domain.services.internal.filter_merger import FilterMerger
 from app.core.common.filters.category import CategoryFilters
 
 
-class CategoryRater(Protocol):
-    @abc.abstractmethod
-    async def get_usage_rate(self, user_id: UserId) -> dict[CategoryId, int]:
-        raise NotImplementedError
-
-
 UNDEFINED_CATEGORY_ID = CategoryId(0)
 
 
 class CategoryService(CategoryUsecase):
-    _repo: CategoryRepository
-    _rater: CategoryRater
+    _saver: CategorySaver
+    _getter: CategoryGetter
+    _finder: CategoryFinder
+    _updater: CategoryUpdater
+    _rater: CategoryUsageRater
 
-    def __init__(self, repo: CategoryRepository, rater: CategoryRater):
-        self._repo = repo
+    def __init__(
+        self,
+        saver: CategorySaver,
+        getter: CategoryGetter,
+        finder: CategoryFinder,
+        updater: CategoryUpdater,
+        rater: CategoryUsageRater,
+    ):
+
+        self._saver = saver
+        self._getter = getter
+        self._finder = finder
+        self._updater = updater
         self._rater = rater
 
     async def save_category(self, dto: CreateCategoryDTO) -> Category:
@@ -41,11 +52,11 @@ class CategoryService(CategoryUsecase):
             created_at=datetime.now(),
         )
 
-        c.id = await self._repo.save_category(c)
+        c.id = await self._saver.save_category(c)
         return c
 
     async def get_category(self, category_id: CategoryId) -> Category:
-        c = await self._repo.get_category(category_id)
+        c = await self._getter.get_category(category_id)
         if c is None:
             raise CategoryNotFound(category_id)
 
@@ -60,7 +71,7 @@ class CategoryService(CategoryUsecase):
         filters = FilterMerger.merge(dto_items, filters)
         FilterMerger.ensure_have_user_id(filters)
 
-        categories = await self._repo.find_categories(filters, paginate)
+        categories = await self._finder.find_categories(filters, paginate)
         return categories
 
     async def find_popular(self, user_id: UserId) -> list[Category]:
@@ -68,7 +79,7 @@ class CategoryService(CategoryUsecase):
         if len(categories) == 0:
             return categories
 
-        categories_rates = await self._rater.get_usage_rate(user_id)
+        categories_rates = await self._rater.get_categories_usage(user_id)
         if len(categories_rates) == 0:
             return categories
 
@@ -92,5 +103,5 @@ class CategoryService(CategoryUsecase):
         if dto.favorite is not None:
             category.is_favorite = dto.favorite
 
-        await self._repo.update_category(category)
+        await self._updater.update_category(category)
         return category

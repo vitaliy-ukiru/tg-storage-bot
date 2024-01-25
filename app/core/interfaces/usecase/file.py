@@ -1,5 +1,6 @@
 __all__ = (
     'FileUsecase',
+    'FileSaver', 'FileGetter', 'FileFinder', 'FileUpdater', 'FileDeleter',
 )
 
 from abc import abstractmethod
@@ -13,32 +14,21 @@ from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
 
 
-class FileUsecase(Protocol):
+class FileSaver(Protocol):
 
     @abstractmethod
     async def save_file(self, dto: CreateFileDTO) -> File:
         raise NotImplementedError
 
+
+class FileGetter(Protocol):
     @abstractmethod
     async def get_file(self, file_id: FileId, user_id: Optional[UserId] = None) -> File:
         raise NotImplementedError
 
-    @abstractmethod
-    async def set_category(self, file_id: FileId, category_id: CategoryId, user_id: UserId) -> File:
-        raise NotImplementedError
 
-    @abstractmethod
-    async def update_title(self, file_id: FileId, title: str, user_id: UserId) -> File:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def reload_file(self, file_id: FileId, dto: ReloadFileDTO, user_id: UserId) -> File:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def delete_file(self, file_id: FileId, user_id: UserId):
-        raise NotImplementedError
-
+# noinspection PyProtocol
+class FileFinder(Protocol):
     @overload
     async def find_files(
         self,
@@ -65,8 +55,7 @@ class FileUsecase(Protocol):
         *filters: FilterField,
         dto: Optional[FilesFindDTO] = None,
         paginate: Optional[Pagination] = None,
-        total_count: Optional[bool] = None
-    ) -> list[File] | tuple[list[File], int]:
+    ) -> list[File]:
         raise NotImplementedError
 
     @abstractmethod
@@ -78,3 +67,29 @@ class FileUsecase(Protocol):
         total_count: Optional[bool] = None
     ) -> tuple[list[File], int] | list[File]:
         raise NotImplementedError
+
+
+class FileUpdater(Protocol):
+    @abstractmethod
+    async def set_category(self, file_id: FileId, category_id: CategoryId, user_id: UserId) -> File:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_title(self, file_id: FileId, title: str, user_id: UserId) -> File:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def reload_file(self, file_id: FileId, dto: ReloadFileDTO, user_id: UserId) -> File:
+        raise NotImplementedError
+
+
+class FileDeleter(Protocol):
+    @abstractmethod
+    async def delete_file(self, file_id: FileId, user_id: UserId):
+        raise NotImplementedError
+
+class FileUsecase(
+    Protocol,
+    FileSaver, FileGetter, FileFinder, FileUpdater, FileDeleter
+):
+    pass

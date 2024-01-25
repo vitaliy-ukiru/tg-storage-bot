@@ -1,5 +1,9 @@
 __all__ = (
     'CategoryUsecase',
+    'CategorySaver',
+    'CategoryGetter',
+    'CategoryUpdater',
+    'CategoryFinder',
 )
 
 import abc
@@ -12,19 +16,25 @@ from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.common import FilterField
 
 
-class CategoryUsecase(Protocol):
+class CategorySaver(Protocol):
     @abc.abstractmethod
     async def save_category(self, dto: CreateCategoryDTO) -> Category:
         raise NotImplementedError
 
+
+class CategoryGetter(Protocol):
     @abc.abstractmethod
     async def get_category(self, category_id: CategoryId) -> Category:
         raise NotImplementedError
 
+
+class CategoryUpdater(Protocol):
     @abc.abstractmethod
     async def update_category(self, dto: UpdateCategoryDTO) -> Category:
         raise NotImplementedError
 
+
+class CategoryFinder(Protocol):
     @abc.abstractmethod
     async def find_popular(self, user_id: UserId) -> list[Category]:
         raise NotImplementedError
@@ -35,3 +45,12 @@ class CategoryUsecase(Protocol):
                               dto: Optional[CategoriesFindDTO] = None,
                               paginate: Optional[Pagination] = None) -> list[Category]:
         raise NotImplementedError
+
+
+class CategoryUsecase(
+    Protocol,
+    CategorySaver,
+    CategoryFinder,
+    CategoryUpdater,
+):
+    pass

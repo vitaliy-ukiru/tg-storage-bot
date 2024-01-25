@@ -6,7 +6,7 @@ from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
 from app.core.domain.exceptions.category import CategoryViolation
 from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
-from app.core.domain.models.category import CategoryId, Category
+from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId, RemoteFileId
 from app.core.domain.models.user import UserId
 from app.core.domain.services.internal.filter_merger import FilterMerger
@@ -14,7 +14,7 @@ from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.repository.file import (
     FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileDeleter
 )
-from app.core.interfaces.repository.common import FilterField
+from app.core.interfaces.usecase.category import CategoryGetter
 from app.core.interfaces.usecase.file import FileUsecase
 
 UNDEFINED_FILE_ID = FileId(0)

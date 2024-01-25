@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Protocol, Optional
 
 from aiogram.types import User as TelegramUser
@@ -6,17 +5,13 @@ from aiogram_i18n.managers import BaseManager
 
 from app.core.domain.dto.user import UpdateLocaleDTO
 from app.core.domain.models.user import UserId, User
+from app.core.interfaces.usecase.user import UserGetter, UserUpdater
 
 
-class UserGateway(Protocol):
-
-    @abstractmethod
-    async def update_locale(self, dto: UpdateLocaleDTO) -> User:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_user(self, user_id: UserId, restore: bool = False) -> User:
-        raise NotImplementedError
+class UserGateway(
+    Protocol, UserGetter, UserUpdater
+):
+    pass
 
 
 class LazyLocaleManager(BaseManager):

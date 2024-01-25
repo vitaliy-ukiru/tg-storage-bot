@@ -13,12 +13,9 @@ from app.bot.handlers import users, dialogs
 from app.bot.middlewares import UserMiddleware
 from app.bot.utils.uploader import FileUploader
 from app.common.config import Config
+from app.core.common.locales import DEFAULT_LOCALE
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
-from app.infrastructure.adapters.locale_manager import (
-    LazyGatewayLocaleManager,
-    GatewayLocaleManager,
-    ContextLocaleManager
-)
+from app.infrastructure.adapters.locale_manager import LazyLocaleManager
 
 
 def _configure_dp(dp: Dispatcher, user_service: UserUsecase):
@@ -28,10 +25,10 @@ def _configure_dp(dp: Dispatcher, user_service: UserUsecase):
         core=FluentRuntimeCore(
             path="app/bot/locales/{locale}"
         ),
-        manager=LazyGatewayLocaleManager(
-            GatewayLocaleManager(user_service),
-            ContextLocaleManager()
-        )
+        manager=LazyLocaleManager(
+            user_gateway=user_service
+        ),
+        default_locale=DEFAULT_LOCALE
     )
     i18n_middleware.setup(dp)
     users.setup(dp)
@@ -47,6 +44,7 @@ class BotModule:
 
     async def run(self, **kwargs):
         return await self.dp.start_polling(self.bot, **kwargs)
+
 
 @dataclass
 class BotBuilder:

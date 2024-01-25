@@ -10,15 +10,25 @@ from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
 from app.core.domain.models.user import UserId
+from app.core.interfaces.repository.category import CategoryUsageRater
 from app.core.interfaces.repository.common import FilterField
-from app.core.interfaces.repository.file import FileRepository
+from app.core.interfaces.repository.file import (
+    FileSaver, FileGetter, FileFinder, FileUpdater, FileDeleter
+)
 from app.infrastructure.db import models
 from ._base import BaseRepository
 from .filters import Registry
 from .utils import apply_pagination, apply_filters
 
 
-class FileStorage(BaseRepository, FileRepository):
+class FileStorageGateway(
+    FileSaver,
+    FileGetter,
+    FileFinder,
+    FileUpdater,
+    FileDeleter,
+    BaseRepository
+):
     async def save_file(self, file: File) -> FileId:
         async with self._pool() as session:
             db_file = models.File(
@@ -108,7 +118,11 @@ class FileStorage(BaseRepository, FileRepository):
             await session.execute(sql)
             await session.commit()
 
-    async def get_categories_usage(self, user_id: UserId) -> list[tuple[CategoryId, int]]:
+class FileCategoryUsageRater(
+    CategoryUsageRater,
+    BaseRepository,
+):
+    async def get_categories_usage(self, user_id: UserId) -> dict[CategoryId, int]:
         async with self._pool() as session:
             rate = count().label("rate")
             sql = (
@@ -117,7 +131,7 @@ class FileStorage(BaseRepository, FileRepository):
                 group_by(models.File.category_id)
             )
             res = await session.execute(sql)
-            return [
-                (CategoryId(category_id), rate)
+            return {
+                CategoryId(category_id): rate
                 for category_id, rate in res.all()
-            ]
+            }

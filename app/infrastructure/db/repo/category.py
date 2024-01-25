@@ -5,7 +5,12 @@ from sqlalchemy import select
 from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound
 from app.core.domain.models.category import Category, CategoryId
-from app.core.interfaces.repository.category import CategoryRepository
+from app.core.interfaces.repository.category import (
+    CategorySaver,
+    CategoryGetter,
+    CategoryFinder,
+    CategoryUpdater
+)
 from app.core.interfaces.repository.common import FilterField
 from app.infrastructure.db import models
 from app.infrastructure.db.repo.filters import Registry
@@ -13,7 +18,14 @@ from ._base import BaseRepository
 from .utils import apply_pagination, apply_filters
 
 
-class CategoryStorage(BaseRepository, CategoryRepository):
+class CategoryStorageGateway(
+    CategorySaver,
+    CategoryGetter,
+    CategoryFinder,
+    CategoryUpdater,
+
+    BaseRepository
+):
     async def save_category(self, c: Category) -> CategoryId:
         async with self._pool() as session:
             db_category = models.Category(

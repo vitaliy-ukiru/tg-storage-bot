@@ -1,8 +1,12 @@
 __all__ = (
-    'FileRepository',
+    'FileRepoSaver',
+    'FileRepoGetter',
+    'FileRepoFinder',
+    'FileRepoUpdater',
+    'FileDeleter',
 )
 
-import abc
+from abc import abstractmethod
 from typing import Protocol, Sequence, Optional
 
 from app.core.domain.dto.common import Pagination
@@ -10,28 +14,36 @@ from app.core.domain.models.file import File, FileId
 from app.core.interfaces.repository.common import FilterField
 
 
-class FileRepository(Protocol):
-    @abc.abstractmethod
+class FileRepoSaver(Protocol):
+    @abstractmethod
     async def save_file(self, file: File) -> FileId:
         raise NotImplementedError
 
-    @abc.abstractmethod
+
+class FileRepoGetter(Protocol):
+    @abstractmethod
     async def get_file(self, file_id: FileId) -> File:
         raise NotImplementedError
 
-    @abc.abstractmethod
+
+class FileRepoFinder(Protocol):
+    @abstractmethod
     async def find_files(self, filters: Sequence[FilterField],
                          paginate: Optional[Pagination] = None) -> list[File]:
         raise NotImplementedError
 
-    @abc.abstractmethod
+    @abstractmethod
     async def get_files_count(self, filters: Sequence[FilterField]) -> int:
         raise NotImplementedError
 
-    @abc.abstractmethod
+
+class FileRepoUpdater(Protocol):
+    @abstractmethod
     async def update_file(self, file: File):
         raise NotImplementedError
 
-    @abc.abstractmethod
+
+class FileDeleter(Protocol):
+    @abstractmethod
     async def delete_file(self, file_id: FileId):
         raise NotImplementedError

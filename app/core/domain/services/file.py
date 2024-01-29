@@ -147,8 +147,7 @@ class FileService(FileUsecase):
         total_count: Optional[bool] = None
     ) -> tuple[list[File], int] | list[File]:
         dto_items = asdict(dto) if dto else None
-        filters = FilterMerger.merge(dto_items, filters)
-        FilterMerger.ensure_have_user_id(filters)
+        filters = FilterMerger(dto_items, filters).merge()
 
         files = await self._finder.find_files(filters, paginate)
         if not total_count:

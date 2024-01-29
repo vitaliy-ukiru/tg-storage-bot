@@ -66,9 +66,7 @@ class CategoryService(CategoryUsecase):
                               paginate: Optional[Pagination] = None) -> list[Category]:
         dto_items = asdict(dto) if dto else None
 
-        filters = FilterMerger.merge(dto_items, filters)
-        FilterMerger.ensure_have_user_id(filters)
-
+        filters = FilterMerger(dto_items, filters).merge()
         categories = await self._finder.find_categories(filters, paginate)
         return categories
 

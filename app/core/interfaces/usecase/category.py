@@ -48,7 +48,6 @@ class CategoryFinder(Protocol):
 
 
 class CategoryUsecase(
-    Protocol,
     CategorySaver,
     CategoryFinder,
     CategoryUpdater,

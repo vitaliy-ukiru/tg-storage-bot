@@ -29,7 +29,6 @@ class UserUpdater(Protocol):
 
 
 class UserUsecase(
-    Protocol,
-    UserCreator, UserGetter, UserUpdater,
+    UserCreator, UserGetter, UserUpdater
 ):
     pass

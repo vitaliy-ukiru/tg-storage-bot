@@ -89,7 +89,7 @@ class FileDeleter(Protocol):
         raise NotImplementedError
 
 class FileUsecase(
-    Protocol,
-    FileSaver, FileGetter, FileFinder, FileUpdater, FileDeleter
+    FileSaver, FileGetter,
+    FileFinder, FileUpdater, FileDeleter
 ):
     pass

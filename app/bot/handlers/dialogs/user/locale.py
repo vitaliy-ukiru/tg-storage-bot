@@ -10,13 +10,12 @@ from aiogram_i18n import I18nContext
 from app.bot.states.dialogs import UserChangeLocaleSG
 from app.bot.widgets.i18n import TL, CloseI18n
 from app.bot.widgets.i18n.template import I18N_KEY
-from app.core.common.locales import RU, EN
 
 ID_SELECT_LOCALE = "select_lang"
 
 LOCALES = (
-    ("🇷🇺 Русский", RU),
-    ("🇺🇸 English", EN)
+    ("🇷🇺 Русский", "ru"),
+    ("🇺🇸 English", "en")
 )
 
 tl = TL.users.locale

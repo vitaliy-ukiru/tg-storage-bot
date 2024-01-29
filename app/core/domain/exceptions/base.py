@@ -5,7 +5,7 @@ class DomainException(Exception):
         self.message = message
 
     def _get_message(self):
-        return super().__str__()
+        return self.message
 
     def __str__(self):
         msg = self._get_message()

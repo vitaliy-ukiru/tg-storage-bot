@@ -13,23 +13,27 @@ from app.bot.handlers import users, dialogs
 from app.bot.middlewares import UserMiddleware
 from app.bot.utils.uploader import FileUploader
 from app.common.config import Config
-from app.core.common.locales import DEFAULT_LOCALE
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
+from app.core.interfaces.usecase.user import UserGetter, UserUpdater
 from app.infrastructure.adapters.locale_manager import LazyLocaleManager
 
 
-def _configure_dp(dp: Dispatcher, user_service: UserUsecase):
-    dp.update.middleware(UserMiddleware(user_service))
-
-    i18n_middleware = I18nMiddleware(
+def _get_i18n_middleware(user_getter: UserGetter, user_updater: UserUpdater, default_locale: str | None):
+    return I18nMiddleware(
         core=FluentRuntimeCore(
             path="app/bot/locales/{locale}"
         ),
         manager=LazyLocaleManager(
-            user_gateway=user_service
+            user_getter=user_getter,
+            user_updater=user_updater
         ),
-        default_locale=DEFAULT_LOCALE
+        default_locale=default_locale,
     )
+
+
+def _configure_dp(dp: Dispatcher, user_service: UserUsecase, default_locale: str | None):
+    dp.update.outer_middleware(UserMiddleware(user_service))
+    i18n_middleware = _get_i18n_middleware(user_service, user_service, default_locale)
     i18n_middleware.setup(dp)
     users.setup(dp)
     dialogs.setup(dp)
@@ -105,7 +109,7 @@ class BotBuilder:
             name=self.dp_name,
             **self.deps
         )
-        _configure_dp(dp, self.user_service)
+        _configure_dp(dp, self.user_service, self.cfg.bot.default_locale)
         return dp
 
     def build(self) -> BotModule:

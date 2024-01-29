@@ -22,6 +22,7 @@ class DatabaseConfig(BaseSettings):
 
 class TelegramConfig(BaseSettings):
     token: SecretStr
+    default_locale: str = "en"
 
 
 class Config(YamlBaseSettings):

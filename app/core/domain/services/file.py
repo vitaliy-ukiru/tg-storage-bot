@@ -57,7 +57,10 @@ class FileService(FileUsecase):
         )
 
         if dto.category_id is not None:
-            file.category = await self._category_getter.get_category(CategoryId(dto.category_id))
+            category = await self._category_getter.get_category(CategoryId(dto.category_id))
+            if category.user_id != file.user_id:
+                raise CategoryViolation(f"user (user_id={file.user_id}) dont own category (id={category.id})")
+            file.category = category
 
         file.id = await self._saver.save_file(file)
         return file
@@ -66,6 +69,7 @@ class FileService(FileUsecase):
         file = await self._getter.get_file(file_id)
         if file is None:
             raise FileNotFound(file_id)
+        _ensure_owner(file, user_id)
 
         return file
 

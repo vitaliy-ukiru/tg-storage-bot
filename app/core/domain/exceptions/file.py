@@ -1,5 +1,5 @@
 from app.core.domain.models.file import FileId, RemoteFileId
-from .base import DomainException
+from .base import DomainException, AccessDenied
 from ..models.user import UserId
 
 
@@ -29,7 +29,7 @@ class FileNotFound(StaticFileException):
 class FileAlreadyExists(StaticFileException):
     MESSAGE = "file with same remote id already exists"
 
-class FileAccessDenied(FileException):
+class FileAccessDenied(FileException, AccessDenied):
     user: UserId
 
     def __init__(self, file_id: FileId | RemoteFileId, user: UserId) -> None:

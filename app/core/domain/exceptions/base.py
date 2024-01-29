@@ -21,7 +21,13 @@ class InvalidFilterError(DomainException):
         self.filter_name = filter_name
         super().__init__(f"unknown filter {filter_name!r} ")
 
+
 class UserNotProvidedError(DomainException):
     domain_name = "core"
+
     def __init__(self):
         super().__init__(f'user not provided')
+
+
+class AccessDenied(DomainException):
+    pass

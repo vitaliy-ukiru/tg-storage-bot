@@ -12,7 +12,7 @@ class FilterMerger:
         self.data = data
         self.native_filters = native_filters
 
-    def _data_filters(self) -> Generator[FilterField]:
+    def _data_filters(self) -> Iterable[FilterField]:
         return (
             FilterField(name, value)
             for name, value in self.data.items()

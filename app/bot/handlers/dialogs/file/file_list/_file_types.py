@@ -1,9 +1,9 @@
 __all__ = (
     'file_types_window',
-    'FileTypeItem'
+
 )
 
-from typing import NamedTuple
+from operator import itemgetter
 
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.kbd import (
@@ -19,29 +19,21 @@ from app.core.domain.models.file import FileCategory
 from .common import ID_SELECT_FILE_TYPES, tl_file_list
 
 
-class FileTypeItem(NamedTuple):
-    name: str
-    value: FileCategory
-
-
 async def _file_types_getter(i18n: I18nContext, **_):
     return {
-        "file_types": [
-            FileTypeItem(name=name, value=file_type_category)
-            for name, file_type_category in file_categories_with_names(i18n)
-        ]
+        "file_types": file_categories_with_names(i18n)
     }
 
 
 file_types_window = Window(
     tl_file_list.type.select(),
     Group(
-        Multiselect(
-            Format("✓ {item.name}"),
-            Format("{item.name}"),
+        Multiselect[FileCategory](
+            Format("✓ {item[0]}"),
+            Format("{item[0]}"),
             id=ID_SELECT_FILE_TYPES,
-            type_factory=lambda s: FileCategory(s),
-            item_id_getter=lambda file_type: file_type.value,
+            type_factory=FileCategory,
+            item_id_getter=itemgetter(1),
             items="file_types",
         ),
         width=1,

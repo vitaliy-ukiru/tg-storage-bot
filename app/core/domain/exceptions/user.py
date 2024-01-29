@@ -33,3 +33,15 @@ class UserNotFound(StaticUserException):
 
 class UserDeleted(StaticUserException):
     MESSAGE = "user deleted"
+
+
+class UnknownLocale(UserException):
+    MESSAGE = "unknown locale"
+
+    def __init__(self, user: User | int, locale: str) -> None:
+        super().__init__(user, "unknown locale")
+        self.locale = locale
+
+    def __str__(self):
+        message = super().__str__()
+        return f'{message} locale={self.locale}'

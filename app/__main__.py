@@ -9,6 +9,7 @@ from app.common.config import Config
 from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
+from app.infrastructure.adapters.locale_validator import MemoryLocaleValidator
 from app.infrastructure.db import connect
 from app.infrastructure.db.repo.category import CategoryStorageGateway
 from app.infrastructure.db.repo.file import FileStorageGateway, FileCategoryUsageRater
@@ -41,6 +42,10 @@ async def main():
         getter=user_repo,
         updater=user_repo,
         deleter=user_repo,
+        locale_validator=MemoryLocaleValidator(
+            default_locale=cfg.bot.default_locale,
+            supported_locales=frozenset({"en", "ru"})
+        )
     )
 
     category_repo = CategoryStorageGateway(session_maker)

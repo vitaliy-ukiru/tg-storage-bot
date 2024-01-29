@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Protocol, Optional
 
 from aiogram.types import User as TelegramUser
@@ -8,15 +9,11 @@ from app.core.domain.models.user import UserId, User
 from app.core.interfaces.usecase.user import UserGetter, UserUpdater
 
 
-class UserGateway(
-    Protocol, UserGetter, UserUpdater
-):
-    pass
-
-
 class LazyLocaleManager(BaseManager):
-    def __init__(self, user_gateway: UserGateway, default_locale: Optional[str] = None) -> None:
-        self._user_gateway = user_gateway
+    def __init__(self, user_getter: UserGetter, user_updater: UserUpdater,
+                 default_locale: Optional[str] = None) -> None:
+        self._getter = user_getter
+        self._updater = user_updater
         super().__init__(default_locale)
 
     async def set_locale(self,
@@ -27,7 +24,7 @@ class LazyLocaleManager(BaseManager):
         user_id = UserId(event_from_user.id)
         if user is not None:
             user_id = user.id
-        await self._user_gateway.update_locale(
+        await self._updater.update_locale(
             UpdateLocaleDTO(
                 user_id=user_id,
                 locale=locale,
@@ -45,5 +42,5 @@ class LazyLocaleManager(BaseManager):
         if not event_from_user:
             return self.default_locale
 
-        user = await self._user_gateway.get_user(UserId(event_from_user.id), restore=True)
+        user = await self._getter.get_user(UserId(event_from_user.id), restore=True)
         return user.locale

@@ -38,7 +38,12 @@ async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manag
 
 
 @router.message(Command("file"))
-async def file_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager, i18n: I18nContext):
+async def file_cmd(
+    msg: Message,
+    command: CommandObject,
+    dialog_manager: DialogManager,
+    i18n: I18nContext
+):
     args = command.args
     if args is None:
         await msg.answer(i18n.get('missed-file-id-hint'))

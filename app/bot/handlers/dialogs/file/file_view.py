@@ -5,6 +5,7 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button, Back
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Format
 from aiogram_i18n import I18nContext
+from magic_filter import F
 
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileViewSG, FileEditSG
@@ -12,7 +13,8 @@ from app.bot.utils.file_type_i18n import locale_file_type
 from app.bot.utils.files import content_type_from_category
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import TemplateProxy, Topic, CancelI18n
+from app.bot.widgets.i18n import TemplateProxy, Topic, CloseI18n
+from app.bot.widgets.i18n.file_title import FileTitle
 from app.bot.widgets.i18n.template import I18N_KEY
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
@@ -42,7 +44,7 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
         category_name = file.category.title
 
     return dict(
-        file_title=file.name,
+        file=file,
         file_type_name=locale_file_type(file.type, i18n),
         file_category=category_name,
         upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
@@ -73,7 +75,11 @@ file_view_dialog = Dialog(
     Window(
         Topic(
             tl_file_view.topic.title(),
-            Format("{file_title}"),
+            FileTitle(
+                Format("{file.title}"),
+                F["file"].id,
+                F["file"].title
+            )
         ),
         Topic(
             tl_file_view.topic.title(),
@@ -106,7 +112,7 @@ file_view_dialog = Dialog(
                 on_click=_process_delete_file
             )
         ),
-        CancelI18n(),
+        CloseI18n(),
         getter=_view_getter,
         state=FileViewSG.main,
     ),

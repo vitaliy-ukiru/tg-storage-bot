@@ -36,10 +36,3 @@ class File:
     user_id: UserId
     created_at: datetime
     category: Optional[Category] = None
-
-    @property
-    def name(self) -> str:
-        if self.title:
-            return self.title
-
-        return self.remote_file_id[-15:]

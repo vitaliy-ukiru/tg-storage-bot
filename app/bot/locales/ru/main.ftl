@@ -26,7 +26,7 @@ file-sub-type =
         [audio] аудио
         *[document] документ 
 }
-
+file-title = Файл № { $file_id }
 
 files-not-found-details = По такому запросу файлов не найдено
 files-not-found-hint = Ничего не найден

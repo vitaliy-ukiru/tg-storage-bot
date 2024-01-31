@@ -4,10 +4,11 @@ __all__ = (
 
 import math
 
-from aiogram_dialog import Window, DialogManager
+from aiogram_dialog import Window, DialogManager, ShowMode, StartMode
 from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.kbd import Select, StubScroll, Column
 from aiogram_dialog.widgets.text import Format
+from magic_filter import F
 
 from app.bot.handlers.dialogs import execute
 from app.bot.handlers.dialogs.file.file_list.common import tl_file_list
@@ -15,6 +16,7 @@ from app.bot.handlers.dialogs.file.file_list.filters_dao import FiltersDAO
 from app.bot.states.dialogs import FileListSG
 from app.bot.widgets import BackTo
 from app.bot.widgets.i18n import BACK_TEXT
+from app.bot.widgets.i18n.file_title import FileTitle
 from app.bot.widgets.scroll import Navigation
 from app.core.domain.dto.common import Pagination
 from app.core.domain.models.user import User
@@ -53,7 +55,11 @@ results_window = Window(
     tl_file_list.result.select(),
     Column(
         Select(
-            Format("{item.name}"),
+            FileTitle(
+                Format("{item.title}"),
+                F["item"].id,
+                F["item"].title
+            ),
             id="select_file",
             type_factory=int,
             on_click=_process_click_file,

@@ -27,6 +27,8 @@ file-sub-type =
         *[document] document
 }
 
+file-title = File № { $file_id }
+
 
 files-not-found-details = No files found for this request
 files-not-found-hint = Not found

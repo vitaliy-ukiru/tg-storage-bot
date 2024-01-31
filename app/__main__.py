@@ -9,7 +9,7 @@ from app.common.config import Config
 from app.core.domain.services.category import CategoryService
 from app.core.domain.services.file import FileService
 from app.core.domain.services.user import UserService
-from app.infrastructure.adapters.locale_validator import MemoryLocaleValidator
+from app.infrastructure.adapters.locale_provider import build_locale_provider
 from app.infrastructure.db import connect
 from app.infrastructure.db.repo.category import CategoryStorageGateway
 from app.infrastructure.db.repo.file import FileStorageGateway, FileCategoryUsageRater
@@ -35,17 +35,16 @@ async def main():
         logging.basicConfig(level=logging.INFO)
     logging.info(f"env is {cfg.env!r}")
 
-    # ugly, but i think it will better in future
+    locale_provider = build_locale_provider(cfg.bot.locales_data_path)
+
+    # ugly, but I think it will better in future
     user_repo = UserStorage(session_maker)
     user_service = UserService(
         saver=user_repo,
         getter=user_repo,
         updater=user_repo,
         deleter=user_repo,
-        locale_validator=MemoryLocaleValidator(
-            default_locale=cfg.bot.default_locale,
-            supported_locales=frozenset({"en", "ru"})
-        )
+        locale_validator=locale_provider
     )
 
     category_repo = CategoryStorageGateway(session_maker)
@@ -69,7 +68,7 @@ async def main():
     )
 
     tg_bot = (
-        BotBuilder(cfg=cfg, user_service=user_service).
+        BotBuilder(cfg=cfg, user_service=user_service, locale_displayer=locale_provider).
         with_fsm_storage(MemoryStorage()).
         build_deps(file_service, category_service).
         build()

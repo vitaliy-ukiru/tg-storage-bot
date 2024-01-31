@@ -16,6 +16,7 @@ from app.common.config import Config
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
 from app.core.interfaces.usecase.user import UserGetter, UserUpdater
 from app.infrastructure.adapters.locale_manager import LazyLocaleManager
+from app.infrastructure.adapters.locale_provider import ResourcesLocaleProvider
 
 
 def _get_i18n_middleware(user_getter: UserGetter, user_updater: UserUpdater, default_locale: str | None):
@@ -54,6 +55,7 @@ class BotModule:
 class BotBuilder:
     cfg: Config
     user_service: UserUsecase
+    locale_displayer: ResourcesLocaleProvider
     deps: dict[str, Any] = field(init=False, default_factory=dict)
     dp_name: str | None = None
     fsm_storage: BaseStorage | None = None
@@ -86,6 +88,7 @@ class BotBuilder:
             category_service=category_service,
             user_service=self.user_service,
             uploader=FileUploader(file_service),
+            locale_displayer=self.locale_displayer,
             cfg=self.cfg,
         )
         return self
@@ -109,7 +112,7 @@ class BotBuilder:
             name=self.dp_name,
             **self.deps
         )
-        _configure_dp(dp, self.user_service, self.cfg.bot.default_locale)
+        _configure_dp(dp, self.user_service, self.locale_displayer.default_locale)
         return dp
 
     def build(self) -> BotModule:

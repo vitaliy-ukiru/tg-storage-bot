@@ -1,0 +1,9 @@
+default_locale: en
+locales:
+  - code: en
+    title: English
+    emoji: 🇺🇸
+
+  - code: ru
+    title: Русский
+    emoji: 🇷🇺

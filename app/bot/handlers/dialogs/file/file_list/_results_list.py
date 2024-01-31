@@ -48,7 +48,7 @@ async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUs
 
 
 async def _process_click_file(_, __, manager: DialogManager, item_id: int):
-    await execute.file_view(manager, item_id, data=dict(opened_over=True))
+    await execute.file_view(manager, item_id, data=dict(opened_over=True), mode=StartMode.NORMAL)
 
 
 results_window = Window(

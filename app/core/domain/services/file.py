@@ -52,6 +52,7 @@ class FileService(FileUsecase):
             dto.title,
             dto.file_type,
             RemoteFileId(dto.remote_id),
+            dto.remote_unique_id,
             UserId(dto.user_id),
             datetime.now(),
         )
@@ -98,6 +99,7 @@ class FileService(FileUsecase):
         _ensure_owner(file, user_id)
 
         file.remote_file_id = dto.remote_id
+        file.remote_unique_id = dto.remote_unique_id
         file.type = dto.file_type
         if dto.title is not None:
             file.title = dto.title

@@ -38,6 +38,7 @@ def upgrade() -> None:
     op.create_table('files',
     sa.Column('id', sa.BigInteger(), sa.Identity(always=True), nullable=False),
     sa.Column('remote_id', sa.String(), nullable=False),
+    sa.Column('unique_id', sa.String(), nullable=False),
     sa.Column('user_id', sa.BigInteger(), nullable=False),
     sa.Column('type_id', sa.Enum('unknown', 'photo', 'video', 'document', 'audio', 'gif', name='filetype'), nullable=False),
     sa.Column('category_id', sa.BigInteger(), nullable=True),
@@ -45,7 +46,9 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('remote_id'),
+    sa.UniqueConstraint('unique_id')
     )
     # ### end Alembic commands ###
 

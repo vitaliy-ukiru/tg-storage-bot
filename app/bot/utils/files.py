@@ -11,16 +11,18 @@ from app.core.domain.dto.file import ReloadFileDTO, CreateFileDTO
 @dataclass
 class FileCredentials:
     remote_id: str
+    remote_unique_id: str
     file_type: FileType
     title: str | None
 
     def to_reload_dto(self) -> ReloadFileDTO:
-        return ReloadFileDTO(self.remote_id, self.file_type, self.title)
+        return ReloadFileDTO(self.remote_id, self.remote_unique_id, self.file_type, self.title)
 
     def to_create_dto(self, user_id: int, category_id: Optional[int] = None) -> CreateFileDTO:
         return CreateFileDTO(
             user_id=user_id,
             remote_id=self.remote_id,
+            remote_unique_id=self.remote_unique_id,
             file_type=self.file_type,
             title=self.title,
             category_id=category_id
@@ -33,6 +35,7 @@ class FileCredentials:
                 photo = m.photo[-1]
                 return cls(
                     remote_id=photo.file_id,
+                    remote_unique_id=photo.file_unique_id,
                     file_type=FileType(FileCategory.photo),
                     title=m.caption
                 )
@@ -40,6 +43,7 @@ class FileCredentials:
                 doc = m.document
                 return cls(
                     remote_id=doc.file_id,
+                    remote_unique_id=doc.file_unique_id,
                     file_type=FileType(
                         FileCategory.document,
                         doc.mime_type,
@@ -50,6 +54,7 @@ class FileCredentials:
                 audio = m.audio
                 return cls(
                     remote_id=audio.file_id,
+                    remote_unique_id=audio.file_unique_id,
                     file_type=FileType(FileCategory.audio),
                     title=m.caption or audio.file_name,
                 )
@@ -57,6 +62,7 @@ class FileCredentials:
                 video = m.video
                 return cls(
                     remote_id=video.file_id,
+                    remote_unique_id=video.file_unique_id,
                     file_type=FileType(FileCategory.video),
                     title=m.caption or video.file_name,
                 )
@@ -64,6 +70,7 @@ class FileCredentials:
                 gif = m.animation
                 return cls(
                     remote_id=gif.file_id,
+                    remote_unique_id=gif.file_unique_id,
                     file_type=FileType(FileCategory.gif),
                     title=m.caption or gif.file_name,
                 )

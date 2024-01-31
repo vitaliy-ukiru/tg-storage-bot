@@ -32,6 +32,7 @@ class File:
     title: Optional[str]
     type: FileType
     remote_file_id: RemoteFileId
+    remote_unique_id: str
     user_id: UserId
     created_at: datetime
     category: Optional[Category] = None

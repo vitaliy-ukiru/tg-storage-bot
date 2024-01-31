@@ -7,6 +7,7 @@ from app.core.domain.models.file import FileCategory, FileType
 class CreateFileDTO:
     user_id: int
     remote_id: str
+    remote_unique_id: str
     file_type: FileType
     title: str | None
     category_id: int | None
@@ -15,6 +16,7 @@ class CreateFileDTO:
 @dataclass(frozen=True)
 class ReloadFileDTO:
     remote_id: str
+    remote_unique_id: str
     file_type: FileType
     title: str | None
 

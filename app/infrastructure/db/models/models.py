@@ -82,7 +82,8 @@ class Category(Base):
 class File(Base):
     __tablename__ = "files"
     id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
-    remote_id: Mapped[str]
+    remote_id: Mapped[str] = mapped_column(unique=True)
+    unique_id: Mapped[str] = mapped_column(unique=True)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"))
     user: Mapped["User"] = relationship()
 
@@ -103,6 +104,7 @@ class File(Base):
                 mime=self.mime_type
             ),
             remote_file_id=self.remote_id,
+            remote_unique_id=self.unique_id,
             user_id=self.user_id,
             created_at=self.created_at,
             title=self.title,
@@ -114,3 +116,9 @@ class File(Base):
             file.category = category.to_domain()
 
         return file
+
+class TestFile(Base):
+    __tablename__ = "tests"
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    file_id: Mapped[str] = mapped_column(unique=True)
+    file_unique_id: Mapped[str] = mapped_column(unique=True)

@@ -2,6 +2,7 @@ from typing import Sequence, Optional
 
 from asyncpg import UniqueViolationError
 from sqlalchemy import select, delete
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.functions import count
 
@@ -32,6 +33,7 @@ class FileStorageGateway(
     async def save_file(self, file: File) -> FileId:
         async with self._pool() as session:
             db_file = models.File(
+                unique_id=file.remote_unique_id,
                 remote_id=file.remote_file_id,
                 user_id=file.user_id,
                 file_type=file.type.category,
@@ -45,7 +47,7 @@ class FileStorageGateway(
                 session.add(db_file)
                 await session.commit()
 
-            except UniqueViolationError:
+            except (UniqueViolationError, IntegrityError):
                 await session.rollback()
                 raise FileAlreadyExists(file.remote_file_id)
 
@@ -107,6 +109,9 @@ class FileStorageGateway(
             if file.remote_file_id != model.remote_id:
                 model.remote_id = str(file.remote_file_id)
 
+            if file.remote_unique_id != model.unique_id:
+                model.unique_id = file.remote_unique_id
+
             if file.title != model.title:
                 model.title = file.title
 
@@ -117,6 +122,7 @@ class FileStorageGateway(
             sql = delete(models.File).where(models.File.id == int(file_id))
             await session.execute(sql)
             await session.commit()
+
 
 class FileCategoryUsageRater(
     CategoryRepoUsageRater,

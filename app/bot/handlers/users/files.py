@@ -17,7 +17,7 @@ router = Router()
 @router.message(Command("list"))
 async def command_list(msg: Message, dialog_manager: DialogManager):  # noqa
     del msg  # unused
-    await execute.file_list(dialog_manager, mode=StartMode.RESET_STACK)
+    await execute.file_list(dialog_manager)
 
 
 @router.message(MediaFilter(), ViaSelfRestrict(), StateFilter(None))
@@ -30,11 +30,7 @@ async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manag
             raise SkipHandler
 
     file = await uploader.upload(msg)
-    await execute.file_view(
-        dialog_manager,
-        file.id,
-        mode=StartMode.RESET_STACK,
-    )
+    await execute.file_view(dialog_manager, file.id)
 
 
 @router.message(Command("file"))
@@ -53,4 +49,4 @@ async def file_cmd(
     except ValueError as _:
         await msg.answer(i18n.get('invalid-file-id-hint'))
     else:
-        await execute.file_view(dialog_manager, file_id, mode=StartMode.RESET_STACK)
+        await execute.file_view(dialog_manager, file_id)

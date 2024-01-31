@@ -10,6 +10,4 @@ router = Router()
 
 @router.message(Command("locale"))
 async def process_change_locale(m: Message, dialog_manager: DialogManager):
-    await execute.change_locale(
-        dialog_manager
-    )
+    await execute.change_locale(dialog_manager)

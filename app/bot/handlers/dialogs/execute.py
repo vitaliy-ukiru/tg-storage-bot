@@ -1,12 +1,9 @@
-__all__ = (
-    'file_view',
-)
-
 from typing import Optional
 
 from aiogram_dialog import DialogManager, ShowMode, StartMode, Data
 
-from app.bot.states.dialogs import FileViewSG, FileListSG, CategoryEditSG, UserChangeLocaleSG
+from app.bot.states.dialogs import FileViewSG, FileListSG, CategoryEditSG, UserChangeLocaleSG, \
+    CategoryCreateSG
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileId
 
@@ -45,6 +42,16 @@ async def file_list(manager: DialogManager,
         show_mode=show_mode,
     )
 
+async def category_create(manager: DialogManager,
+                          data: Data = None,
+                          mode: StartMode = StartMode.RESET_STACK,
+                          show_mode: Optional[ShowMode] = None):
+    await manager.start(
+        CategoryCreateSG.input_title,
+        data=data,
+        mode=mode,
+        show_mode=show_mode
+    )
 
 async def category_edit(manager: DialogManager,
                         category_id: int | CategoryId,

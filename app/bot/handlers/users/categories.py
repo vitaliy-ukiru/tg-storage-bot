@@ -1,15 +1,17 @@
 from aiogram import Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
-from aiogram_dialog import DialogManager, StartMode
-from aiogram_i18n import I18nContext, L
+from aiogram_dialog import DialogManager
+from aiogram_i18n import I18nContext
 
 from app.bot.handlers.dialogs import execute
-from app.bot.states.dialogs import CategoryCreateSG
 
 router = Router(name="categories")
+
+
 @router.message(Command("cat"))
-async def category_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager, i18n: I18nContext):
+async def category_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager,
+                       i18n: I18nContext):
     args = command.args
     if args is None:
         await msg.answer(i18n.get('missed-category-id-hint'))
@@ -19,8 +21,9 @@ async def category_cmd(msg: Message, command: CommandObject, dialog_manager: Dia
     except ValueError:
         await msg.answer(i18n.get('invalid-category-id-hint'))
     else:
-        await execute.category_edit(dialog_manager, category_id, mode=StartMode.RESET_STACK)
+        await execute.category_edit(dialog_manager, category_id)
+
 
 @router.message(Command("create_category"))
 async def create_category(msg: Message, dialog_manager: DialogManager):
-    await dialog_manager.start(CategoryCreateSG.input_title)
+    await execute.category_create(dialog_manager)

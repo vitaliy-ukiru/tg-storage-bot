@@ -11,7 +11,6 @@ from aiogram_i18n.cores import FluentRuntimeCore
 
 from app.bot.handlers import users, dialogs
 from app.bot.middlewares import UserMiddleware
-from app.bot.utils.uploader import FileUploader
 from app.common.config import Config
 from app.core.interfaces.usecase import UserUsecase, CategoryUsecase, FileUsecase
 from app.core.interfaces.usecase.user import UserGetter, UserUpdater
@@ -87,7 +86,6 @@ class BotBuilder:
             file_service=file_service,
             category_service=category_service,
             user_service=self.user_service,
-            uploader=FileUploader(file_service),
             locale_displayer=self.locale_displayer,
             cfg=self.cfg,
         )

@@ -2,14 +2,15 @@ from aiogram import Router
 from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.filters import Command, CommandObject, StateFilter
 from aiogram.types import Message
-from aiogram_dialog import DialogManager, StartMode
+from aiogram_dialog import DialogManager
 from aiogram_i18n import I18nContext
 
 from app.bot.filters.media import MediaFilter
 from app.bot.filters.via_self import ViaSelfRestrict
 from app.bot.handlers.dialogs import execute
 from app.bot.states.dialogs import ALLOWED_STATES
-from app.bot.utils.uploader import FileUploader
+from app.bot.services import FileUploader
+from app.core.interfaces.usecase import FileUsecase
 
 router = Router()
 
@@ -21,7 +22,7 @@ async def command_list(msg: Message, dialog_manager: DialogManager):  # noqa
 
 
 @router.message(MediaFilter(), ViaSelfRestrict(), StateFilter(None))
-async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manager: DialogManager):
+async def process_upload_file(msg: Message, file_service: FileUsecase, dialog_manager: DialogManager):
     # I don't have idea how get dialog_manager in filter
     # therefore will filter this and skip handler
     if dialog_manager.has_context():
@@ -29,6 +30,7 @@ async def process_upload_file(msg: Message, uploader: FileUploader, dialog_manag
         if state not in ALLOWED_STATES:
             raise SkipHandler
 
+    uploader = FileUploader(file_service)
     file = await uploader.upload(msg)
     await execute.file_view(dialog_manager, file.id)
 

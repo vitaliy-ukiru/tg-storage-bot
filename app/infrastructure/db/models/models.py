@@ -116,9 +116,3 @@ class File(Base):
             file.category = category.to_domain()
 
         return file
-
-class TestFile(Base):
-    __tablename__ = "tests"
-    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
-    file_id: Mapped[str] = mapped_column(unique=True)
-    file_unique_id: Mapped[str] = mapped_column(unique=True)

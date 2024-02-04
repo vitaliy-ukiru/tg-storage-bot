@@ -40,10 +40,11 @@ class CategoryFinder(Protocol):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def find_categories(self,
-                              *filters: FilterField,
-                              dto: Optional[CategoriesFindDTO] = None,
-                              paginate: Optional[Pagination] = None) -> list[Category]:
+    async def find_categories(
+        self,
+        dto: CategoriesFindDTO,
+        paginate: Optional[Pagination] = None
+    ) -> list[Category]:
         raise NotImplementedError
 
 

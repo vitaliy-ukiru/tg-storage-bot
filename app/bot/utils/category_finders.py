@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 from aiogram_dialog import DialogManager
 
-from app.core.common.filters.category import CategoryFilters
+from app.core.domain.dto.category import CategoriesFindDTO
 from app.core.domain.models.category import Category
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase import CategoryUsecase
@@ -32,8 +32,10 @@ class PopularCategoriesFinder(CategoryFinder):
 class FavoriteCategoriesFinder(CategoryFinder):
     async def find_categories(self) -> list[Category]:
         return await self.category_service.find_categories(
-            CategoryFilters.user_id(self.user.id),
-            CategoryFilters.favorites(True)
+            CategoriesFindDTO(
+                user_id=self.user.id,
+                favorites=True,
+            ),
         )
 
 
@@ -46,8 +48,10 @@ class TitleCategoriesFinder(CategoryFinder):
 
     async def find_categories(self) -> list[Category]:
         return await self.category_service.find_categories(
-            CategoryFilters.user_id(self.user.id),
-            CategoryFilters.title_match(self._title)
+            CategoriesFindDTO(
+                user_id=self.user.id,
+                title_match=self._title,
+            )
         )
 
 

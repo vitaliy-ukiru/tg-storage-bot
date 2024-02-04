@@ -1,6 +1,6 @@
 from dataclasses import asdict
 from datetime import datetime
-from typing import Optional, overload, Literal
+from typing import Optional
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
@@ -9,8 +9,7 @@ from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId, RemoteFileId
 from app.core.domain.models.user import UserId
-from app.core.domain.services.internal.filter_merger import FilterMerger
-from app.core.interfaces.repository.common import FilterField
+from app.core.domain.services.internal import convert_to_filter_fields
 from app.core.interfaces.repository.file import (
     FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileRepoDeleter
 )
@@ -113,47 +112,13 @@ class FileService(FileUsecase):
 
         await self._deleter.delete_file(file_id)
 
-    # mypy not found issues in this file
-    # noinspection PyMethodOverriding,PyProtocol
-    @overload
     async def find_files(
         self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
-        paginate: Optional[Pagination] = None,
-        total_count: Literal[True]
-    ) -> tuple[list[File], int]:
-        raise NotImplementedError
-
-    # noinspection PyMethodOverriding,PyProtocol
-    @overload
-    async def find_files(
-        self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
-        paginate: Optional[Pagination] = None,
-        total_count: Literal[False]
-    ) -> list[File]:
-        raise NotImplementedError
-
-    @overload
-    async def find_files(
-        self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
-        paginate: Optional[Pagination] = None,
-    ) -> list[File]:
-        raise NotImplementedError
-
-    async def find_files(
-        self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
+        dto: FilesFindDTO,
         paginate: Optional[Pagination] = None,
         total_count: Optional[bool] = None
     ) -> tuple[list[File], int] | list[File]:
-        dto_items = asdict(dto) if dto else None
-        filters = FilterMerger(dto_items, filters).merge()
+        filters = convert_to_filter_fields(asdict(dto))
 
         files = await self._finder.find_files(filters, paginate)
         if not total_count:

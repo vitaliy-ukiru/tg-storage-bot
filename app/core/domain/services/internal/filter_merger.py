@@ -1,34 +1,13 @@
-from typing import Any, Sequence, Optional, Iterable, Generator
-
 from app.core.domain.exceptions.base import UserNotProvidedError
 from app.core.interfaces.repository.common import FilterField
 
 
-class FilterMerger:
-    def __init__(self,
-                 data: Optional[dict[str, Any]],
-                 native_filters: Iterable[FilterField]):
+def convert_to_filter_fields(data: dict) -> list[FilterField]:
+    if not data.get("user_id"):
+        raise UserNotProvidedError()
 
-        self.data = data
-        self.native_filters = native_filters
-
-    def _data_filters(self) -> Iterable[FilterField]:
-        return (
-            FilterField(name, value)
-            for name, value in self.data.items()
-            if value is not None
-        )
-
-    def merge(self) -> list[FilterField]:
-        filters = {}
-        for f in self.native_filters:
-            filters[f.name] = f
-
-        if self.data is not None:
-            for f in self._data_filters():
-                filters[f.name] = f  # override
-
-        if "user_id" not in filters:
-            raise UserNotProvidedError()
-
-        return list(filters.values())
+    return [
+        FilterField(name, value)
+        for name, value in data.items()
+        if value is not None
+    ]

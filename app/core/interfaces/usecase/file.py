@@ -32,28 +32,16 @@ class FileFinder(Protocol):
     @overload
     async def find_files(
         self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
+        dto: FilesFindDTO,
+        total_count: Literal[True],
         paginate: Optional[Pagination] = None,
-        total_count: Literal[True]
     ) -> tuple[list[File], int]:
         raise NotImplementedError
 
     @overload
     async def find_files(
         self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
-        paginate: Optional[Pagination] = None,
-        total_count: Literal[False]
-    ) -> list[File]:
-        raise NotImplementedError
-
-    @overload
-    async def find_files(
-        self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
+        dto: FilesFindDTO,
         paginate: Optional[Pagination] = None,
     ) -> list[File]:
         raise NotImplementedError
@@ -61,8 +49,7 @@ class FileFinder(Protocol):
     @abstractmethod
     async def find_files(
         self,
-        *filters: FilterField,
-        dto: Optional[FilesFindDTO] = None,
+        dto: FilesFindDTO,
         paginate: Optional[Pagination] = None,
         total_count: Optional[bool] = None
     ) -> tuple[list[File], int] | list[File]:
@@ -87,6 +74,7 @@ class FileDeleter(Protocol):
     @abstractmethod
     async def delete_file(self, file_id: FileId, user_id: UserId):
         raise NotImplementedError
+
 
 class FileUsecase(
     FileSaver, FileGetter,

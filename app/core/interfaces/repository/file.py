@@ -3,7 +3,7 @@ __all__ = (
     'FileRepoGetter',
     'FileRepoFinder',
     'FileRepoUpdater',
-    'FileDeleter',
+    'FileRepoDeleter',
 )
 
 from abc import abstractmethod
@@ -43,7 +43,7 @@ class FileRepoUpdater(Protocol):
         raise NotImplementedError
 
 
-class FileDeleter(Protocol):
+class FileRepoDeleter(Protocol):
     @abstractmethod
     async def delete_file(self, file_id: FileId):
         raise NotImplementedError

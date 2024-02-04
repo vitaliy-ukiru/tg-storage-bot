@@ -14,7 +14,7 @@ from app.core.domain.models.user import UserId
 from app.core.interfaces.repository.category import CategoryRepoUsageRater
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.repository.file import (
-    FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileDeleter
+    FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileRepoDeleter
 )
 from app.infrastructure.db import models
 from ._base import BaseRepository
@@ -27,7 +27,7 @@ class FileStorageGateway(
     FileRepoGetter,
     FileRepoFinder,
     FileRepoUpdater,
-    FileDeleter,
+    FileRepoDeleter,
     BaseRepository
 ):
     async def save_file(self, file: File) -> FileId:

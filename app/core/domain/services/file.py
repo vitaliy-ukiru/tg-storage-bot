@@ -12,7 +12,7 @@ from app.core.domain.models.user import UserId
 from app.core.domain.services.internal.filter_merger import FilterMerger
 from app.core.interfaces.repository.common import FilterField
 from app.core.interfaces.repository.file import (
-    FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileDeleter
+    FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileRepoDeleter
 )
 from app.core.interfaces.usecase.category import CategoryGetter
 from app.core.interfaces.usecase.file import FileUsecase
@@ -35,7 +35,7 @@ class FileService(FileUsecase):
         getter: FileRepoGetter,
         finder: FileRepoFinder,
         updater: FileRepoUpdater,
-        deleter: FileDeleter,
+        deleter: FileRepoDeleter,
         category_getter: CategoryGetter
     ):
 

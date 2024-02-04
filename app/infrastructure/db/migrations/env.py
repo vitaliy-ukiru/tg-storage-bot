@@ -32,9 +32,9 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config_path = config.get_main_option("app_config_path")
+config_path = os.environ.get("CONFIG_PATH")
 if not config_path:
-    config_path = os.environ.get("CONFIG_PATH")
+    config_path = config.get_main_option("app_config_path")
 
 assert config_path, "Config path must be in CONFIG_PATH env var or in alembic.ini as app_config_path"
 dsn = to_dsn(Config(_yaml_file=config_path).db)

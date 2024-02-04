@@ -13,6 +13,7 @@ from magic_filter import F
 from app.bot.handlers.dialogs import execute
 from app.bot.handlers.dialogs.file.file_list.common import tl_file_list
 from app.bot.handlers.dialogs.file.file_list.filters_dao import FiltersDAO
+from app.bot.services.paginator import Paginator
 from app.bot.states.dialogs import FileListSG
 from app.bot.widgets import BackTo
 from app.bot.widgets.i18n import BACK_TEXT
@@ -32,17 +33,15 @@ async def _files_find_getter(dialog_manager: DialogManager, file_service: FileUs
 
     pager: ManagedScroll = dialog_manager.find(FILE_LIST_ID)
     current_page = await pager.get_page()
+    paginator = Paginator(FILES_PER_PAGE, current_page)
 
     files, total_files = await file_service.find_files(
         dto=filters,
-        paginate=Pagination(
-            FILES_PER_PAGE,
-            current_page * FILES_PER_PAGE,
-        ),
+        paginate=paginator.pagination,
         total_count=True
     )
     return {
-        "pages": math.ceil(total_files / FILES_PER_PAGE),
+        "pages": paginator.get_page_count(total_files),
         "files": files,
     }
 

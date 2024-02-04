@@ -1,5 +1,3 @@
-from typing import cast
-
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup
@@ -31,8 +29,8 @@ async def _category_generic_getter(dialog_manager: DialogManager,
     finder: CategoryFinder
     match mode:
         case FindMode.title:
-            title = cast(ManagedTextInput, dialog_manager.find(ID_INPUT_TITLE)).get_value()
-            finder = TitleCategoriesFinder(dialog_manager, user, category_service, title)
+            title: ManagedTextInput = dialog_manager.find(ID_INPUT_TITLE)
+            finder = TitleCategoriesFinder(dialog_manager, user, category_service, title.get_value())
         case FindMode.favorite:
             finder = FavoriteCategoriesFinder(dialog_manager, user, category_service)
         case _:
@@ -50,24 +48,6 @@ async def process_click_category(_, __, manager: DialogManager, item_id: Categor
     await manager.done(dict(category_id=int(item_id)))
 
 
-_select_category = Select[CategoryId](
-    Format("{item.title}"),
-    id="select_category",
-    on_click=process_click_category,
-    type_factory=lambda c: CategoryId(int(c)),
-    item_id_getter=lambda category: category.id,
-    items="categories",
-)
-
-_scroll_categories = ScrollingGroup(
-    _select_category,
-    id="select_category_scroll",
-    width=2,
-    height=2,
-    hide_on_single_page=True,
-)
-
-
 async def _on_click_back(_, __, manager: DialogManager):
     del manager.dialog_data[FIND_MODE_KEY]
 
@@ -80,7 +60,6 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
 
 
 ID_INPUT_TITLE = "find_title"
-
 
 tl = TL.category.find
 
@@ -118,7 +97,20 @@ find_category_dialog = Dialog(
     ),
     Window(
         tl.result(),
-        _scroll_categories,
+        ScrollingGroup(
+            Select[CategoryId](
+                Format("{item.title}"),
+                id="select_category",
+                on_click=process_click_category,
+                type_factory=lambda c: CategoryId(int(c)),
+                item_id_getter=lambda category: category.id,
+                items="categories",
+            ),
+            id="select_category_scroll",
+            width=2,
+            height=2,
+            hide_on_single_page=True,
+        ),
         BackToI18n(
             CategoryFindSG.main,
             on_click=_on_click_back

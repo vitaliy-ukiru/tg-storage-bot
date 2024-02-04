@@ -24,13 +24,19 @@ _FILES_NOT_FOUND = "__files_not_found"
 
 HINT_NOT_FOUND_KEY = 'files-not-found-hint'
 
+
 @router.message(CommandStart(deep_link=True, magic=F.args == _FILES_NOT_FOUND))
-async def _files_not_found(m: Message,  i18n: I18nContext):
+async def _files_not_found(m: Message, i18n: I18nContext):
     await m.answer(i18n.get('files-not-found-details'))
 
 
 @router.inline_query(F.query.cast(int))
-async def _find_file_by_id(inline_query: InlineQuery, file_service: FileUsecase, user: User,i18n: I18nContext):
+async def _find_file_by_id(
+    inline_query: InlineQuery,
+    file_service: FileUsecase,
+    user: User,
+    i18n: I18nContext
+):
     file_id = FileId(int(inline_query.query))
     try:
         file = await file_service.get_file(
@@ -59,7 +65,12 @@ ITEMS_PER_PAGE = 50
 
 
 @router.inline_query()
-async def _find_files_by_title(inline_query: InlineQuery, file_service: FileUsecase, user: User, i18n: I18nContext):
+async def _find_files_by_title(
+    inline_query: InlineQuery,
+    file_service: FileUsecase,
+    user: User,
+    i18n: I18nContext
+):
     page = 0
     # in offset stores page number
     # it give more capacity.

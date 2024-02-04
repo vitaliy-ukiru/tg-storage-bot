@@ -10,7 +10,7 @@ from magic_filter import F
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileViewSG, FileEditSG
 from app.bot.utils.file_type_i18n import locale_file_type
-from app.bot.utils.files import content_type_from_category
+from app.bot.services import content_type_from_category
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import TemplateProxy, Topic, CloseI18n

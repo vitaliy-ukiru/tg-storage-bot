@@ -8,7 +8,7 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 from app.bot.filters.media import MediaFilter
 from app.bot.middlewares.user_manager import USER_KEY
 from app.bot.states.dialogs import FileEditSG, CategorySelectSG
-from app.bot.utils.files import FileCredentials
+from app.bot.services import FileCredentials
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import CANCEL_TEXT, CLOSE_TEXT, BackToI18n, TemplateProxy

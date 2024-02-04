@@ -5,9 +5,9 @@ from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Format
 
 from app.bot.states.dialogs import CategoryFindSG
-from app.bot.utils.category_finders import (CategoryFinder, TitleCategoriesFinder,
-                                            PopularCategoriesFinder,
-                                            FavoriteCategoriesFinder, FindMode)
+from app.bot.services.category_finders import (CategoryFinder, TitleCategoriesFinder,
+                                               PopularCategoriesFinder,
+                                               FavoriteCategoriesFinder, FindMode)
 from app.bot.widgets import BackTo
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, TL, BackToI18n

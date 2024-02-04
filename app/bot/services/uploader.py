@@ -2,7 +2,7 @@ from typing import Optional
 
 from aiogram.types import Message
 
-from app.bot.utils.files import FileCredentials
+from .file_creds import FileCredentials
 from app.core.domain.models.file import File
 from app.core.interfaces.usecase.file import FileUsecase
 

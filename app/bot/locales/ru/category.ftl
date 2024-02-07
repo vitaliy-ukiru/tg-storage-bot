@@ -1,12 +1,15 @@
 category-title = Название
 category-desc = Описание
+category-marker = Маркер
 
 category-create-input-title = Отправьте название категории
 category-create-input-desc = Отправьте описание для категории
+category-create-input-marker = Отправьте эмодзи для маркера
 
 category-create-btn-title = Название
 category-create-btn-desc = Описание
 category-create-btn-create = Создать
+category-create-btn-marker = Маркер
 
 category-select-target = Выберите источник категории
 category-select-btn-exists = Существующая

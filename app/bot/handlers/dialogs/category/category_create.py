@@ -17,6 +17,7 @@ from app.core.interfaces.usecase.category import CategoryUsecase
 
 ID_INPUT_TITLE = "input_title"
 ID_INPUT_DESC = "input_desc"
+ID_INPUT_MARKER = "input_marker"
 
 tl = TL.category.create
 
@@ -24,6 +25,7 @@ tl = TL.category.create
 class CreateCategoryDAO(BaseDAO):
     title = TextInputProp[str](ID_INPUT_TITLE)
     desc = TextInputProp[str | None](ID_INPUT_DESC)
+    marker = TextInputProp[str | None](ID_INPUT_MARKER)
 
 
 async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
@@ -32,7 +34,7 @@ async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
 
 async def menu_getter(dialog_manager: DialogManager, **_):
     dao = CreateCategoryDAO(dialog_manager)
-    return dict(title=dao.title, desc=dao.desc)
+    return dict(title=dao.title, desc=dao.desc, marker=dao.marker)
 
 
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
@@ -41,7 +43,8 @@ async def create_category(call: CallbackQuery, _: Button, manager: DialogManager
     category = await category_service.save_category(CreateCategoryDTO(
         title=dao.title,
         desc=dao.desc,
-        user_id=call.from_user.id
+        user_id=call.from_user.id,
+        marker=dao.marker,
     ))
 
     await manager.done(dict(category_id=category.id, category=category))
@@ -64,6 +67,11 @@ category_create_dialog = Dialog(
                 TL.category.desc(),
                 Format("{desc}"),
                 when="desc"
+            ),
+            Topic(
+                TL.category.marker(),
+                Format("{marker}"),
+                when="marker"
             )
         ),
         Group(
@@ -78,6 +86,11 @@ category_create_dialog = Dialog(
                     id="edit_desc",
                     state=CategoryCreateSG.input_desc
                 ),
+                SwitchTo(
+                    Emoji("🟢", tl.btn.marker()),
+                    id="edit_marker",
+                    state=CategoryCreateSG.input_marker,
+                )
             ),
             Button(
                 Emoji("✅", tl.btn.create()),
@@ -100,4 +113,14 @@ category_create_dialog = Dialog(
         ),
         state=CategoryCreateSG.input_desc
     ),
+    Window(
+        tl.input.marker(),
+        BackI18n(),
+        TextInput(
+            id=ID_INPUT_MARKER,
+            type_factory=optional_str_factory,
+            on_success=_to_menu
+        ),
+        state=CategoryCreateSG.input_marker,
+    )
 )

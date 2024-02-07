@@ -1,12 +1,17 @@
 category-title = Title
 category-desc = Description
+category-marker = Marker
 
 category-create-input-title = Enter the category name
 category-create-input-desc = Enter a description for the category
+category-create-input-marker = Enter a emoji for marker
+
 
 category-create-btn-title = Title
 category-create-btn-desc = Description
 category-create-btn-create = Create
+category-create-btn-marker = Marker
+
 
 category-select-target = Select category type
 category-select-btn-exists = Existing

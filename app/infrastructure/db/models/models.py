@@ -7,14 +7,14 @@ __all__ = (
 from datetime import datetime
 from typing import Optional, cast
 
-from .base import Base
 from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
-from app.core.domain.models.file import File as DFile, FileCategory, FileType
 from app.core.domain.models.category import Category as DCategory
+from app.core.domain.models.file import File as DFile, FileCategory, FileType
 from app.core.domain.models.user import User as DUser
+from .base import Base
 
 
 class User(Base):
@@ -45,6 +45,7 @@ class User(Base):
             deleted_at=u.deleted_at
         )
 
+
 class Category(Base):
     __tablename__ = "categories"
 
@@ -53,6 +54,7 @@ class Category(Base):
     user: Mapped[User] = relationship()
 
     title: Mapped[str]
+    marker: Mapped[Optional[str]]
     description: Mapped[Optional[str]]
     is_favorite: Mapped[bool] = mapped_column(server_default=false())
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -65,6 +67,7 @@ class Category(Base):
             description=self.description,
             is_favorite=self.is_favorite,
             created_at=self.created_at,
+            marker=self.marker
         )
 
     @classmethod
@@ -76,6 +79,7 @@ class Category(Base):
             created_at=c.created_at,
             description=c.description,
             is_favorite=c.is_favorite,
+            marker=c.marker,
         )
 
 

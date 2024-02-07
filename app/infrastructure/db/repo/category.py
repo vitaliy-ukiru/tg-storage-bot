@@ -74,6 +74,9 @@ class CategoryStorageGateway(
             if category.is_favorite != model.is_favorite:
                 model.is_favorite = category.is_favorite
 
+            if category.marker != model.marker:
+                model.marker = category.marker
+
             await session.commit()
 
     async def get_category_count(self, filters: Sequence[FilterField]) -> int:

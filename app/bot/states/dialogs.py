@@ -33,6 +33,7 @@ class CategoryEditSG(StatesGroup):
     main = State()
     title = State()
     desc = State()
+    marker = State()
 
 
 class FileListSG(StatesGroup):

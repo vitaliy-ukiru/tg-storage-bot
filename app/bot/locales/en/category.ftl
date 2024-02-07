@@ -29,7 +29,12 @@ category-find-result = List of categories found
 category-edit-btn-title = Title
 category-edit-btn-desc = Description
 category-edit-btn-favorite = Favorite
+category-edit-btn-marker = Marker
+
 
 category-edit-input-title = Enter category name
 category-edit-input-desc = Enter a description for the category
+category-create-input-marker = Enter a emoji for marker
 category-edit-btn-delete-desc = Delete description
+category-edit-btn-delete-marker = Delete marker
+

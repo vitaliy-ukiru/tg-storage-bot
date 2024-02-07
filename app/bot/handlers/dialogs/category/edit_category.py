@@ -54,6 +54,7 @@ async def _update_category(
     desc: Optional[str] = None,
     delete_desc: Optional[bool] = None,
     favorite: Optional[bool] = None,
+    marker: Optional[str] = None,
 ) -> Category:
     data = UpdateDAO(manager)
     category_service = data.category_service
@@ -63,7 +64,8 @@ async def _update_category(
         title=title,
         desc=desc,
         delete_desc=delete_desc,
-        favorite=favorite
+        favorite=favorite,
+        marker=marker,
     ))
     data.category = category
     return category
@@ -98,6 +100,10 @@ async def _input_title_handler(_, __, manager: DialogManager, text: str):
 async def _input_desc_handler(_, __, manager: DialogManager, text: str):
     await _update_category(manager, desc=text)
 
+@switcher(CategoryEditSG.main)
+async def _input_marker_handler(_, __, manager: DialogManager, text: str):
+    await _update_category(manager, marker=text)
+
 
 async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, manager: DialogManager):
     if event.data == _ON_START_SET_DATA:
@@ -111,15 +117,24 @@ async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, mana
 async def _process_delete_desc(_, __, manager: DialogManager):
     await _update_category(manager, delete_desc=True)
 
+@switcher(CategoryEditSG.main)
+async def _process_delete_marker(_, __, manager: DialogManager):
+    await _update_category(manager, marker='')
+
 
 async def menu_getter(dialog_manager: DialogManager, **_):
     category = await _get_category(dialog_manager)
-    return dict(title=category.title, desc=category.description)
+    return dict(title=category.title, desc=category.description, marker=category.marker)
 
 
 async def _desc_window_getter(dialog_manager: DialogManager, **_):
     category = await _get_category(dialog_manager)
     return dict(have_desc=category.description is not None)
+
+
+async def _marker_window_getter(dialog_manager: DialogManager, **_):
+    category = await _get_category(dialog_manager)
+    return dict(have_marker=category.marker is not None)
 
 
 async def _on_start(start_data: dict, manager: DialogManager):
@@ -147,12 +162,12 @@ favorite_template = tl.btn.favorite()
 category_edit_dialog = Dialog(
     Window(
         Multi(
+            Topic(TL.category.marker(), Format("{marker}"), when="marker"),
             Topic(TL.category.title(), Format("{title}")),
             Topic(TL.category.desc(), Format("{desc}"), when="desc")
         ),
         Group(
             Row(
-
                 SwitchTo(
                     Emoji("📝", tl.btn.title()),
                     id="create_category_edit_title",
@@ -170,6 +185,11 @@ category_edit_dialog = Dialog(
                 id=_FAVORITE_ID,
                 on_state_changed=_process_click_favorite
 
+            ),
+            SwitchTo(
+                Emoji("🟢", tl.btn.marker()),
+                id="edit_marker",
+                state=CategoryEditSG.marker,
             ),
             Cancel(CLOSE_TEXT)
         ),
@@ -198,6 +218,21 @@ category_edit_dialog = Dialog(
         TextInput(id="edit__input_desc", on_success=_input_desc_handler),
         getter=_desc_window_getter,
         state=CategoryEditSG.desc
+    ),
+    Window(
+        tl.input.marker(),
+        Column(
+            Button(
+                tl.btn.delete.marker(),
+                id="delete_marker",
+                on_click=_process_delete_marker,
+                when="have_marker",
+            ),
+            BackToI18n(CategoryEditSG.main),
+        ),
+        TextInput(id="edit__input_marker", on_success=_input_marker_handler),
+        getter=_marker_window_getter,
+        state=CategoryEditSG.marker
     ),
     on_start=_on_start
 )

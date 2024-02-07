@@ -27,7 +27,11 @@ category-find-result = Список найденных категорий
 category-edit-btn-title = Название
 category-edit-btn-desc = Описание
 category-edit-btn-favorite = Избранное
+category-edit-btn-marker = Маркер
+
 
 category-edit-input-title = Отправьте название категории
 category-edit-input-desc = Отправьте описание для категории
+category-create-input-marker = Отправьте эмодзи для маркера
 category-edit-btn-delete-desc = Удалить описание
+category-edit-btn-delete-marker = Удалить маркер

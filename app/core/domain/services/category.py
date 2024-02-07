@@ -46,6 +46,7 @@ class CategoryService(CategoryUsecase):
             title=dto.title,
             description=dto.desc,
             created_at=datetime.now(),
+            marker=dto.marker,  # TODO: check on emoji
         )
 
         c.id = await self._saver.save_category(c)
@@ -97,6 +98,9 @@ class CategoryService(CategoryUsecase):
 
         if dto.favorite is not None:
             category.is_favorite = dto.favorite
+
+        if dto.marker is not None:
+            category.marker = dto.marker if dto.marker != '' else None
 
         await self._updater.update_category(category)
         return category

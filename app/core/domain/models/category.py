@@ -14,4 +14,5 @@ class Category:
     title: str
     created_at: datetime
     description: Optional[str] = None
+    marker: Optional[str] = None
     is_favorite: bool = False

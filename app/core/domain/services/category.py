@@ -2,9 +2,11 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import Optional
 
+from emoji import is_emoji
+
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.dto.common import Pagination
-from app.core.domain.exceptions.category import CategoryNotFound
+from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategoryMarker
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.domain.services.internal import convert_to_filter_fields
@@ -40,13 +42,16 @@ class CategoryService(CategoryUsecase):
         self._rater = rater
 
     async def save_category(self, dto: CreateCategoryDTO) -> Category:
+        if dto.marker:
+            ensure_valid_marker(dto.marker)
+
         c = Category(
             id=UNDEFINED_CATEGORY_ID,
             user_id=UserId(dto.user_id),
             title=dto.title,
             description=dto.desc,
             created_at=datetime.now(),
-            marker=dto.marker,  # TODO: check on emoji
+            marker=dto.marker,
         )
 
         c.id = await self._saver.save_category(c)
@@ -99,8 +104,17 @@ class CategoryService(CategoryUsecase):
         if dto.favorite is not None:
             category.is_favorite = dto.favorite
 
-        if dto.marker is not None:
-            category.marker = dto.marker if dto.marker != '' else None
+        if dto.marker is not None and not dto.delete_marker:
+            ensure_valid_marker(dto.marker)
+            category.marker = dto.marker
+
+        if dto.delete_marker:
+            category.marker = None
 
         await self._updater.update_category(category)
         return category
+
+
+def ensure_valid_marker(marker: str) -> None:
+    if not is_emoji(marker):
+        raise InvalidCategoryMarker(0)

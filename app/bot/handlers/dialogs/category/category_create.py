@@ -1,10 +1,12 @@
 from typing import Optional
 
+import emoji
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Format, Multi
+from aiogram_i18n import I18nContext
 
 from app.bot.states.dialogs import CategoryCreateSG
 from app.bot.utils.optional_str import optional_str_factory
@@ -13,6 +15,7 @@ from app.bot.widgets.dao.widgets import TextInputProp
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import CANCEL_TEXT, Topic, BackI18n, TL
 from app.core.domain.dto.category import CreateCategoryDTO
+from app.core.domain.exceptions.category import InvalidCategoryMarker
 from app.core.interfaces.usecase.category import CategoryUsecase
 
 ID_INPUT_TITLE = "input_title"
@@ -32,6 +35,15 @@ async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
     await manager.switch_to(CategoryCreateSG.menu_idle)
 
 
+async def _on_marker_input(m: Message, __, manager: DialogManager, value: str):
+    if not emoji.is_emoji(value):
+        i18n: I18nContext = manager.middleware_data["i18n"]
+        await m.answer(i18n.get("category-invalid-marker"))
+        return
+
+    await manager.switch_to(CategoryCreateSG.menu_idle)
+
+
 async def menu_getter(dialog_manager: DialogManager, **_):
     dao = CreateCategoryDAO(dialog_manager)
     return dict(title=dao.title, desc=dao.desc, marker=dao.marker)
@@ -40,12 +52,17 @@ async def menu_getter(dialog_manager: DialogManager, **_):
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
     category_service: CategoryUsecase = manager.middleware_data["category_service"]
     dao = CreateCategoryDAO(manager)
-    category = await category_service.save_category(CreateCategoryDTO(
-        title=dao.title,
-        desc=dao.desc,
-        user_id=call.from_user.id,
-        marker=dao.marker,
-    ))
+    try:
+        category = await category_service.save_category(CreateCategoryDTO(
+            title=dao.title,
+            desc=dao.desc,
+            user_id=call.from_user.id,
+            marker=dao.marker,
+        ))
+    except InvalidCategoryMarker:
+        i18n: I18nContext = manager.middleware_data["i18n"]
+        await call.answer(i18n.get("category-invalid-marker"), show_alert=True)
+        return
 
     await manager.done(dict(category_id=category.id, category=category))
 
@@ -119,7 +136,7 @@ category_create_dialog = Dialog(
         TextInput(
             id=ID_INPUT_MARKER,
             type_factory=optional_str_factory,
-            on_success=_to_menu
+            on_success=_on_marker_input
         ),
         state=CategoryCreateSG.input_marker,
     )

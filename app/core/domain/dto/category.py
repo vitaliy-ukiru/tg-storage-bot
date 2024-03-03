@@ -32,5 +32,5 @@ class UpdateCategoryDTO:
     delete_desc: Optional[bool] = None
     favorite: Optional[bool] = None
 
-    # convention: If marker is empty string will delete marker.
     marker: Optional[str] = None
+    delete_marker: Optional[bool] = None

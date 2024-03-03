@@ -34,7 +34,8 @@ category-edit-btn-marker = Marker
 
 category-edit-input-title = Enter category name
 category-edit-input-desc = Enter a description for the category
-category-create-input-marker = Enter a emoji for marker
+category-edit-input-marker = Enter a emoji for marker
 category-edit-btn-delete-desc = Delete description
 category-edit-btn-delete-marker = Delete marker
 
+category-invalid-marker = The marker can only be an emoji

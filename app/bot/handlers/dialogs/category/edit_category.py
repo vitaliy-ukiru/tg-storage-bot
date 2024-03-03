@@ -2,13 +2,14 @@ from functools import wraps
 from typing import Optional, Any, Callable, TypeAlias, Awaitable
 
 from aiogram.fsm.state import State
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.common import ManagedWidget
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row, Checkbox, \
     Column, ManagedCheckbox
 from aiogram_dialog.widgets.text import Format, Multi
+from aiogram_i18n import I18nContext
 
 from app.bot.states.dialogs import CategoryEditSG
 from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp
@@ -16,6 +17,7 @@ from app.bot.widgets.dao.base_dao import BaseDAO
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, TL, Topic, BackToI18n
 from app.core.domain.dto.category import UpdateCategoryDTO
+from app.core.domain.exceptions.category import InvalidCategoryMarker
 from app.core.domain.models.category import CategoryId, Category
 from app.core.interfaces.usecase.category import CategoryUsecase
 
@@ -55,6 +57,7 @@ async def _update_category(
     delete_desc: Optional[bool] = None,
     favorite: Optional[bool] = None,
     marker: Optional[str] = None,
+    delete_marker: Optional[bool] = None
 ) -> Category:
     data = UpdateDAO(manager)
     category_service = data.category_service
@@ -66,6 +69,7 @@ async def _update_category(
         delete_desc=delete_desc,
         favorite=favorite,
         marker=marker,
+        delete_marker=delete_marker,
     ))
     data.category = category
     return category
@@ -100,9 +104,15 @@ async def _input_title_handler(_, __, manager: DialogManager, text: str):
 async def _input_desc_handler(_, __, manager: DialogManager, text: str):
     await _update_category(manager, desc=text)
 
-@switcher(CategoryEditSG.main)
-async def _input_marker_handler(_, __, manager: DialogManager, text: str):
-    await _update_category(manager, marker=text)
+
+async def _input_marker_handler(m: Message, __, manager: DialogManager, text: str):
+    try:
+        await _update_category(manager, marker=text)
+    except InvalidCategoryMarker:
+        i18n: I18nContext = manager.middleware_data["i18n"]
+        await m.answer(i18n.get("category-invalid-marker"))
+    else:
+        await manager.switch_to(CategoryEditSG.main)
 
 
 async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, manager: DialogManager):
@@ -117,9 +127,10 @@ async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, mana
 async def _process_delete_desc(_, __, manager: DialogManager):
     await _update_category(manager, delete_desc=True)
 
+
 @switcher(CategoryEditSG.main)
 async def _process_delete_marker(_, __, manager: DialogManager):
-    await _update_category(manager, marker='')
+    await _update_category(manager, delete_marker=True)
 
 
 async def menu_getter(dialog_manager: DialogManager, **_):

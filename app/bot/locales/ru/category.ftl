@@ -32,6 +32,8 @@ category-edit-btn-marker = Маркер
 
 category-edit-input-title = Отправьте название категории
 category-edit-input-desc = Отправьте описание для категории
-category-create-input-marker = Отправьте эмодзи для маркера
+category-edit-input-marker = Отправьте эмодзи для маркера
 category-edit-btn-delete-desc = Удалить описание
 category-edit-btn-delete-marker = Удалить маркер
+
+category-invalid-marker = Маркером может быть только эмодзи

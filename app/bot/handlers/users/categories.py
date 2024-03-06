@@ -9,7 +9,7 @@ from app.bot.handlers.dialogs import execute
 router = Router(name="categories")
 
 
-@router.message(Command("cat"))
+@router.message(Command("category"))
 async def category_cmd(msg: Message, command: CommandObject, dialog_manager: DialogManager,
                        i18n: I18nContext):
     args = command.args

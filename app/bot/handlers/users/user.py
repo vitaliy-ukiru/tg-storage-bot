@@ -1,13 +1,30 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import any_state
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram_dialog import DialogManager
+from aiogram_i18n import I18nContext
 
 from app.bot.handlers.dialogs import execute
 
 router = Router()
+
+HELP_TEXT = "help-text"
+SWITCH_INLINE_BTN = "inline-mode-btn"
+
+
+@router.message(Command("start"))
+@router.message(Command("help"))
+async def start_cmd(m: Message, i18n: I18nContext):
+    await m.answer(
+        text=i18n.get(HELP_TEXT),
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text=i18n.get(SWITCH_INLINE_BTN),
+                switch_inline_query="",
+            )]
+        ])
+    )
 
 
 @router.message(Command("locale"))

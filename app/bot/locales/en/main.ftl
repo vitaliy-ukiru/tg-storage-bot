@@ -42,3 +42,18 @@ invalid-category-id-hint = Invalid category id
 
 users-locale-select = Choose language. The current language is marked with a check mark.
 users-locale-chosen = English language chosen
+
+help-text =
+    To download a file, simply send it to the chat.
+    You can also use the inline mode to send a file by name.
+
+    Commands:
+    /list - Search files
+    /file - Open a file by its ID
+
+    /category - Editing a category
+    /create_category - Create a category
+
+    /locale - Change the bot language
+
+inline-mode-btn = Try inline mode in other chat

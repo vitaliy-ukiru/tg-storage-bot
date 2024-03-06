@@ -3,7 +3,6 @@ from aiogram.fsm.state import StatesGroup, State
 
 class FileViewSG(StatesGroup):
     main = State()
-    send_file = State()
 
 
 class FileEditSG(StatesGroup):

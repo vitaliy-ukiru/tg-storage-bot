@@ -43,11 +43,15 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
     if file.category is not None:
         category_name = file.category.title
 
+    content_type = content_type_from_category(file.type.category)
+    media = MediaAttachment(content_type, file_id=MediaId(file.remote_file_id))
+
     return dict(
         file=file,
         file_type_name=locale_file_type(file.type, i18n),
         file_category=category_name,
-        upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z")
+        upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z"),
+        file_media=media,
     )
 
 
@@ -73,6 +77,7 @@ async def _process_back_to_menu_click(__: CallbackQuery, _: Button, manager: Dia
 
 file_view_dialog = Dialog(
     Window(
+        DynamicMedia("file_media"),
         Topic(
             tl_file_view.topic.title(),
             FileTitle(
@@ -95,11 +100,6 @@ file_view_dialog = Dialog(
             Format("{upload_time}")
         ),
         Column(
-            SwitchTo(
-                Emoji("📥", tl_file_view.btn.send()),
-                id="send_file",
-                state=FileViewSG.send_file,
-            ),
             StartWithData(
                 Emoji("✏️", tl_file_view.btn.edit()),
                 id="edit_file",
@@ -116,13 +116,4 @@ file_view_dialog = Dialog(
         getter=_view_getter,
         state=FileViewSG.main,
     ),
-    Window(
-        DynamicMedia("file_media"),
-        Back(
-            tl_file_view.btn.menu(),
-            id="show_menu",
-        ),
-        getter=_media_getter,
-        state=FileViewSG.send_file,
-    )
 )

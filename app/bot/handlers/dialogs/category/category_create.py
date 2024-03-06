@@ -14,6 +14,7 @@ from app.bot.widgets.dao.base_dao import BaseDAO
 from app.bot.widgets.dao.widgets import TextInputProp
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import CANCEL_TEXT, Topic, BackI18n, TL
+from app.common.helpers import is_category_marker_valid
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.domain.exceptions.category import InvalidCategoryMarker
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -36,7 +37,7 @@ async def _to_menu(_: Message, __, manager: DialogManager, ___: str):
 
 
 async def _on_marker_input(m: Message, __, manager: DialogManager, value: str):
-    if not emoji.is_emoji(value):
+    if not is_category_marker_valid(value):
         i18n: I18nContext = manager.middleware_data["i18n"]
         await m.answer(i18n.get("category-invalid-marker"))
         return

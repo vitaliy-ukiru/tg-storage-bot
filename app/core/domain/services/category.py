@@ -4,6 +4,7 @@ from typing import Optional
 
 from emoji import is_emoji
 
+from app.common.helpers import is_category_marker_valid
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.dto.common import Pagination
 from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategoryMarker
@@ -43,7 +44,7 @@ class CategoryService(CategoryUsecase):
 
     async def save_category(self, dto: CreateCategoryDTO) -> Category:
         if dto.marker:
-            ensure_valid_marker(dto.marker)
+            ensure_valid_marker(dto.marker, UNDEFINED_CATEGORY_ID)
 
         c = Category(
             id=UNDEFINED_CATEGORY_ID,
@@ -105,7 +106,7 @@ class CategoryService(CategoryUsecase):
             category.is_favorite = dto.favorite
 
         if dto.marker is not None and not dto.delete_marker:
-            ensure_valid_marker(dto.marker)
+            ensure_valid_marker(dto.marker, category.id)
             category.marker = dto.marker
 
         if dto.delete_marker:
@@ -115,6 +116,6 @@ class CategoryService(CategoryUsecase):
         return category
 
 
-def ensure_valid_marker(marker: str) -> None:
-    if not is_emoji(marker):
-        raise InvalidCategoryMarker(0)
+def ensure_valid_marker(marker: str, category_id: CategoryId) -> None:
+    if not is_category_marker_valid(marker):
+        raise InvalidCategoryMarker(category_id)

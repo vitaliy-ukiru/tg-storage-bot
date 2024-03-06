@@ -6,8 +6,10 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.common import ManagedWidget
 from aiogram_dialog.widgets.input import TextInput
-from aiogram_dialog.widgets.kbd import Button, SwitchTo, Back, Group, Cancel, Row, Checkbox, \
+from aiogram_dialog.widgets.kbd import (
+    Button, SwitchTo, Back, Group, Cancel, Row, Checkbox,
     Column, ManagedCheckbox
+)
 from aiogram_dialog.widgets.text import Format, Multi
 from aiogram_i18n import I18nContext
 

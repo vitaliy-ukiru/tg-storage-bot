@@ -1,13 +1,18 @@
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup
+from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup, Row
 from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.text import Format
 
 from app.bot.states.dialogs import CategoryFindSG
-from app.bot.services.category_finders import (CategoryFinder, TitleCategoriesFinder,
-                                               PopularCategoriesFinder,
-                                               FavoriteCategoriesFinder, FindMode)
+from app.bot.services.category_finders import (
+    CategoryFinder,
+    TitleCategoriesFinder,
+    PopularCategoriesFinder,
+    FavoriteCategoriesFinder,
+    MarkedCategoriesFinder,
+    FindMode
+)
 from app.bot.widgets import BackTo
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, TL, BackToI18n
@@ -59,6 +64,15 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
     return _on_click
 
 
+async def _main_getter(user: User, category_service: CategoryUsecase, dialog_manager: DialogManager,
+                       **_):
+    finder = MarkedCategoriesFinder(dialog_manager, user, category_service)
+    marked_categories = await finder.find_categories()
+    return {
+        "markers": marked_categories
+    }
+
+
 ID_INPUT_TITLE = "find_title"
 
 tl = TL.category.find
@@ -85,8 +99,19 @@ find_category_dialog = Dialog(
                 on_click=_switch_mode_on_click(FindMode.title),
                 state=CategoryFindSG.input_title,
             ),
-            Cancel(CANCEL_TEXT),
         ),
+        Row(
+            Select(
+                Format("{item.marker}"),
+                id="select_category",
+                on_click=process_click_category,
+                type_factory=lambda c: CategoryId(int(c)),
+                item_id_getter=lambda category: category.id,
+                items="markers",
+            ),
+        ),
+        Cancel(CANCEL_TEXT),
+        getter=_main_getter,
         state=CategoryFindSG.main,
     ),
     Window(

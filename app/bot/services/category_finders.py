@@ -55,6 +55,16 @@ class TitleCategoriesFinder(CategoryFinder):
         )
 
 
+class MarkedCategoriesFinder(CategoryFinder):
+    async def find_categories(self) -> list[Category]:
+        return await self.category_service.find_categories(
+            CategoriesFindDTO(
+                user_id=self.user.id,
+                have_marker=True,
+            )
+        )
+
+
 class FindMode(Enum):
     popular = auto()
     favorite = auto()

@@ -20,7 +20,7 @@ async def main():
     parser = ArgumentParser(description="Telegram bot for stores files")
     parser.add_argument(
         "--config", help="path to config file",
-        default="configs/local.yaml"
+        default="configs/app.yaml"
     )
     args = parser.parse_args()
 

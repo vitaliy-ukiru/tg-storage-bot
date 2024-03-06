@@ -6,6 +6,7 @@ Settings in the yaml config file:
 env: "Launch environment. Valid values: dev, local, prod. Default local"
 bot:
   token: Token of BotAPI
+  locales_data_path: Path to locales data (not locales folder). Default "data/locales.yaml"
 db:
   password: Password [Optional]
   username: DB User

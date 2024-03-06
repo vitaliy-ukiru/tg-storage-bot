@@ -1,8 +1,0 @@
-db:
-  username: "py-tg"
-  database: "tg-storage"
-  password: "py-tg"
-  host: "localhost"
-env: local
-bot:
-  locales_data_path: "data/locales.yaml"

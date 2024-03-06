@@ -22,7 +22,7 @@ class DatabaseConfig(BaseSettings):
 
 class TelegramConfig(BaseSettings):
     token: SecretStr
-    locales_data_path: str
+    locales_data_path: str = "data/locales.yaml"
 
 
 class Config(YamlBaseSettings):

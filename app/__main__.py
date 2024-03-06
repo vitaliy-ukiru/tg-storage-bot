@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 
 from aiogram.fsm.storage.memory import MemoryStorage
 
+from app import __version__
 from app.bot.builder import BotBuilder
 from app.common.config import Config
 from app.core.domain.services.category import CategoryService
@@ -18,11 +19,15 @@ from app.infrastructure.db.repo.user import UserStorage
 
 async def main():
     parser = ArgumentParser(description="Telegram bot for stores files")
+    parser.add_argument("--version", "-V", action="store_true")
     parser.add_argument(
         "--config", help="path to config file",
         default="configs/app.yaml"
     )
     args = parser.parse_args()
+    if args.version:
+        print(f"Telegram Storage Bot v{__version__}")
+        exit(0)
 
     cfg = Config(_yaml_file=args.config)
 

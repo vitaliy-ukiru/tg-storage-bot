@@ -50,7 +50,6 @@ async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase,
         file=file,
         file_type_name=locale_file_type(file.type, i18n),
         file_category=category_name,
-        upload_time=file.created_at.strftime("%Y-%m-%d %H:%M:%S %Z"),
         file_media=media,
     )
 
@@ -95,10 +94,7 @@ file_view_dialog = Dialog(
             tl_file_view.topic.type(),
             Format("{file_type_name}")
         ),
-        Topic(
-            tl_file_view.topic.created(),
-            Format("{upload_time}")
-        ),
+        tl_file_view.topic.created(getter=lambda data: dict(upload_time=data["file"].created_at)),
         Column(
             StartWithData(
                 Emoji("✏️", tl_file_view.btn.edit()),

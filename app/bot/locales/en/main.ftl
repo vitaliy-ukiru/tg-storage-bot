@@ -36,6 +36,7 @@ files-not-found-hint = Not found
 missed-file-id-hint = Send file id as argument
 missed-category-id-hint = Send category id as argument
 
+file-already-exists = This file has already been uploaded
 invalid-file-id-hint = Invalid file id
 invalid-category-id-hint = Invalid category id
 

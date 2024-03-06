@@ -34,6 +34,7 @@ files-not-found-hint = Ничего не найден
 missed-file-id-hint = Отправьте ид файла аргументом
 missed-category-id-hint = Отправьте ид категории аргументом
 
+file-already-exists = Этот файл уже загружен
 invalid-file-id-hint = Некорректный ид файла
 invalid-category-id-hint = Некорректный ид категории
 

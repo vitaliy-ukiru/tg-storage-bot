@@ -10,6 +10,7 @@ from app.bot.filters.via_self import ViaSelfRestrict
 from app.bot.handlers.dialogs import execute
 from app.bot.states.dialogs import ALLOWED_STATES
 from app.bot.services import FileUploader
+from app.core.domain.exceptions.file import FileAlreadyExists
 from app.core.interfaces.usecase import FileUsecase
 
 router = Router()
@@ -22,7 +23,12 @@ async def command_list(msg: Message, dialog_manager: DialogManager):  # noqa
 
 
 @router.message(MediaFilter(), ViaSelfRestrict(), StateFilter(None))
-async def process_upload_file(msg: Message, file_service: FileUsecase, dialog_manager: DialogManager):
+async def process_upload_file(
+    msg: Message,
+    file_service: FileUsecase,
+    dialog_manager: DialogManager,
+    i18n: I18nContext,
+):
     # I don't have idea how get dialog_manager in filter
     # therefore will filter this and skip handler
     if dialog_manager.has_context():
@@ -31,8 +37,12 @@ async def process_upload_file(msg: Message, file_service: FileUsecase, dialog_ma
             raise SkipHandler
 
     uploader = FileUploader(file_service)
-    file = await uploader.upload(msg)
-    await execute.file_view(dialog_manager, file.id)
+    try:
+        file = await uploader.upload(msg)
+    except FileAlreadyExists:
+        await m.answer(i18n.get("file-already-exists"))
+    else:
+        await execute.file_view(dialog_manager, file.id)
 
 
 @router.message(Command("file"))

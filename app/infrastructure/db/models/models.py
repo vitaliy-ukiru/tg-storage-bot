@@ -7,7 +7,7 @@ __all__ = (
 from datetime import datetime
 from typing import Optional, cast
 
-from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false
+from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false, UniqueConstraint
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
@@ -86,8 +86,8 @@ class Category(Base):
 class File(Base):
     __tablename__ = "files"
     id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
-    remote_id: Mapped[str] = mapped_column(unique=True)
-    unique_id: Mapped[str] = mapped_column(unique=True)
+    remote_id: Mapped[str] = mapped_column()
+    unique_id: Mapped[str] = mapped_column()
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"))
     user: Mapped["User"] = relationship()
 
@@ -99,6 +99,9 @@ class File(Base):
 
     title: Mapped[str | None]
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    __table_args__ = (
+        UniqueConstraint('user_id', 'unique_id', name='_user_file_id_uc'),
+                      )
 
     def to_domain(self, with_category=True) -> DFile:
         file = DFile(

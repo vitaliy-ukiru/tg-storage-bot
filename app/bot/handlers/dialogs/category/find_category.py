@@ -1,8 +1,13 @@
+from aiogram.types import CallbackQuery
+from aiogram.utils.i18n import FSMI18nMiddleware
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup, Row
-from aiogram_dialog.widgets.kbd.button import OnClick
-from aiogram_dialog.widgets.text import Format
+from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup, Row, Group, \
+    ListGroup
+from aiogram_dialog.widgets.kbd.button import OnClick, Button
+from aiogram_dialog.widgets.text import Format, Const
+from aiogram_i18n import I18nContext
+from magic_filter import F
 
 from app.bot.states.dialogs import CategoryFindSG
 from app.bot.services.category_finders import (
@@ -16,6 +21,7 @@ from app.bot.services.category_finders import (
 from app.bot.widgets import BackTo
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, TL, BackToI18n
+from app.bot.widgets.i18n.template import I18N_KEY
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
@@ -57,6 +63,14 @@ async def _on_click_back(_, __, manager: DialogManager):
     del manager.dialog_data[FIND_MODE_KEY]
 
 
+async def _on_click_empty_marker(event: CallbackQuery, _, manager: DialogManager):
+    i18n: I18nContext = manager.middleware_data[I18N_KEY]
+    await event.answer(
+        i18n.get("about-category-marker"),
+        show_alert=True,
+    )
+
+
 def _switch_mode_on_click(mode: FindMode) -> OnClick:
     async def _on_click(_, __, manager: DialogManager):
         manager.dialog_data[FIND_MODE_KEY] = mode
@@ -64,12 +78,21 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
     return _on_click
 
 
+MARKERS_PER_ROW = 5
+
+
 async def _main_getter(user: User, category_service: CategoryUsecase, dialog_manager: DialogManager,
                        **_):
     finder = MarkedCategoriesFinder(dialog_manager, user, category_service)
     marked_categories = await finder.find_categories()
+
+    to_min = 0
+    if len(marked_categories) < MARKERS_PER_ROW:
+        to_min = MARKERS_PER_ROW - len(marked_categories)
+
     return {
-        "markers": marked_categories
+        "markers": marked_categories,
+        "to_min": to_min
     }
 
 
@@ -100,7 +123,7 @@ find_category_dialog = Dialog(
                 state=CategoryFindSG.input_title,
             ),
         ),
-        Row(
+        Group(
             Select(
                 Format("{item.marker}"),
                 id="select_category",
@@ -109,6 +132,18 @@ find_category_dialog = Dialog(
                 item_id_getter=lambda category: category.id,
                 items="markers",
             ),
+            ListGroup(
+                Button(
+                    Const(" "),
+                    id="show_markers_info",
+                    on_click=_on_click_empty_marker
+                ),
+                id="markers_padding",
+                item_id_getter=lambda _: "marker_padding",
+                items=lambda data: range(data["to_min"]),
+                when=F["to_min"] > 0
+            ),
+            width=5,
         ),
         Cancel(CANCEL_TEXT),
         getter=_main_getter,

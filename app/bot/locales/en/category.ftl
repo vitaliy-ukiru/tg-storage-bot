@@ -39,3 +39,7 @@ category-edit-btn-delete-desc = Delete description
 category-edit-btn-delete-marker = Delete marker
 
 category-invalid-marker = The marker can only be an emoji
+
+about-category-marker =
+    Markers are emoji-like marks for quick access to a category.
+    You can install it through the category change menu or during creation.

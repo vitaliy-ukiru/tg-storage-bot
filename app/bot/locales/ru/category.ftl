@@ -37,3 +37,7 @@ category-edit-btn-delete-desc = Удалить описание
 category-edit-btn-delete-marker = Удалить маркер
 
 category-invalid-marker = Маркером может быть только эмодзи
+
+about-category-marker =
+    Маркеры - это пометки в виде эмодзи для быстрого доступа к категории.
+    Установить её можно через меню изменения категории или при создании.

@@ -11,9 +11,7 @@ category-create-btn-desc = Описание
 category-create-btn-create = Создать
 category-create-btn-marker = Маркер
 
-category-select-target = Выберите источник категории
-category-select-btn-exists = Существующая
-category-select-btn-create = Создать
+category-find-btn-create = Создать
 
 category-find-select-method = Выберите способ поиска категории
 

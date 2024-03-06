@@ -13,9 +13,7 @@ category-create-btn-create = Create
 category-create-btn-marker = Marker
 
 
-category-select-target = Select category type
-category-select-btn-exists = Existing
-category-select-btn-create = Create new
+category-find-btn-create = Create new
 
 category-find-select-method = Select a category search method
 

@@ -1,15 +1,17 @@
+from typing import Any
+
 from aiogram.types import CallbackQuery
 from aiogram.utils.i18n import FSMI18nMiddleware
-from aiogram_dialog import Dialog, Window, DialogManager
+from aiogram_dialog import Dialog, Window, DialogManager, Data
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup, Row, Group, \
-    ListGroup
+    ListGroup, Start
 from aiogram_dialog.widgets.kbd.button import OnClick, Button
 from aiogram_dialog.widgets.text import Format, Const
 from aiogram_i18n import I18nContext
 from magic_filter import F
 
-from app.bot.states.dialogs import CategoryFindSG
+from app.bot.states.dialogs import CategoryFindSG, CategoryCreateSG
 from app.bot.services.category_finders import (
     CategoryFinder,
     TitleCategoriesFinder,
@@ -28,9 +30,7 @@ from app.core.interfaces.usecase.category import CategoryUsecase
 
 FIND_MODE_KEY = "find_mode"
 
-
-async def _process_input_title(_, __, manager: DialogManager, ___):
-    await manager.next()
+MARKERS_PER_ROW = 5
 
 
 async def _category_generic_getter(dialog_manager: DialogManager,
@@ -55,6 +55,10 @@ async def _category_generic_getter(dialog_manager: DialogManager,
     }
 
 
+async def _process_input_title(_, __, manager: DialogManager, ___):
+    await manager.next()
+
+
 async def process_click_category(_, __, manager: DialogManager, item_id: CategoryId):
     await manager.done(dict(category_id=int(item_id)))
 
@@ -77,8 +81,9 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
 
     return _on_click
 
-
-MARKERS_PER_ROW = 5
+async def _process_result(_: Data, result: Any, manager: DialogManager):
+    if result:
+        await manager.done(dict(category_id=result["category_id"]))
 
 
 async def _main_getter(user: User, category_service: CategoryUsecase, dialog_manager: DialogManager,
@@ -100,6 +105,7 @@ ID_INPUT_TITLE = "find_title"
 
 tl = TL.category.find
 
+# Input: allowed_create - bool [Optional]
 find_category_dialog = Dialog(
     Window(
         tl.select.method(),
@@ -121,6 +127,12 @@ find_category_dialog = Dialog(
                 id="category_exists_find",
                 on_click=_switch_mode_on_click(FindMode.title),
                 state=CategoryFindSG.input_title,
+            ),
+            Start(
+                Emoji("🆕", tl.btn.create()),
+                id="category_create",
+                state=CategoryCreateSG.input_title,
+                when=F["start_data"]["allow_create"]
             ),
         ),
         Group(
@@ -145,6 +157,7 @@ find_category_dialog = Dialog(
             ),
             width=5,
         ),
+
         Cancel(CANCEL_TEXT),
         getter=_main_getter,
         state=CategoryFindSG.main,
@@ -177,5 +190,6 @@ find_category_dialog = Dialog(
         ),
         state=CategoryFindSG.select,
         getter=_category_generic_getter,
-    )
+    ),
+    on_process_result=_process_result,
 )

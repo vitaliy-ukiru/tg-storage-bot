@@ -7,8 +7,8 @@ from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 
 from app.bot.filters.media import MediaFilter
 from app.bot.middlewares.user_manager import USER_KEY
-from app.bot.states.dialogs import FileEditSG, CategorySelectSG
 from app.bot.services import FileCredentials
+from app.bot.states.dialogs import FileEditSG, CategoryFindSG
 from app.bot.widgets import StartWithData
 from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import CANCEL_TEXT, CLOSE_TEXT, BackToI18n, TemplateProxy
@@ -17,6 +17,7 @@ from app.core.domain.models.user import User
 from app.core.interfaces.usecase.file import FileUsecase
 
 tl = TemplateProxy("file-edit")
+
 
 async def _process_new_title(_, __, manager: DialogManager, title: str):
     file_id: FileId = manager.start_data["file_id"]
@@ -62,7 +63,7 @@ async def _process_result(_, result: Any, manager: DialogManager):
 
 async def _set_category_getter(dialog_manager: DialogManager, **_):
     file_id: int = dialog_manager.start_data["file_id"]
-    return dict(file_id=file_id)
+    return dict(file_id=file_id, allow_create=True)
 
 
 file_edit_dialog = Dialog(
@@ -77,7 +78,7 @@ file_edit_dialog = Dialog(
             StartWithData(
                 Emoji("🗂", tl.category()),
                 id="file_edit_c",
-                state=CategorySelectSG.start,
+                state=CategoryFindSG.main,
                 getter=_set_category_getter
             ),
             SwitchTo(

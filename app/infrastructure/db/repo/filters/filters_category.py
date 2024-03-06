@@ -4,6 +4,7 @@ from ...models import Category
 
 categories = Container()
 
+
 @categories("user_id")
 def _user(value: UserId | int):
     return Category.user_id == value
@@ -17,3 +18,11 @@ def _title(title: str):
 @categories("favorites")
 def _favorites(val: bool):
     return Category.is_favorite == val
+
+
+@categories("have_marker")
+def _have_marker(val: bool):
+    if not val:
+        return Category.marker.is_(None)
+
+    return Category.marker.isnot(None)

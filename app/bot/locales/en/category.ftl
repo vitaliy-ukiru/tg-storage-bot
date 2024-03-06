@@ -1,12 +1,17 @@
 category-title = Title
 category-desc = Description
+category-marker = Marker
 
 category-create-input-title = Enter the category name
 category-create-input-desc = Enter a description for the category
+category-create-input-marker = Enter a emoji for marker
+
 
 category-create-btn-title = Title
 category-create-btn-desc = Description
 category-create-btn-create = Create
+category-create-btn-marker = Marker
+
 
 category-select-target = Select category type
 category-select-btn-exists = Existing
@@ -24,7 +29,13 @@ category-find-result = List of categories found
 category-edit-btn-title = Title
 category-edit-btn-desc = Description
 category-edit-btn-favorite = Favorite
+category-edit-btn-marker = Marker
+
 
 category-edit-input-title = Enter category name
 category-edit-input-desc = Enter a description for the category
+category-edit-input-marker = Enter a emoji for marker
 category-edit-btn-delete-desc = Delete description
+category-edit-btn-delete-marker = Delete marker
+
+category-invalid-marker = The marker can only be an emoji

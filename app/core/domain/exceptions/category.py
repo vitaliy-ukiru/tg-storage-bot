@@ -33,3 +33,7 @@ class CategoryViolation(CategoryException):
     def __init__(self, category_id: CategoryId, user: UserId) -> None:
         self.user = user
         super().__init__(category_id, f"user don't own category {user!r}")
+
+
+class InvalidCategoryMarker(StaticCategoryException):
+    MESSAGE = "invalid category marker"

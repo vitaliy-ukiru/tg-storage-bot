@@ -2,15 +2,14 @@ from functools import wraps
 from typing import Optional, Any, Callable, TypeAlias, Awaitable
 
 from aiogram.fsm.state import State
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import Message
 from aiogram_dialog import Dialog, Window, DialogManager, ChatEvent
 from aiogram_dialog.widgets.common import ManagedWidget
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import (
-    Button, SwitchTo, Back, Group, Cancel, Row, Checkbox,
-    Column, ManagedCheckbox
+    Button, SwitchTo, Back, Group, Cancel, Row, Column
 )
-from aiogram_dialog.widgets.text import Format, Multi
+from aiogram_dialog.widgets.text import Format, Multi, Case, Const
 from aiogram_i18n import I18nContext
 
 from app.bot.middlewares.user_manager import USER_KEY
@@ -25,8 +24,6 @@ from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase.category import CategoryUsecase
 
-_ON_START_SET_DATA = "__on_startup_setup$$$$$"
-_FAVORITE_ID = "favorite"
 MARKER_FROM_REACTION = "new_marker_from_reaction"
 MARKER_MESSAGE_ID = "marker_message_id"
 DELETE_MARKER = "\xDEDELETE_MARKER"
@@ -127,11 +124,10 @@ async def _input_marker_handler(m: Message, __, manager: DialogManager, text: st
         await manager.switch_to(CategoryEditSG.main)
 
 
-async def _process_click_favorite(event: CallbackQuery, m: ManagedCheckbox, manager: DialogManager):
-    if event.data == _ON_START_SET_DATA:
-        return
+async def _process_click_favorite(_, __, manager: DialogManager):
+    category = await _get_category(manager)
 
-    await _update_category(manager, favorite=m.is_checked())
+    await _update_category(manager, favorite=not category.is_favorite)
     await manager.switch_to(CategoryEditSG.main)
 
 
@@ -161,7 +157,7 @@ async def _process_marker_bg(dialog_manager: DialogManager):
         marker=marker,
         delete_marker=marker == DELETE_MARKER
     )
-      
+
     del dialog_manager.dialog_data[MARKER_FROM_REACTION]
     del dialog_manager.dialog_data[MARKER_MESSAGE_ID]
 
@@ -170,7 +166,7 @@ async def menu_getter(dialog_manager: DialogManager, **_):
     await _process_marker_bg(dialog_manager)
 
     category = await _get_category(dialog_manager)
-    return dict(title=category.title, desc=category.description, marker=category.marker)
+    return dict(category=category, is_favorite=category.is_favorite)
 
 
 async def _desc_window_getter(dialog_manager: DialogManager, **_):
@@ -186,32 +182,17 @@ async def _marker_window_getter(dialog_manager: DialogManager, **_):
 async def _on_start(start_data: dict, manager: DialogManager):
     dao = UpdateDAO(manager)
     dao.category_id = start_data["category_id"]
-    category = await dao.get_category()
-
-    if category.is_favorite:
-        m: ManagedCheckbox = manager.find(_FAVORITE_ID)
-        await m.widget.set_checked(
-            # for identification and not update in service
-            # see _process_click_favorite
-            manager.event.model_copy(
-                update=dict(data=_ON_START_SET_DATA)
-            ),
-            True,
-            manager
-        )
 
 
 tl = TL.category.edit
-
-favorite_template = tl.btn.favorite()
 
 category_edit_dialog = Dialog(
     Window(
         Multi(
             tl.tag(),
-            Topic(TL.category.marker(), Format("{marker}"), when="marker"),
-            Topic(TL.category.title(), Format("{title}")),
-            Topic(TL.category.desc(), Format("{desc}"), when="desc")
+            Topic(TL.category.marker(), Format("{category.marker}"), when="marker"),
+            Topic(TL.category.title(), Format("{category.title}")),
+            Topic(TL.category.desc(), Format("{category.description}"), when="desc")
         ),
         Group(
             Row(
@@ -227,12 +208,20 @@ category_edit_dialog = Dialog(
                 ),
             ),
 
-            Checkbox(
-                Emoji("✅", favorite_template),
-                Emoji("❌", favorite_template),
-                id=_FAVORITE_ID,
-                on_state_changed=_process_click_favorite
-
+            Button(
+                Multi(
+                    Case(
+                        {
+                            True: Const("✅"),
+                            False: Const("❌"),
+                        },
+                        selector="is_favorite"
+                    ),
+                    tl.btn.favorite(),
+                    sep=" ",
+                ),
+                id="favorite_btn",
+                on_click=_process_click_favorite
             ),
             SwitchTo(
                 Emoji("🟢", tl.btn.marker()),

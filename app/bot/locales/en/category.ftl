@@ -41,3 +41,5 @@ category-invalid-marker = The marker can only be an emoji
 about-category-marker =
     Markers are emoji-like marks for quick access to a category.
     You can install it through the category change menu or during creation.
+
+category-not-found = Category not found

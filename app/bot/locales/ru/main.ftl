@@ -30,6 +30,7 @@ file-title = Файл № { $file_id }
 
 files-not-found-details = По такому запросу файлов не найдено
 files-not-found-hint = Ничего не найден
+file-not-found = Файл не найден
 
 missed-file-id-hint = Отправьте ид файла аргументом
 missed-category-id-hint = Отправьте ид категории аргументом
@@ -56,3 +57,5 @@ help-text =
     /locale - Изменить язык бота
 
 inline-mode-btn = Попробуйте встроенный режим в другом чате
+file-access-denied = У вас нет доступа к этом файлу
+category-access-denied = У вас нет доступа к этой категории

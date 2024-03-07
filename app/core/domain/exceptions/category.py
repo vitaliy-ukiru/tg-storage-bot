@@ -1,4 +1,4 @@
-from app.core.domain.exceptions.base import DomainException
+from app.core.domain.exceptions.base import DomainException, AccessDenied
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.user import UserId
 
@@ -27,7 +27,7 @@ class CategoryNotFound(StaticCategoryException):
     MESSAGE = "category not found"
 
 
-class CategoryViolation(CategoryException):
+class CategoryAccessDenied(CategoryException, AccessDenied):
     user: UserId
 
     def __init__(self, category_id: CategoryId, user: UserId) -> None:

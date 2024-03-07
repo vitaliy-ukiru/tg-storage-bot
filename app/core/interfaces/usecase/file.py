@@ -23,7 +23,7 @@ class FileSaver(Protocol):
 
 class FileGetter(Protocol):
     @abstractmethod
-    async def get_file(self, file_id: FileId, user_id: Optional[UserId] = None) -> File:
+    async def get_file(self, file_id: FileId, user_id: UserId) -> File:
         raise NotImplementedError
 
 

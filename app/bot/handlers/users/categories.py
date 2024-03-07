@@ -5,6 +5,7 @@ from aiogram_dialog import DialogManager
 from aiogram_i18n import I18nContext
 
 from app.bot.handlers.dialogs import execute
+from app.core.domain.exceptions.category import CategoryNotFound
 
 router = Router(name="categories")
 

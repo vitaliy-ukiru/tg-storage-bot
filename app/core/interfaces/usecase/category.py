@@ -24,13 +24,13 @@ class CategorySaver(Protocol):
 
 class CategoryGetter(Protocol):
     @abc.abstractmethod
-    async def get_category(self, category_id: CategoryId) -> Category:
+    async def get_category(self, category_id: CategoryId, user_id: UserId) -> Category:
         raise NotImplementedError
 
 
 class CategoryUpdater(Protocol):
     @abc.abstractmethod
-    async def update_category(self, dto: UpdateCategoryDTO) -> Category:
+    async def update_category(self, dto: UpdateCategoryDTO, user_id: UserId) -> Category:
         raise NotImplementedError
 
 

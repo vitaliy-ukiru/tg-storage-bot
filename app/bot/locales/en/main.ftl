@@ -32,6 +32,7 @@ file-title = File № { $file_id }
 
 files-not-found-details = No files found for this request
 files-not-found-hint = Not found
+file-not-found = File not found
 
 missed-file-id-hint = Send file id as argument
 missed-category-id-hint = Send category id as argument
@@ -58,3 +59,6 @@ help-text =
     /locale - Change the bot language
 
 inline-mode-btn = Try inline mode in other chat
+
+file-access-denied = You do not have access to this file
+category-access-denied = You do not have access to this category

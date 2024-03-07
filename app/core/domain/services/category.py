@@ -7,7 +7,8 @@ from emoji import is_emoji
 from app.common.helpers import is_category_marker_valid
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.dto.common import Pagination
-from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategoryMarker
+from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategoryMarker, \
+    CategoryAccessDenied
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.domain.services.internal import convert_to_filter_fields
@@ -18,6 +19,11 @@ from app.core.interfaces.repository.category import (
 from app.core.interfaces.usecase.category import CategoryUsecase
 
 UNDEFINED_CATEGORY_ID = CategoryId(0)
+
+
+def _ensure_owner(category: Category, user_id: UserId):
+    if category.user_id != user_id:
+        raise CategoryAccessDenied(category.id, user_id)
 
 
 class CategoryService(CategoryUsecase):
@@ -58,11 +64,12 @@ class CategoryService(CategoryUsecase):
         c.id = await self._saver.save_category(c)
         return c
 
-    async def get_category(self, category_id: CategoryId) -> Category:
+    async def get_category(self, category_id: CategoryId, user_id: UserId) -> Category:
         c = await self._getter.get_category(category_id)
         if c is None:
             raise CategoryNotFound(category_id)
 
+        _ensure_owner(c, user_id)
         return c
 
     async def find_categories(
@@ -91,8 +98,9 @@ class CategoryService(CategoryUsecase):
         )
         return categories
 
-    async def update_category(self, dto: UpdateCategoryDTO) -> Category:
+    async def update_category(self, dto: UpdateCategoryDTO, user_id: UserId) -> Category:
         category = await self.get_category(dto.category_id)
+        _ensure_owner(category, user_id)
         if dto.title is not None:
             category.title = dto.title
 

@@ -4,7 +4,7 @@ from typing import Optional
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
-from app.core.domain.exceptions.category import CategoryViolation
+from app.core.domain.exceptions.category import CategoryAccessDenied
 from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId, RemoteFileId
@@ -57,9 +57,7 @@ class FileService(FileUsecase):
         )
 
         if dto.category_id is not None:
-            category = await self._category_getter.get_category(CategoryId(dto.category_id))
-            if category.user_id != file.user_id:
-                raise CategoryViolation(category.id, file.user_id)
+            category = await self._category_getter.get_category(CategoryId(dto.category_id), file.user_id)
             file.category = category
 
         file.id = await self._saver.save_file(file)
@@ -77,10 +75,7 @@ class FileService(FileUsecase):
         file = await self.get_file(file_id, user_id)
         _ensure_owner(file, user_id)
 
-        category = await self._category_getter.get_category(category_id)
-        if user_id != category.user_id:
-            raise CategoryViolation(category_id, user_id)
-
+        category = await self._category_getter.get_category(category_id, user_id)
         file.category = category
         await self._updater.update_file(file)
         return file

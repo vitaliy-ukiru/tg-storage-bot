@@ -99,7 +99,7 @@ class CategoryService(CategoryUsecase):
         return categories
 
     async def update_category(self, dto: UpdateCategoryDTO, user_id: UserId) -> Category:
-        category = await self.get_category(dto.category_id)
+        category = await self.get_category(dto.category_id, user_id)
         _ensure_owner(category, user_id)
         if dto.title is not None:
             category.title = dto.title

@@ -27,6 +27,9 @@ from app.core.interfaces.usecase.category import CategoryUsecase
 
 _ON_START_SET_DATA = "__on_startup_setup$$$$$"
 _FAVORITE_ID = "favorite"
+MARKER_FROM_REACTION = "new_marker_from_reaction"
+MARKER_MESSAGE_ID = "marker_message_id"
+DELETE_MARKER = "\xDEDELETE_MARKER"
 
 
 class UpdateDAO(BaseDAO):
@@ -142,7 +145,30 @@ async def _process_delete_marker(_, __, manager: DialogManager):
     await _update_category(manager, delete_marker=True)
 
 
+async def _process_marker_bg(dialog_manager: DialogManager):
+    message_id = dialog_manager.dialog_data.get(MARKER_MESSAGE_ID)
+    marker = dialog_manager.dialog_data.get(MARKER_FROM_REACTION)
+
+    if message_id is None or marker is None:
+        return
+
+    event_message_id = dialog_manager.current_stack().last_message_id
+    if message_id != event_message_id:
+        return
+
+    await _update_category(
+        dialog_manager,
+        marker=marker,
+        delete_marker=marker == DELETE_MARKER
+    )
+      
+    del dialog_manager.dialog_data[MARKER_FROM_REACTION]
+    del dialog_manager.dialog_data[MARKER_MESSAGE_ID]
+
+
 async def menu_getter(dialog_manager: DialogManager, **_):
+    await _process_marker_bg(dialog_manager)
+
     category = await _get_category(dialog_manager)
     return dict(title=category.title, desc=category.description, marker=category.marker)
 
@@ -182,6 +208,7 @@ favorite_template = tl.btn.favorite()
 category_edit_dialog = Dialog(
     Window(
         Multi(
+            tl.tag(),
             Topic(TL.category.marker(), Format("{marker}"), when="marker"),
             Topic(TL.category.title(), Format("{title}")),
             Topic(TL.category.desc(), Format("{desc}"), when="desc")
@@ -199,6 +226,7 @@ category_edit_dialog = Dialog(
                     state=CategoryEditSG.desc
                 ),
             ),
+
             Checkbox(
                 Emoji("✅", favorite_template),
                 Emoji("❌", favorite_template),

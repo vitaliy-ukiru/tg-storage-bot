@@ -24,6 +24,7 @@ category-find-btn-title = Search by name
 category-find-input-title = Enter part of the category name
 category-find-result = List of categories found
 
+category-edit-tag = Editing a category:
 category-edit-btn-title = Title
 category-edit-btn-desc = Description
 category-edit-btn-favorite = Favorite

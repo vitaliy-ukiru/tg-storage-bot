@@ -22,6 +22,7 @@ category-find-btn-title = Поиск по названию
 category-find-input-title = Введите часть названия категории
 category-find-result = Список найденных категорий
 
+category-edit-tag = Редактирование категории:
 category-edit-btn-title = Название
 category-edit-btn-desc = Описание
 category-edit-btn-favorite = Избранное

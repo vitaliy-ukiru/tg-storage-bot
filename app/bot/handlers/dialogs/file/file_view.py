@@ -30,7 +30,7 @@ async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogMa
     i18n: I18nContext = manager.middleware_data[I18N_KEY]
 
     await file_service.delete_file(file_id, user.id)
-    await call.message.edit_text(i18n.get(str(tl_file_view.removed)))  # type: ignore
+    await call.message.edit_caption(i18n.get(str(tl_file_view.removed)))  # type: ignore
     await manager.done()
 
 
@@ -59,21 +59,6 @@ async def _file_edit_getter(dialog_manager: DialogManager, **_):
     return dict(file_id=file_id)
 
 
-async def _media_getter(dialog_manager: DialogManager, file_service: FileUsecase, **_):
-    file_id: FileId = dialog_manager.start_data["file_id"]
-    user: User = dialog_manager.middleware_data[USER_KEY]
-
-    file = await file_service.get_file(file_id, user.id)
-    content_type = content_type_from_category(file.type.category)
-    media = MediaAttachment(content_type, file_id=MediaId(file.remote_file_id))
-    return dict(file_media=media, file_id=file_id)
-
-
-async def _process_back_to_menu_click(__: CallbackQuery, _: Button, manager: DialogManager):
-    file_id: int = manager.start_data["file_id"]
-    await manager.start(FileViewSG.main, dict(file_id=file_id), mode=StartMode.RESET_STACK)
-
-
 file_view_dialog = Dialog(
     Window(
         DynamicMedia("file_media"),
@@ -94,7 +79,9 @@ file_view_dialog = Dialog(
             tl_file_view.topic.type(),
             Format("{file_type_name}")
         ),
-        tl_file_view.topic.created(getter=lambda data: dict(upload_time=data["file"].created_at)),
+        tl_file_view.topic.created(
+            getter=lambda data: dict(upload_time=data["file"].created_at)
+        ),
         Column(
             StartWithData(
                 Emoji("✏️", tl_file_view.btn.edit()),

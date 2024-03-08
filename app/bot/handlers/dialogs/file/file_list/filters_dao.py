@@ -1,19 +1,19 @@
 from typing import Optional
 
-from app.bot.handlers.dialogs.file.file_list.common import (
+from app.bot.widgets.dao import DialogDataProp, BaseDAO
+from app.bot.widgets.dao.widgets import TextInputProp, MultiselectProp
+
+from app.core.domain.dto.file import FilesFindDTO
+from app.core.domain.models.category import CategoryId
+from app.core.domain.models.file import FileCategory
+from app.core.domain.models.user import UserId
+
+from .common import (
     ID_INPUT_TITLE,
     ID_SELECT_FILE_TYPES,
     CATEGORY_ID_KEY,
     FiltersDict
 )
-from app.bot.widgets.dao import DialogDataProp
-from app.bot.widgets.dao.base_dao import BaseDAO
-from app.bot.widgets.dao.widgets import TextInputProp
-from app.bot.widgets.dao.widgets.multiselect import MultiselectProp
-from app.core.domain.dto.file import FilesFindDTO
-from app.core.domain.models.category import CategoryId
-from app.core.domain.models.file import FileCategory
-from app.core.domain.models.user import UserId
 
 
 class FiltersDAO(BaseDAO):

@@ -12,13 +12,13 @@ from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
 from aiogram_i18n import I18nContext
 from magic_filter import F
 
-from app.bot.middlewares.user_manager import USER_KEY
+from app.bot.middlewares import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
-from app.bot.utils.file_type_i18n import get_file_category_name
-from app.bot.widgets.emoji import Emoji
+from app.bot.utils import get_file_category_name
+from app.bot.widgets import Emoji
 from app.bot.widgets.i18n import Topic
 from app.core.domain.models.user import User
-from app.core.interfaces.usecase.category import CategoryUsecase
+from app.core.interfaces.usecase import CategoryUsecase
 from .common import tl_file_list
 from .filters_dao import FiltersDAO
 

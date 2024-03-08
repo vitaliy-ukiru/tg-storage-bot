@@ -1,5 +1,4 @@
-from operator import itemgetter
-from typing import Dict, Self, Callable, Union, Awaitable
+from typing import Dict, Self, Callable, Union
 
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.common import WhenCondition

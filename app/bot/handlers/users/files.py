@@ -5,12 +5,11 @@ from aiogram.types import Message
 from aiogram_dialog import DialogManager
 from aiogram_i18n import I18nContext
 
-from app.bot.filters.media import MediaFilter
-from app.bot.filters.via_self import ViaSelfRestrict
+from app.bot.filters import MediaFilter, ViaSelfRestrict
 from app.bot.handlers.dialogs import execute
 from app.bot.services import FileUploader
 from app.bot.states.dialogs import ALLOWED_STATES, CategoryEditSG
-from app.core.domain.exceptions.file import FileAlreadyExists, FileNotFound
+from app.core.domain.exceptions.file import FileAlreadyExists
 from app.core.domain.models.category import CategoryId
 from app.core.interfaces.usecase import FileUsecase
 

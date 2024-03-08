@@ -2,8 +2,6 @@ from dataclasses import asdict
 from datetime import datetime
 from typing import Optional
 
-from emoji import is_emoji
-
 from app.common.helpers import is_category_marker_valid
 from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
 from app.core.domain.dto.common import Pagination
@@ -16,7 +14,7 @@ from app.core.interfaces.repository.category import (
     CategoryRepoSaver, CategoryRepoGetter, CategoryRepoFinder, CategoryRepoUpdater,
     CategoryRepoUsageRater
 )
-from app.core.interfaces.usecase.category import CategoryUsecase
+from app.core.interfaces.usecase import CategoryUsecase
 
 UNDEFINED_CATEGORY_ID = CategoryId(0)
 

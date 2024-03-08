@@ -7,14 +7,11 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from app import __version__
 from app.bot.builder import BotBuilder
 from app.common.config import Config
-from app.core.domain.services.category import CategoryService
-from app.core.domain.services.file import FileService
-from app.core.domain.services.user import UserService
+from app.core.domain.services import CategoryService, FileService, UserService
 from app.infrastructure.adapters.locale_provider import build_locale_provider
 from app.infrastructure.db import connect
-from app.infrastructure.db.repo.category import CategoryStorageGateway
-from app.infrastructure.db.repo.file import FileStorageGateway, FileCategoryUsageRater
-from app.infrastructure.db.repo.user import UserStorage
+from app.infrastructure.db.repo import (CategoryStorageGateway, FileStorageGateway,
+                                        FileCategoryUsageRater, UserStorageGateway)
 
 
 async def main():
@@ -43,7 +40,7 @@ async def main():
     locale_provider = build_locale_provider(cfg.bot.locales_data_path)
 
     # ugly, but I think it will better in future
-    user_repo = UserStorage(session_maker)
+    user_repo = UserStorageGateway(session_maker)
     user_service = UserService(
         saver=user_repo,
         getter=user_repo,

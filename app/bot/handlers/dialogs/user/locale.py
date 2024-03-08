@@ -9,8 +9,7 @@ from aiogram_i18n import I18nContext
 
 from app.bot.services.locale import LocaleDisplayer
 from app.bot.states.dialogs import UserChangeLocaleSG
-from app.bot.widgets.i18n import TL, CloseI18n
-from app.bot.widgets.i18n.template import I18N_KEY
+from app.bot.widgets.i18n import TL, CloseI18n, I18N_KEY
 
 ID_SELECT_LOCALE = "select_lang"
 

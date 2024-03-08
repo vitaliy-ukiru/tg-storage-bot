@@ -1,12 +1,12 @@
 from operator import itemgetter
-from typing import Dict, Any, Union, Callable
+from typing import Dict, Union, Callable
 
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.text import Case, Text
 from aiogram_dialog.widgets.text.multi import Selector
 from magic_filter import MagicFilter
 
-from .template import ParamsGetterVariant, Template
+from .template import Template
 
 
 def _magic_filter_field(f: MagicFilter):

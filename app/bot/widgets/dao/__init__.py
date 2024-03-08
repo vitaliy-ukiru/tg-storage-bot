@@ -1,12 +1,4 @@
-__all__ = (
-    'ManagedDataObject',
-    'ManagerProviderVariant',
-    'ManagerFieldProvider',
-    'DialogManagerFieldProvider',
-    'DialogDataProp',
-    'DialogDataRequiredProp',
-    'get_manager'
-)
+
 
 from .base import (
     ManagedDataObject,
@@ -16,4 +8,18 @@ from .base import (
     DialogManagerFieldProvider,
     get_manager
 )
+from .base_dao import BaseDAO
 from .dialog_data import DialogDataProp, DialogDataRequiredProp
+
+__all__ = (
+    ManagedDataObject,
+    ManagerProviderVariant,
+    ManagerFieldProvider,
+    DialogManagerFieldProvider,
+    get_manager,
+
+    BaseDAO,
+
+    DialogDataProp,
+    DialogDataRequiredProp,
+)

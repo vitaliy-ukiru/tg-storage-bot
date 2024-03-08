@@ -1,11 +1,8 @@
 from aiogram.fsm.state import StatesGroup, State
 from aiogram_dialog import Dialog, Window
-from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import SwitchTo, Row, Group
+from aiogram_dialog.widgets.kbd import SwitchTo, Group
 from aiogram_dialog.widgets.text import Const
-from aiogram_i18n.types import InputMediaPhoto
 
-from app.bot.filters.media import MediaFilter
 from app.bot.states.dialogs import FileListSG, CategoryCreateSG
 
 

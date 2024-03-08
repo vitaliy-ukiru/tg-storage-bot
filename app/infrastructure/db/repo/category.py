@@ -1,3 +1,7 @@
+__all__ = (
+    'CategoryStorageGateway',
+)
+
 from typing import Optional, Sequence
 
 from sqlalchemy import select

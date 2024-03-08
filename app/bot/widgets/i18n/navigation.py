@@ -4,7 +4,7 @@ from aiogram.fsm.state import State
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.kbd import Back, Cancel
 from aiogram_dialog.widgets.kbd.button import OnClick
-from aiogram_dialog.widgets.text import Text, Const
+from aiogram_dialog.widgets.text import Text
 
 from app.bot.widgets import BackTo
 from app.bot.widgets.emoji import Emoji

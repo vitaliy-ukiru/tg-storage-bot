@@ -1,24 +1,21 @@
 from aiogram.types import CallbackQuery
-from aiogram_dialog import Dialog, Window, DialogManager, StartMode
+from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Button, Back
+from aiogram_dialog.widgets.kbd import Column, Button
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.text import Format
 from aiogram_i18n import I18nContext
 from magic_filter import F
 
-from app.bot.middlewares.user_manager import USER_KEY
-from app.bot.states.dialogs import FileViewSG, FileEditSG
-from app.bot.utils.file_type_i18n import locale_file_type
+from app.bot.middlewares import USER_KEY
 from app.bot.services import content_type_from_category
-from app.bot.widgets import StartWithData
-from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import TemplateProxy, Topic, CloseI18n
-from app.bot.widgets.i18n.file_title import FileTitle
-from app.bot.widgets.i18n.template import I18N_KEY
+from app.bot.states.dialogs import FileViewSG, FileEditSG
+from app.bot.utils import locale_file_type
+from app.bot.widgets import StartWithData, Emoji
+from app.bot.widgets.i18n import TemplateProxy, Topic, CloseI18n, FileTitle, I18N_KEY
 from app.core.domain.models.file import FileId
 from app.core.domain.models.user import User
-from app.core.interfaces.usecase.file import FileUsecase
+from app.core.interfaces.usecase import FileUsecase
 
 tl_file_view = TemplateProxy('file-view')
 

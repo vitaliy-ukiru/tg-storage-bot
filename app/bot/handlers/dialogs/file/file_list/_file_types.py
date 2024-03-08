@@ -13,7 +13,7 @@ from aiogram_dialog.widgets.text import Format
 from aiogram_i18n import I18nContext
 
 from app.bot.states.dialogs import FileListSG
-from app.bot.utils.file_type_i18n import file_categories_with_names
+from app.bot.utils import file_categories_with_names
 from app.bot.widgets.i18n import BACK_TEXT
 from app.core.domain.models.file import FileCategory
 from .common import ID_SELECT_FILE_TYPES, tl_file_list

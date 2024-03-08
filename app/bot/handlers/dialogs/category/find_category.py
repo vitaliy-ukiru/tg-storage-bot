@@ -1,17 +1,23 @@
 from typing import Any
 
 from aiogram.types import CallbackQuery
-from aiogram.utils.i18n import FSMI18nMiddleware
 from aiogram_dialog import Dialog, Window, DialogManager, Data
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
-from aiogram_dialog.widgets.kbd import Column, SwitchTo, Select, Cancel, ScrollingGroup, Row, Group, \
-    ListGroup, Start
+from aiogram_dialog.widgets.kbd import (
+    Column,
+    SwitchTo,
+    Select,
+    Cancel,
+    ScrollingGroup,
+    Group,
+    ListGroup,
+    Start
+)
 from aiogram_dialog.widgets.kbd.button import OnClick, Button
 from aiogram_dialog.widgets.text import Format, Const
 from aiogram_i18n import I18nContext
 from magic_filter import F
 
-from app.bot.states.dialogs import CategoryFindSG, CategoryCreateSG
 from app.bot.services.category_finders import (
     CategoryFinder,
     TitleCategoriesFinder,
@@ -20,13 +26,12 @@ from app.bot.services.category_finders import (
     MarkedCategoriesFinder,
     FindMode
 )
-from app.bot.widgets import BackTo
-from app.bot.widgets.emoji import Emoji
-from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, TL, BackToI18n
-from app.bot.widgets.i18n.template import I18N_KEY
+from app.bot.states.dialogs import CategoryFindSG, CategoryCreateSG
+from app.bot.widgets import BackTo, Emoji
+from app.bot.widgets.i18n import BACK_TEXT, CANCEL_TEXT, TL, BackToI18n, I18N_KEY
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.user import User
-from app.core.interfaces.usecase.category import CategoryUsecase
+from app.core.interfaces.usecase import CategoryUsecase
 
 FIND_MODE_KEY = "find_mode"
 
@@ -80,6 +85,7 @@ def _switch_mode_on_click(mode: FindMode) -> OnClick:
         manager.dialog_data[FIND_MODE_KEY] = mode
 
     return _on_click
+
 
 async def _process_result(_: Data, result: Any, manager: DialogManager):
     if result:

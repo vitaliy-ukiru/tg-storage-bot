@@ -12,17 +12,16 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Format, Multi, Case, Const
 from aiogram_i18n import I18nContext
 
-from app.bot.middlewares.user_manager import USER_KEY
+from app.bot.middlewares import USER_KEY
 from app.bot.states.dialogs import CategoryEditSG
-from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp
-from app.bot.widgets.dao.base_dao import BaseDAO
-from app.bot.widgets.emoji import Emoji
+from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp, BaseDAO
+from app.bot.widgets import Emoji
 from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, TL, Topic, BackToI18n
 from app.core.domain.dto.category import UpdateCategoryDTO
 from app.core.domain.exceptions.category import InvalidCategoryMarker
 from app.core.domain.models.category import CategoryId, Category
 from app.core.domain.models.user import User
-from app.core.interfaces.usecase.category import CategoryUsecase
+from app.core.interfaces.usecase import CategoryUsecase
 
 MARKER_FROM_REACTION = "new_marker_from_reaction"
 MARKER_MESSAGE_ID = "marker_message_id"

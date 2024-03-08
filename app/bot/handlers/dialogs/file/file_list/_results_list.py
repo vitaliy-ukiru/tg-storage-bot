@@ -9,8 +9,6 @@ from aiogram_dialog.widgets.text import Format
 from magic_filter import F
 
 from app.bot.handlers.dialogs import execute
-from app.bot.handlers.dialogs.file.file_list.common import tl_file_list
-from app.bot.handlers.dialogs.file.file_list.filters_dao import FiltersDAO
 from app.bot.services import Paginator
 from app.bot.states.dialogs import FileListSG
 from app.bot.widgets import BackTo
@@ -18,7 +16,10 @@ from app.bot.widgets.i18n import BACK_TEXT
 from app.bot.widgets.i18n.file_title import FileTitle
 from app.bot.widgets.scroll import Navigation
 from app.core.domain.models.user import User
-from app.core.interfaces.usecase.file import FileUsecase
+from app.core.interfaces.usecase import FileUsecase
+
+from .common import tl_file_list
+from .filters_dao import FiltersDAO
 
 FILE_LIST_ID = "file_list"
 FILES_PER_PAGE = 7

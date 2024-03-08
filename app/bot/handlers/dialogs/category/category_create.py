@@ -1,6 +1,5 @@
 from typing import Optional
 
-import emoji
 from aiogram.types import Message, CallbackQuery
 from aiogram_dialog import Dialog, Window, DialogManager
 from aiogram_dialog.widgets.input import TextInput
@@ -9,15 +8,15 @@ from aiogram_dialog.widgets.text import Format, Multi
 from aiogram_i18n import I18nContext
 
 from app.bot.states.dialogs import CategoryCreateSG
-from app.bot.utils.optional_str import optional_str_factory
-from app.bot.widgets.dao.base_dao import BaseDAO
+from app.bot.utils import optional_str_factory
+from app.bot.widgets import Emoji
+from app.bot.widgets.dao import BaseDAO
 from app.bot.widgets.dao.widgets import TextInputProp
-from app.bot.widgets.emoji import Emoji
 from app.bot.widgets.i18n import CANCEL_TEXT, Topic, BackI18n, TL
 from app.common.helpers import is_category_marker_valid
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.domain.exceptions.category import InvalidCategoryMarker
-from app.core.interfaces.usecase.category import CategoryUsecase
+from app.core.interfaces.usecase import CategoryUsecase
 
 ID_INPUT_TITLE = "input_title"
 ID_INPUT_DESC = "input_desc"

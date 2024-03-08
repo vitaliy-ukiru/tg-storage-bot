@@ -8,8 +8,11 @@ from aiogram_dialog import DialogManager, BgManagerFactory
 from aiogram_i18n import I18nContext
 
 from app.bot.handlers.dialogs import execute
-from app.bot.handlers.dialogs.category.edit_category import MARKER_FROM_REACTION, DELETE_MARKER, \
+from app.bot.handlers.dialogs.category.edit_category import (
+    MARKER_FROM_REACTION,
+    DELETE_MARKER,
     MARKER_MESSAGE_ID
+)
 
 router = Router(name="categories")
 
@@ -30,7 +33,7 @@ async def category_cmd(msg: Message, command: CommandObject, dialog_manager: Dia
 
 
 @router.message(Command("create_category"))
-async def create_category(msg: Message, dialog_manager: DialogManager):
+async def create_category(_: Message, dialog_manager: DialogManager):
     await execute.category_create(dialog_manager)
 
 

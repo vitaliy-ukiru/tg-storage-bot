@@ -14,7 +14,7 @@ from app.core.interfaces.repository.file import (
     FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileRepoDeleter
 )
 from app.core.interfaces.usecase.category import CategoryGetter
-from app.core.interfaces.usecase.file import FileUsecase
+from app.core.interfaces.usecase import FileUsecase
 
 UNDEFINED_FILE_ID = FileId(0)
 

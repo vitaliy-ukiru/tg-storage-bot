@@ -6,7 +6,8 @@ from aiogram_dialog.widgets.kbd import (
     FirstPage,
     CurrentPage,
     NextPage,
-    PrevPage, LastPage)
+    PrevPage, LastPage
+)
 from aiogram_dialog.widgets.text import Format
 
 

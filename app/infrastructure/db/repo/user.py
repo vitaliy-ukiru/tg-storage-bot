@@ -1,3 +1,7 @@
+__all__ = (
+    'UserStorageGateway',
+)
+
 from datetime import datetime
 from typing import Optional
 
@@ -12,7 +16,7 @@ from app.infrastructure.db import models
 from app.infrastructure.db.repo._base import BaseRepository
 
 
-class UserStorage(
+class UserStorageGateway(
     UserRepoSaver, UserRepoGetter, UserRepoUpdater, UserRepoDeleter,
     BaseRepository
 ):

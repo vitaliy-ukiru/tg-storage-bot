@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from .file_creds import FileCredentials
 from app.core.domain.models.file import File
-from app.core.interfaces.usecase.file import FileUsecase
+from app.core.interfaces.usecase import FileUsecase
 
 
 class FileUploader:

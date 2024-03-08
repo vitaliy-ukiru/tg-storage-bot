@@ -1,5 +1,6 @@
-__all__ = (
-    'UserMiddleware'
-)
+from .user_manager import UserMiddleware, USER_KEY
 
-from .user_manager import UserMiddleware
+__all__ = (
+    UserMiddleware,
+    USER_KEY,
+)

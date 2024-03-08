@@ -71,7 +71,7 @@ file_view_dialog = Dialog(
             )
         ),
         Topic(
-            tl_file_view.topic.title(),
+            tl_file_view.topic.category(),
             Format("{file_category}"),
             when="file_category"
         ),

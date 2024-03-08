@@ -166,7 +166,12 @@ async def menu_getter(dialog_manager: DialogManager, **_):
     await _process_marker_bg(dialog_manager)
 
     category = await _get_category(dialog_manager)
-    return dict(category=category, is_favorite=category.is_favorite)
+    return dict(
+        title=category.title,
+        desc=category.description,
+        marker=category.marker,
+        is_favorite=category.is_favorite
+    )
 
 
 async def _desc_window_getter(dialog_manager: DialogManager, **_):
@@ -190,9 +195,9 @@ category_edit_dialog = Dialog(
     Window(
         Multi(
             tl.tag(),
-            Topic(TL.category.marker(), Format("{category.marker}"), when="marker"),
-            Topic(TL.category.title(), Format("{category.title}")),
-            Topic(TL.category.desc(), Format("{category.description}"), when="desc")
+            Topic(TL.category.marker(), Format("{marker}"), when="marker"),
+            Topic(TL.category.title(), Format("{title}")),
+            Topic(TL.category.desc(), Format("{desc}"), when="desc")
         ),
         Group(
             Row(

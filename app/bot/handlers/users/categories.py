@@ -86,11 +86,12 @@ async def _set_marker_by_reaction(
     else:
         emoji = reaction.emoji
 
-    manager = dialog_bg_factory.bg(bot, event.user.id, event.chat.id,)
+    manager = dialog_bg_factory.bg(bot, event.user.id, event.chat.id)
     await manager.update(data={
         MARKER_FROM_REACTION: emoji,
         MARKER_MESSAGE_ID: event.message_id
     })
+
 
 @router.message_reaction(filter_old_reactions)
 async def _delete_marker_by_reaction(
@@ -102,9 +103,8 @@ async def _delete_marker_by_reaction(
     if not await _check_is_category_edit(event, bot, i18n):
         raise SkipHandler()
 
-    manager = dialog_bg_factory.bg(bot, event.user.id, event.chat.id,)
+    manager = dialog_bg_factory.bg(bot, event.user.id, event.chat.id)
     await manager.update(data={
         MARKER_FROM_REACTION: DELETE_MARKER,
         MARKER_MESSAGE_ID: event.message_id
     })
-

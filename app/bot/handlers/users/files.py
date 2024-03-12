@@ -11,6 +11,7 @@ from app.bot.services import FileUploader
 from app.bot.states.dialogs import ALLOWED_STATES, CategoryEditSG
 from app.core.domain.exceptions.file import FileAlreadyExists
 from app.core.domain.models.category import CategoryId
+from app.core.interfaces.access import AccessController
 from app.core.interfaces.usecase import FileUsecase
 
 router = Router()
@@ -28,6 +29,7 @@ async def process_upload_file(
     file_service: FileUsecase,
     dialog_manager: DialogManager,
     i18n: I18nContext,
+    access_controller: AccessController,
 ):
     category_id: CategoryId | None = None
     # I don't have idea how get dialog_manager in filter
@@ -43,7 +45,7 @@ async def process_upload_file(
     uploader = FileUploader(file_service)
     try:
 
-        file = await uploader.upload(msg, category_id)
+        file = await uploader.upload(msg, access_controller, category_id)
     except FileAlreadyExists:
         await msg.answer(i18n.get("file-already-exists"))
     else:

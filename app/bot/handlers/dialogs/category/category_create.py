@@ -7,6 +7,7 @@ from aiogram_dialog.widgets.kbd import Button, SwitchTo, Group, Cancel, Row
 from aiogram_dialog.widgets.text import Format, Multi
 from aiogram_i18n import I18nContext
 
+from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
 from app.bot.states.dialogs import CategoryCreateSG
 from app.bot.utils import optional_str_factory
 from app.bot.widgets import Emoji
@@ -16,6 +17,7 @@ from app.bot.widgets.i18n import CANCEL_TEXT, Topic, BackI18n, TL
 from app.common.helpers import is_category_marker_valid
 from app.core.domain.dto.category import CreateCategoryDTO
 from app.core.domain.exceptions.category import InvalidCategoryMarker
+from app.core.interfaces.access import AccessController
 from app.core.interfaces.usecase import CategoryUsecase
 
 ID_INPUT_TITLE = "input_title"
@@ -51,14 +53,19 @@ async def menu_getter(dialog_manager: DialogManager, **_):
 
 async def create_category(call: CallbackQuery, _: Button, manager: DialogManager):
     category_service: CategoryUsecase = manager.middleware_data["category_service"]
+    access_controller: AccessController = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+
     dao = CreateCategoryDAO(manager)
     try:
-        category = await category_service.save_category(CreateCategoryDTO(
-            title=dao.title,
-            desc=dao.desc,
-            user_id=call.from_user.id,
-            marker=dao.marker,
-        ))
+        category = await category_service.save_category(
+            CreateCategoryDTO(
+                title=dao.title,
+                desc=dao.desc,
+                user_id=call.from_user.id,
+                marker=dao.marker,
+            ),
+            access_controller
+        )
     except InvalidCategoryMarker:
         i18n: I18nContext = manager.middleware_data["i18n"]
         await call.answer(i18n.get("category-invalid-marker"), show_alert=True)

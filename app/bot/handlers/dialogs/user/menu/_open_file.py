@@ -4,6 +4,7 @@ from aiogram_dialog import DialogManager, Window, StartMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.text import Case
 
+from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
 from app.bot.states.dialogs import FileViewSG, UserMenuSG
 from app.bot.widgets.i18n import Template, BackToI18n
 from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
@@ -18,10 +19,11 @@ OPEN_FILE_ERROR_KEY = "open_file_error"
 
 async def _on_input_file(m: Message, _, manager: DialogManager):
     file_id = FileId(int(m.text))
-    user: User = manager.middleware_data["user"]
     file_service: FileUsecase = manager.middleware_data["file_service"]
+    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+
     try:
-        file = await file_service.get_file(file_id, user.id)
+        file = await file_service.get_file(file_id, ac)
     except (FileNotFound, FileAccessDenied) as exp:
         manager.dialog_data[OPEN_FILE_ERROR_KEY] = exp
         return

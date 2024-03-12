@@ -12,15 +12,14 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Format, Multi, Case, Const
 from aiogram_i18n import I18nContext
 
-from app.bot.middlewares import USER_KEY
+from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
 from app.bot.states.dialogs import CategoryEditSG
-from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp, BaseDAO
 from app.bot.widgets import Emoji
+from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp, BaseDAO
 from app.bot.widgets.i18n import BACK_TEXT, CLOSE_TEXT, TL, Topic, BackToI18n
 from app.core.domain.dto.category import UpdateCategoryDTO
 from app.core.domain.exceptions.category import InvalidCategoryMarker
 from app.core.domain.models.category import CategoryId, Category
-from app.core.domain.models.user import User
 from app.core.interfaces.usecase import CategoryUsecase
 
 MARKER_FROM_REACTION = "new_marker_from_reaction"
@@ -38,8 +37,9 @@ class UpdateDAO(BaseDAO):
             return category
 
         svc = self.category_service
-        user: User = self.manager.middleware_data[USER_KEY]
-        category = await svc.get_category(self.category_id, user.id)
+        ac = self.manager.middleware_data[ACCESS_CONTROLLER_KEY]
+
+        category = await svc.get_category(self.category_id, ac)
         self.__category_cache = category
         return category
 
@@ -63,7 +63,7 @@ async def _update_category(
     delete_marker: Optional[bool] = None
 ) -> Category:
     data = UpdateDAO(manager)
-    user: User = manager.middleware_data[USER_KEY]
+    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
 
     category_service = data.category_service
     category_id = data.category_id
@@ -77,7 +77,7 @@ async def _update_category(
             marker=marker,
             delete_marker=delete_marker,
         ),
-        user_id=user.id
+        access=ac,
     )
     data.category = category
     return category

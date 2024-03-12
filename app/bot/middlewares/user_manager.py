@@ -1,6 +1,7 @@
 __all__ = (
     'UserMiddleware',
     'USER_KEY',
+    'ACCESS_CONTROLLER_KEY'
 )
 
 from typing import Callable, Dict, Any, Awaitable, cast
@@ -13,8 +14,10 @@ from app.core.domain.dto.user import CreateUserDTO
 from app.core.domain.exceptions.user import UserNotFound
 from app.core.domain.models.user import UserId
 from app.core.interfaces.usecase import UserUsecase
+from app.infrastructure.adapters.auth.telegram import TelegramAccessController
 
 USER_KEY = "user"
+ACCESS_CONTROLLER_KEY = "access_controller"
 
 
 class UserMiddleware(BaseMiddleware):
@@ -43,4 +46,5 @@ class UserMiddleware(BaseMiddleware):
 
         user = await self._get_user(tg_user)
         data[USER_KEY] = user
+        data[ACCESS_CONTROLLER_KEY] = TelegramAccessController(user.id)
         return await handler(event, data)

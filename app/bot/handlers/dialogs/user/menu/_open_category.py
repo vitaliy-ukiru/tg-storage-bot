@@ -4,6 +4,7 @@ from aiogram_dialog import DialogManager, Window, StartMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.text import Case
 
+from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
 from app.bot.states.dialogs import UserMenuSG
 from app.bot.widgets.i18n import Template, BackToI18n
 from app.core.domain.exceptions.category import CategoryNotFound, CategoryAccessDenied
@@ -18,10 +19,10 @@ OPEN_CATEGORY_ERROR_KEY = "open_category_error"
 
 async def _on_input_category(m: Message, _, manager: DialogManager):
     category_id = CategoryId(int(m.text))
-    user: User = manager.middleware_data["user"]
     category_service: CategoryUsecase = manager.middleware_data["category_service"]
+    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
     try:
-        category = await category_service.get_category(category_id, user.id)
+        category = await category_service.get_category(category_id, ac)
     except (CategoryNotFound, CategoryAccessDenied) as exp:
         manager.dialog_data[OPEN_CATEGORY_ERROR_KEY] = exp
         return

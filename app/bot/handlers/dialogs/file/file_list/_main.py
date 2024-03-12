@@ -16,7 +16,7 @@ from app.bot.middlewares import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils import get_file_category_name
 from app.bot.widgets import Emoji
-from app.bot.widgets.i18n import Topic
+from app.bot.widgets.i18n import Topic, CloseI18n
 from app.core.domain.models.user import User
 from app.core.interfaces.usecase import CategoryUsecase
 from .common import tl_file_list
@@ -146,6 +146,7 @@ main_window = Window(
         state=FileListSG.file_list,
         id="find_files",
     ),
+    CloseI18n(),
     state=FileListSG.main,
     getter=_main_window_getter,
 )

@@ -37,6 +37,7 @@ class CategoryStorageGateway(
                 title=c.title,
                 created_at=c.created_at,
                 description=c.description,
+                marker=c.marker,
             )
             session.add(db_category)
             await session.commit()

@@ -13,24 +13,25 @@ from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, U
 from app.core.domain.dto.common import Pagination
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
+from app.core.interfaces.access import AccessController
 from app.core.interfaces.repository.common import FilterField
 
 
 class CategorySaver(Protocol):
     @abc.abstractmethod
-    async def save_category(self, dto: CreateCategoryDTO) -> Category:
+    async def save_category(self, dto: CreateCategoryDTO, access: AccessController) -> Category:
         raise NotImplementedError
 
 
 class CategoryGetter(Protocol):
     @abc.abstractmethod
-    async def get_category(self, category_id: CategoryId, user_id: UserId) -> Category:
+    async def get_category(self, category_id: CategoryId, access: AccessController) -> Category:
         raise NotImplementedError
 
 
 class CategoryUpdater(Protocol):
     @abc.abstractmethod
-    async def update_category(self, dto: UpdateCategoryDTO, user_id: UserId) -> Category:
+    async def update_category(self, dto: UpdateCategoryDTO, access: AccessController) -> Category:
         raise NotImplementedError
 
 

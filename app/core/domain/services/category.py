@@ -10,6 +10,7 @@ from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategor
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
 from app.core.domain.services.internal import convert_to_filter_fields
+from app.core.interfaces.access import AccessController, Operation
 from app.core.interfaces.repository.category import (
     CategoryRepoSaver, CategoryRepoGetter, CategoryRepoFinder, CategoryRepoUpdater,
     CategoryRepoUsageRater
@@ -17,11 +18,6 @@ from app.core.interfaces.repository.category import (
 from app.core.interfaces.usecase import CategoryUsecase
 
 UNDEFINED_CATEGORY_ID = CategoryId(0)
-
-
-def _ensure_owner(category: Category, user_id: UserId):
-    if category.user_id != user_id:
-        raise CategoryAccessDenied(category.id, user_id)
 
 
 class CategoryService(CategoryUsecase):
@@ -46,7 +42,9 @@ class CategoryService(CategoryUsecase):
         self._updater = updater
         self._rater = rater
 
-    async def save_category(self, dto: CreateCategoryDTO) -> Category:
+    async def save_category(self, dto: CreateCategoryDTO, access: AccessController) -> Category:
+        access.ensure_have_access(Operation.category_create)
+
         if dto.marker:
             ensure_valid_marker(dto.marker, UNDEFINED_CATEGORY_ID)
 
@@ -62,12 +60,12 @@ class CategoryService(CategoryUsecase):
         c.id = await self._saver.save_category(c)
         return c
 
-    async def get_category(self, category_id: CategoryId, user_id: UserId) -> Category:
+    async def get_category(self, category_id: CategoryId, access: AccessController) -> Category:
         c = await self._getter.get_category(category_id)
         if c is None:
             raise CategoryNotFound(category_id)
 
-        _ensure_owner(c, user_id)
+        access.ensure_own_category(c)
         return c
 
     async def find_categories(
@@ -96,9 +94,10 @@ class CategoryService(CategoryUsecase):
         )
         return categories
 
-    async def update_category(self, dto: UpdateCategoryDTO, user_id: UserId) -> Category:
-        category = await self.get_category(dto.category_id, user_id)
-        _ensure_owner(category, user_id)
+    async def update_category(self, dto: UpdateCategoryDTO, access: AccessController) -> Category:
+        access.ensure_have_access(Operation.category_edit)
+
+        category = await self.get_category(dto.category_id, access)
         if dto.title is not None:
             category.title = dto.title
 

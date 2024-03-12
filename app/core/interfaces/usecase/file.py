@@ -7,6 +7,7 @@ from abc import abstractmethod
 from typing import Protocol, Optional, overload, Literal
 
 from app.core.domain.dto.common import Pagination
+from app.core.interfaces.access import AccessController
 from app.core.interfaces.repository.common import FilterField
 from app.core.domain.dto.file import CreateFileDTO, FilesFindDTO, ReloadFileDTO
 from app.core.domain.models.category import CategoryId
@@ -17,13 +18,13 @@ from app.core.domain.models.user import UserId
 class FileSaver(Protocol):
 
     @abstractmethod
-    async def save_file(self, dto: CreateFileDTO) -> File:
+    async def save_file(self, dto: CreateFileDTO, access: AccessController) -> File:
         raise NotImplementedError
 
 
 class FileGetter(Protocol):
     @abstractmethod
-    async def get_file(self, file_id: FileId, user_id: UserId) -> File:
+    async def get_file(self, file_id: FileId, access: AccessController) -> File:
         raise NotImplementedError
 
 
@@ -58,21 +59,36 @@ class FileFinder(Protocol):
 
 class FileUpdater(Protocol):
     @abstractmethod
-    async def set_category(self, file_id: FileId, category_id: CategoryId, user_id: UserId) -> File:
+    async def set_category(
+        self,
+        file_id: FileId,
+        category_id: CategoryId,
+        access: AccessController
+    ) -> File:
         raise NotImplementedError
 
     @abstractmethod
-    async def update_title(self, file_id: FileId, title: str, user_id: UserId) -> File:
+    async def update_title(
+        self,
+        file_id: FileId,
+        title: str,
+        access: AccessController
+    ) -> File:
         raise NotImplementedError
 
     @abstractmethod
-    async def reload_file(self, file_id: FileId, dto: ReloadFileDTO, user_id: UserId) -> File:
+    async def reload_file(
+        self,
+        file_id: FileId,
+        dto: ReloadFileDTO,
+        access: AccessController
+    ) -> File:
         raise NotImplementedError
 
 
 class FileDeleter(Protocol):
     @abstractmethod
-    async def delete_file(self, file_id: FileId, user_id: UserId):
+    async def delete_file(self, file_id: FileId, access: AccessController):
         raise NotImplementedError
 
 

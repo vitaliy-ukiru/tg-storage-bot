@@ -29,5 +29,5 @@ class UserNotProvidedError(DomainException):
         super().__init__(f'user not provided')
 
 
-class AccessDenied(DomainException):
+class AccessDenied(Exception):
     pass

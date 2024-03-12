@@ -94,7 +94,7 @@ file_upload_dialog = Dialog(
             TL.add.category(),
             id="add_category",
             data={
-                "allowed_create": True,
+                "allow_create": True,
             },
             state=CategoryFindSG.main,
         ),

@@ -111,7 +111,7 @@ ID_INPUT_TITLE = "find_title"
 
 tl = TL.category.find
 
-# Input: allowed_create - bool [Optional]
+# Input: allow_create - bool [Optional]
 find_category_dialog = Dialog(
     Window(
         tl.select.method(),

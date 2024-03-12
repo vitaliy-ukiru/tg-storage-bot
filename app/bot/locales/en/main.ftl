@@ -65,3 +65,4 @@ category-access-denied = You do not have access to this category
 
 file-upload-add-category = Add category
 file-upload-send = Send a file
+file-upload-multiple = Multiple uploading

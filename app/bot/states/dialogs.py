@@ -17,9 +17,6 @@ class CategoryFindSG(StatesGroup):
     select = State()
 
 
-class CategorySelectSG(StatesGroup):
-    start = State()
-
 
 class CategoryCreateSG(StatesGroup):
     input_title = State()
@@ -52,3 +49,14 @@ ALLOWED_STATES = frozenset({
 
 class UserChangeLocaleSG(StatesGroup):
     main = State()
+
+
+class UserMenuSG(StatesGroup):
+    main = State()
+    open_file = State()
+    open_category = State()
+
+
+class UploadFileSG(StatesGroup):
+    main = State()
+    already_exists = State()

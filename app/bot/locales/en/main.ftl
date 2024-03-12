@@ -62,3 +62,6 @@ inline-mode-btn = Try inline mode in other chat
 
 file-access-denied = You do not have access to this file
 category-access-denied = You do not have access to this category
+
+file-upload-add-category = Add category
+file-upload-send = Send a file

@@ -59,3 +59,7 @@ help-text =
 inline-mode-btn = Попробуйте встроенный режим в другом чате
 file-access-denied = У вас нет доступа к этом файлу
 category-access-denied = У вас нет доступа к этой категории
+
+
+file-upload-add-category = Добавить категорию
+file-upload-send = Отправьте файл

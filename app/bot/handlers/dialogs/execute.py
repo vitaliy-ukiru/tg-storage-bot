@@ -3,7 +3,7 @@ from typing import Optional
 from aiogram_dialog import DialogManager, ShowMode, StartMode, Data
 
 from app.bot.states.dialogs import FileViewSG, FileListSG, CategoryEditSG, UserChangeLocaleSG, \
-    CategoryCreateSG
+    CategoryCreateSG, UserMenuSG
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import FileId
 
@@ -42,6 +42,7 @@ async def file_list(manager: DialogManager,
         show_mode=show_mode,
     )
 
+
 async def category_create(manager: DialogManager,
                           data: Data = None,
                           mode: StartMode = StartMode.RESET_STACK,
@@ -52,6 +53,7 @@ async def category_create(manager: DialogManager,
         mode=mode,
         show_mode=show_mode
     )
+
 
 async def category_edit(manager: DialogManager,
                         category_id: int | CategoryId,
@@ -73,6 +75,18 @@ async def change_locale(manager: DialogManager,
                         show_mode: Optional[ShowMode] = None):
     await manager.start(
         UserChangeLocaleSG.main,
+        data=data,
+        mode=mode,
+        show_mode=show_mode,
+    )
+
+
+async def user_menu(manager: DialogManager,
+                    data: Data = None,
+                    mode: StartMode = StartMode.RESET_STACK,
+                    show_mode: Optional[ShowMode] = None):
+    await manager.start(
+        UserMenuSG.main,
         data=data,
         mode=mode,
         show_mode=show_mode,

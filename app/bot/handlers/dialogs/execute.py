@@ -58,7 +58,7 @@ async def category_create(manager: DialogManager,
 async def category_edit(manager: DialogManager,
                         category_id: int | CategoryId,
                         data: Data = None,
-                        mode: StartMode = StartMode.NORMAL,
+                        mode: StartMode = StartMode.RESET_STACK,
                         show_mode: Optional[ShowMode] = None):
     data = data or {}
     await manager.start(

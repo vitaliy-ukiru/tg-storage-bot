@@ -37,3 +37,8 @@ async def _stop_any(m: Message, dialog_manager: DialogManager, state: FSMContext
     await dialog_manager.reset_stack(remove_keyboard=True)
     await state.clear()
     await m.answer("forced stop")
+
+
+@router.message(Command("menu"))
+async def _start_menu(m: Message, dialog_manager: DialogManager):
+    await execute.user_menu(dialog_manager)

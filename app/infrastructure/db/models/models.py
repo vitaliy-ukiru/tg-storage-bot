@@ -5,12 +5,14 @@ __all__ = (
 )
 
 from datetime import datetime
-from typing import Optional, cast
+from typing import Optional, cast, Self
 
-from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false, UniqueConstraint
+from sqlalchemy import BigInteger, ForeignKey, func, DateTime, Identity, false, UniqueConstraint, ARRAY, \
+    String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column
 
+from app.core.domain.dto.token import TokenDTO
 from app.core.domain.models.category import Category as DCategory
 from app.core.domain.models.file import File as DFile, FileCategory, FileType
 from app.core.domain.models.user import User as DUser
@@ -101,7 +103,7 @@ class File(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     __table_args__ = (
         UniqueConstraint('user_id', 'unique_id', name='_user_file_id_uc'),
-                      )
+    )
 
     def to_domain(self, with_category=True) -> DFile:
         file = DFile(
@@ -123,3 +125,31 @@ class File(Base):
             file.category = category.to_domain()
 
         return file
+
+
+class Token(Base):
+    __tablename__ = "tokens"
+    id: Mapped[str] = mapped_column(unique=True, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    name: Mapped[str] = mapped_column()
+    expiry: Mapped[datetime | None] = mapped_column()
+    scopes: Mapped[list[str]] = mapped_column(ARRAY(String))
+
+    def to_dto(self) -> TokenDTO:
+        return TokenDTO(
+            id=self.id,
+            user_id=self.user_id,
+            scopes=self.scopes,
+            name=self.name,
+            expiry=self.expiry,
+        )
+
+    @classmethod
+    def from_dto(cls, dto: TokenDTO) -> Self:
+        return cls(
+            id=dto.id,
+            user_id=dto.user_id,
+            scopes=dto.scopes,
+            name=dto.name,
+            expiry=dto.expiry,
+        )

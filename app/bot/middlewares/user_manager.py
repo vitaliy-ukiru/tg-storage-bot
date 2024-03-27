@@ -1,7 +1,7 @@
 __all__ = (
     'UserMiddleware',
     'USER_KEY',
-    'ACCESS_CONTROLLER_KEY'
+    'ISSUER_KEY'
 )
 
 from typing import Callable, Dict, Any, Awaitable, cast
@@ -12,12 +12,12 @@ from aiogram.types import TelegramObject, User as TgUser
 
 from app.core.domain.dto.user import CreateUserDTO
 from app.core.domain.exceptions.user import UserNotFound
+from app.core.domain.models.auth import TelegramIssuer
 from app.core.domain.models.user import UserId
 from app.core.interfaces.usecase import UserUsecase
-from app.infrastructure.adapters.auth.telegram import TelegramAccessController
 
 USER_KEY = "user"
-ACCESS_CONTROLLER_KEY = "access_controller"
+ISSUER_KEY = "issuer"
 
 
 class UserMiddleware(BaseMiddleware):
@@ -46,5 +46,5 @@ class UserMiddleware(BaseMiddleware):
 
         user = await self._get_user(tg_user)
         data[USER_KEY] = user
-        data[ACCESS_CONTROLLER_KEY] = TelegramAccessController(user.id)
+        data[ISSUER_KEY] = TelegramIssuer(user.id)
         return await handler(event, data)

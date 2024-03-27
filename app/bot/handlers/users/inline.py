@@ -14,9 +14,9 @@ from aiogram_i18n import I18nContext
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import FilesFindDTO
 from app.core.domain.exceptions.file import FileException, FileNotFound
+from app.core.domain.models.auth import Issuer
 from app.core.domain.models.file import File, FileCategory, FileId
 from app.core.domain.models.user import User
-from app.core.interfaces.access import AccessController
 from app.core.interfaces.usecase import FileUsecase
 
 router = Router()
@@ -35,14 +35,14 @@ async def _files_not_found(m: Message, i18n: I18nContext):
 async def _find_file_by_id(
     inline_query: InlineQuery,
     file_service: FileUsecase,
-    access_controller: AccessController,
+    issuer: Issuer,
     i18n: I18nContext
 ):
     file_id = FileId(int(inline_query.query))
     try:
         file = await file_service.get_file(
             file_id,
-            access_controller,
+            issuer,
         )
         # seen something bad
         if file.type.category == FileCategory.unknown:

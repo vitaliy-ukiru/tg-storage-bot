@@ -5,7 +5,7 @@ from aiogram.types import Message
 from .file_creds import FileCredentials
 from app.core.domain.models.file import File
 from app.core.interfaces.usecase import FileUsecase
-from ...core.interfaces.access import AccessController
+from app.core.domain.models.auth import Issuer
 
 
 class FileUploader:
@@ -16,14 +16,14 @@ class FileUploader:
 
     async def upload(self,
                      msg: Message,
-                     access_controller: AccessController,
+                     issuer: Issuer,
                      category_id: Optional[int],
                      ) -> File:
         cred = FileCredentials.from_message(msg)
         return await self._uc.save_file(
             cred.to_create_dto(
-                access_controller.get_current_user_id(),
+                issuer.user_id,
                 category_id,
             ),
-            access_controller
+            issuer,
         )

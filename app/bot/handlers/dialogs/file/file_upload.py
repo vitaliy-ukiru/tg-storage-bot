@@ -7,13 +7,13 @@ from magic_filter import F
 
 from app.bot.filters import MediaFilter
 from app.bot.handlers.dialogs import execute
-from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
+from app.bot.middlewares.user_manager import ISSUER_KEY
 from app.bot.services import FileUploader
 from app.bot.states.dialogs import UploadFileSG, CategoryFindSG
 from app.bot.widgets import Emoji
 from app.bot.widgets.i18n import Template, CloseI18n, TemplateProxy, Topic, FileTitle
 from app.core.domain.exceptions.file import FileAlreadyExists
-from app.core.interfaces.access import AccessController
+from app.core.domain.models.auth import Issuer
 from app.core.interfaces.usecase import CategoryUsecase, FileUsecase
 
 TL = TemplateProxy("file", "upload")
@@ -26,13 +26,13 @@ FILES_HISTORY_LIST = "files_list"
 async def _on_send_file(m: Message, _, manager: DialogManager):
     category_id = manager.dialog_data.get("category_id")
     file_service = manager.middleware_data["file_service"]
-    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = manager.middleware_data[ISSUER_KEY]
 
     multiple_upload_checkbox: ManagedCheckbox = manager.find(MULTIPLE_UPLOAD_ID)
 
     uploader = FileUploader(file_service)
     try:
-        file = await uploader.upload(m, ac, category_id)
+        file = await uploader.upload(m, issuer, category_id)
     except FileAlreadyExists:
         manager.dialog_data[ALREADY_EXISTS_KEY] = True
         return
@@ -49,7 +49,7 @@ async def _getter(
     dialog_manager: DialogManager,
     category_service: CategoryUsecase,
     file_service: FileUsecase,
-    access_controller: AccessController,
+    issuer: Issuer,
     **_,
 ):
     category_id = dialog_manager.dialog_data.get("category_id")
@@ -58,13 +58,13 @@ async def _getter(
     }
 
     if category_id:
-        category = await category_service.get_category(category_id, access_controller)
+        category = await category_service.get_category(category_id, issuer)
         data["category"] = category.title
 
     files_ids = dialog_manager.dialog_data.get(FILES_HISTORY_LIST)
     if files_ids:
         files = [
-            await file_service.get_file(file_id, access_controller)
+            await file_service.get_file(file_id, issuer)
 
             for file_id in files_ids
         ]
@@ -79,7 +79,12 @@ async def _on_process_result(start_data: Data, result, manager: DialogManager):
 
 
 async def _process_click_file(_, __, manager: DialogManager, item_id: int):
-    await execute.file_view(manager, item_id, data=dict(opened_over=True), mode=StartMode.NORMAL)
+    await execute.file_view(
+        manager,
+        item_id,
+        data=dict(opened_over=True),
+        mode=StartMode.NORMAL,
+    )
 
 
 file_upload_dialog = Dialog(

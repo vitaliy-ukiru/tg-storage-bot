@@ -3,14 +3,16 @@ from datetime import datetime
 from typing import Optional
 
 from app.common.helpers import is_category_marker_valid
-from app.core.domain.dto.category import CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
+from app.core.domain.dto.category import (
+    CreateCategoryDTO, CategoriesFindDTO, UpdateCategoryDTO
+)
 from app.core.domain.dto.common import Pagination
-from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategoryMarker, \
-    CategoryAccessDenied
+from app.core.domain.exceptions.category import CategoryNotFound, InvalidCategoryMarker
 from app.core.domain.models.category import Category, CategoryId
 from app.core.domain.models.user import UserId
+from app.core.domain.services.access import AccessService
 from app.core.domain.services.internal import convert_to_filter_fields
-from app.core.interfaces.access import AccessController, Operation
+from app.core.domain.models.auth import Operation, Issuer
 from app.core.interfaces.repository.category import (
     CategoryRepoSaver, CategoryRepoGetter, CategoryRepoFinder, CategoryRepoUpdater,
     CategoryRepoUsageRater
@@ -34,16 +36,18 @@ class CategoryService(CategoryUsecase):
         finder: CategoryRepoFinder,
         updater: CategoryRepoUpdater,
         rater: CategoryRepoUsageRater,
+        access: AccessService,
     ):
 
+        self.access = access
         self._saver = saver
         self._getter = getter
         self._finder = finder
         self._updater = updater
         self._rater = rater
 
-    async def save_category(self, dto: CreateCategoryDTO, access: AccessController) -> Category:
-        access.ensure_have_access(Operation.category_create)
+    async def save_category(self, dto: CreateCategoryDTO, issuer: Issuer) -> Category:
+        self.access.ensure_have_access(issuer, Operation.category_create)
 
         if dto.marker:
             ensure_valid_marker(dto.marker, UNDEFINED_CATEGORY_ID)
@@ -60,12 +64,12 @@ class CategoryService(CategoryUsecase):
         c.id = await self._saver.save_category(c)
         return c
 
-    async def get_category(self, category_id: CategoryId, access: AccessController) -> Category:
+    async def get_category(self, category_id: CategoryId, issuer: Issuer) -> Category:
         c = await self._getter.get_category(category_id)
         if c is None:
             raise CategoryNotFound(category_id)
 
-        access.ensure_own_category(c)
+        self.access.ensure_own_category(issuer, c)
         return c
 
     async def find_categories(
@@ -94,10 +98,10 @@ class CategoryService(CategoryUsecase):
         )
         return categories
 
-    async def update_category(self, dto: UpdateCategoryDTO, access: AccessController) -> Category:
-        access.ensure_have_access(Operation.category_edit)
+    async def update_category(self, dto: UpdateCategoryDTO, issuer: Issuer) -> Category:
+        self.access.ensure_have_access(issuer, Operation.category_edit)
 
-        category = await self.get_category(dto.category_id, access)
+        category = await self.get_category(dto.category_id, issuer)
         if dto.title is not None:
             category.title = dto.title
 

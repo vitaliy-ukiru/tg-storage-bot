@@ -8,6 +8,7 @@ from app import __version__
 from app.bot.builder import BotBuilder
 from app.common.config import Config
 from app.core.domain.services import CategoryService, FileService, UserService
+from app.core.domain.services.access import AccessService
 from app.infrastructure.adapters.locale_provider import build_locale_provider
 from app.infrastructure.db import connect
 from app.infrastructure.db.repo import (CategoryStorageGateway, FileStorageGateway,
@@ -39,6 +40,8 @@ async def main():
 
     locale_provider = build_locale_provider(cfg.bot.locales_data_path)
 
+    access_service = AccessService()
+
     # ugly, but I think it will better in future
     user_repo = UserStorageGateway(session_maker)
     user_service = UserService(
@@ -57,6 +60,7 @@ async def main():
         finder=category_repo,
         updater=category_repo,
         rater=category_rater,
+        access=access_service,
     )
 
     file_repo = FileStorageGateway(session_maker)
@@ -66,7 +70,8 @@ async def main():
         finder=file_repo,
         updater=file_repo,
         deleter=file_repo,
-        category_getter=category_service
+        category_getter=category_service,
+        access=access_service,
     )
 
     tg_bot = (

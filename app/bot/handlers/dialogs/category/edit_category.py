@@ -12,7 +12,7 @@ from aiogram_dialog.widgets.kbd import (
 from aiogram_dialog.widgets.text import Format, Multi, Case, Const
 from aiogram_i18n import I18nContext
 
-from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
+from app.bot.middlewares.user_manager import ISSUER_KEY
 from app.bot.states.dialogs import CategoryEditSG
 from app.bot.widgets import Emoji
 from app.bot.widgets.dao import DialogDataProp, DialogDataRequiredProp, BaseDAO
@@ -37,9 +37,9 @@ class UpdateDAO(BaseDAO):
             return category
 
         svc = self.category_service
-        ac = self.manager.middleware_data[ACCESS_CONTROLLER_KEY]
+        issuer = self.manager.middleware_data[ISSUER_KEY]
 
-        category = await svc.get_category(self.category_id, ac)
+        category = await svc.get_category(self.category_id, issuer)
         self.__category_cache = category
         return category
 
@@ -63,7 +63,7 @@ async def _update_category(
     delete_marker: Optional[bool] = None
 ) -> Category:
     data = UpdateDAO(manager)
-    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = manager.middleware_data[ISSUER_KEY]
 
     category_service = data.category_service
     category_id = data.category_id
@@ -77,7 +77,7 @@ async def _update_category(
             marker=marker,
             delete_marker=delete_marker,
         ),
-        access=ac,
+        issuer=issuer,
     )
     data.category = category
     return category

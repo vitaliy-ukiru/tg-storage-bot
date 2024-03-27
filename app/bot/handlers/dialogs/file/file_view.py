@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.text import Format
 from aiogram_i18n import I18nContext
 from magic_filter import F
 
-from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
+from app.bot.middlewares.user_manager import ISSUER_KEY
 from app.bot.services import content_type_from_category
 from app.bot.states.dialogs import FileViewSG, FileEditSG
 from app.bot.utils import locale_file_type
@@ -22,19 +22,19 @@ tl_file_view = TemplateProxy('file-view')
 async def _process_delete_file(call: CallbackQuery, _: Button, manager: DialogManager):
     file_id: FileId = manager.start_data["file_id"]
     file_service: FileUsecase = manager.middleware_data["file_service"]
-    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = manager.middleware_data[ISSUER_KEY]
     i18n: I18nContext = manager.middleware_data[I18N_KEY]
 
-    await file_service.delete_file(file_id, ac)
+    await file_service.delete_file(file_id, issuer)
     await call.message.edit_caption(i18n.get(str(tl_file_view.removed)))  # type: ignore
     await manager.done()
 
 
 async def _view_getter(dialog_manager: DialogManager, file_service: FileUsecase, i18n: I18nContext, **_):
     file_id: FileId = dialog_manager.start_data["file_id"]
-    ac = dialog_manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = dialog_manager.middleware_data[ISSUER_KEY]
 
-    file = await file_service.get_file(file_id, ac)
+    file = await file_service.get_file(file_id, issuer)
     category_name = None
     if file.category is not None:
         category_name = file.category.title

@@ -12,12 +12,11 @@ from aiogram_dialog.widgets.widget_event import WidgetEventProcessor
 from aiogram_i18n import I18nContext
 from magic_filter import F
 
-from app.bot.middlewares import USER_KEY
 from app.bot.states.dialogs import FileListSG, CategoryFindSG
 from app.bot.utils import get_file_category_name
 from app.bot.widgets import Emoji
 from app.bot.widgets.i18n import Topic, CloseI18n
-from app.core.domain.models.user import User
+from app.core.domain.models.auth import Issuer
 from app.core.interfaces.usecase import CategoryUsecase
 from .common import tl_file_list
 from .filters_dao import FiltersDAO
@@ -26,17 +25,21 @@ _filters = F["filters"]
 tl = tl_file_list.main
 
 
-async def _main_window_getter(dialog_manager: DialogManager, category_service: CategoryUsecase, **_):
+async def _main_window_getter(
+    dialog_manager: DialogManager,
+    category_service: CategoryUsecase,
+    issuer: Issuer,
+    **_
+):
     filters_dao = FiltersDAO(dialog_manager)
     filters = filters_dao.extract_to_dict()
     data = {
         "filters": filters,
         "have_filters": len(filters) > 0
     }
-    user: User = dialog_manager.middleware_data[USER_KEY]
 
     if (category_id := filters.get("category_id")) is not None:
-        category = await category_service.get_category(category_id, user.id)
+        category = await category_service.get_category(category_id, issuer)
         data["category_name"] = category.title
 
     return data

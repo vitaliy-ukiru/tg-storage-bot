@@ -4,12 +4,13 @@ from typing import Optional
 
 from app.core.domain.dto.common import Pagination
 from app.core.domain.dto.file import CreateFileDTO, ReloadFileDTO, FilesFindDTO
-from app.core.domain.exceptions.file import FileNotFound, FileAccessDenied
+from app.core.domain.exceptions.file import FileNotFound
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId, RemoteFileId
 from app.core.domain.models.user import UserId
+from app.core.domain.services.access import AccessService
 from app.core.domain.services.internal import convert_to_filter_fields
-from app.core.interfaces.access import AccessController, Operation
+from app.core.domain.models.auth import Operation, Issuer
 from app.core.interfaces.repository.file import (
     FileRepoSaver, FileRepoGetter, FileRepoFinder, FileRepoUpdater, FileRepoDeleter
 )
@@ -17,14 +18,6 @@ from app.core.interfaces.usecase import FileUsecase
 from app.core.interfaces.usecase.category import CategoryGetter
 
 UNDEFINED_FILE_ID = FileId(0)
-
-
-def _ensure_owner(file: File, user_id: Optional[UserId] = None):
-    if user_id is None:
-        return
-
-    if file.user_id != user_id:
-        raise FileAccessDenied(file.id, user_id)
 
 
 class FileService(FileUsecase):
@@ -35,7 +28,8 @@ class FileService(FileUsecase):
         finder: FileRepoFinder,
         updater: FileRepoUpdater,
         deleter: FileRepoDeleter,
-        category_getter: CategoryGetter
+        category_getter: CategoryGetter,
+        access: AccessService,
     ):
 
         self._saver = saver
@@ -44,9 +38,11 @@ class FileService(FileUsecase):
         self._updater = updater
         self._deleter = deleter
         self._category_getter = category_getter
+        self._access = access
 
-    async def save_file(self, dto: CreateFileDTO, access: AccessController) -> File:
-        access.ensure_have_access(Operation.file_create)
+    async def save_file(self, dto: CreateFileDTO, issuer: Issuer) -> File:
+        self._access.ensure_have_access(issuer, Operation.file_create)
+
         file = File(
             UNDEFINED_FILE_ID,
             dto.title,
@@ -59,19 +55,19 @@ class FileService(FileUsecase):
 
         if dto.category_id is not None:
             category = await self._category_getter.get_category(
-                CategoryId(dto.category_id), access
+                CategoryId(dto.category_id), issuer
             )
-            access.ensure_own_category(category)
+            self._access.ensure_own_category(issuer, category)
             file.category = category
 
         file.id = await self._saver.save_file(file)
         return file
 
-    async def get_file(self, file_id: FileId, access: AccessController) -> File:
+    async def get_file(self, file_id: FileId, issuer: Issuer) -> File:
         file = await self._getter.get_file(file_id)
         if file is None:
             raise FileNotFound(file_id)
-        access.ensure_own_file(file)
+        self._access.ensure_own_file(issuer, file)
 
         return file
 
@@ -79,13 +75,13 @@ class FileService(FileUsecase):
         self,
         file_id: FileId,
         category_id: CategoryId,
-        access: AccessController
+        issuer: Issuer
     ) -> File:
-        access.ensure_have_access(Operation.file_edit)
-        file = await self.get_file(file_id, access)
+        self._access.ensure_have_access(issuer, Operation.file_edit)
+        file = await self.get_file(file_id, issuer)
 
-        category = await self._category_getter.get_category(category_id, access)
-        access.ensure_own_category(category)
+        category = await self._category_getter.get_category(category_id, issuer)
+        self._access.ensure_own_category(issuer, category)
 
         file.category = category
         await self._updater.update_file(file)
@@ -95,12 +91,12 @@ class FileService(FileUsecase):
         self,
         file_id: FileId,
         title: str,
-        access: AccessController
+        issuer: Issuer
     ) -> File:
-        access.ensure_have_access(Operation.file_edit)
+        self._access.ensure_have_access(issuer, Operation.file_edit)
 
-        file = await self.get_file(file_id, access)
-        access.ensure_own_file(file)
+        file = await self.get_file(file_id, issuer)
+        self._access.ensure_own_file(issuer, file)
 
         file.title = title
         await self._updater.update_file(file)
@@ -110,12 +106,12 @@ class FileService(FileUsecase):
         self,
         file_id: FileId,
         dto: ReloadFileDTO,
-        access: AccessController
+        issuer: Issuer
     ) -> File:
-        access.ensure_have_access(Operation.file_edit)
+        self._access.ensure_have_access(issuer, Operation.file_edit)
 
-        file = await self.get_file(file_id, access)
-        access.ensure_own_file(file)
+        file = await self.get_file(file_id, issuer)
+        self._access.ensure_own_file(issuer, file)
 
         file.remote_file_id = dto.remote_id
         file.remote_unique_id = dto.remote_unique_id
@@ -127,11 +123,11 @@ class FileService(FileUsecase):
         await self._updater.update_file(file)
         return file
 
-    async def delete_file(self, file_id: FileId, access: AccessController):
-        access.ensure_have_access(Operation.file_delete)
+    async def delete_file(self, file_id: FileId, issuer: Issuer):
+        self._access.ensure_have_access(issuer, Operation.file_delete)
 
-        file = await self.get_file(file_id, access)
-        access.ensure_own_file(file)
+        file = await self.get_file(file_id, issuer)
+        self._access.ensure_own_file(issuer, file)
 
         await self._deleter.delete_file(file_id)
 

@@ -7,24 +7,22 @@ from abc import abstractmethod
 from typing import Protocol, Optional, overload, Literal
 
 from app.core.domain.dto.common import Pagination
-from app.core.interfaces.access import AccessController
-from app.core.interfaces.repository.common import FilterField
 from app.core.domain.dto.file import CreateFileDTO, FilesFindDTO, ReloadFileDTO
 from app.core.domain.models.category import CategoryId
 from app.core.domain.models.file import File, FileId
-from app.core.domain.models.user import UserId
+from app.core.domain.models.auth import Issuer
 
 
 class FileSaver(Protocol):
 
     @abstractmethod
-    async def save_file(self, dto: CreateFileDTO, access: AccessController) -> File:
+    async def save_file(self, dto: CreateFileDTO, issuer: Issuer) -> File:
         raise NotImplementedError
 
 
 class FileGetter(Protocol):
     @abstractmethod
-    async def get_file(self, file_id: FileId, access: AccessController) -> File:
+    async def get_file(self, file_id: FileId, issuer: Issuer) -> File:
         raise NotImplementedError
 
 
@@ -63,7 +61,7 @@ class FileUpdater(Protocol):
         self,
         file_id: FileId,
         category_id: CategoryId,
-        access: AccessController
+        issuer: Issuer
     ) -> File:
         raise NotImplementedError
 
@@ -72,7 +70,7 @@ class FileUpdater(Protocol):
         self,
         file_id: FileId,
         title: str,
-        access: AccessController
+        issuer: Issuer
     ) -> File:
         raise NotImplementedError
 
@@ -81,14 +79,14 @@ class FileUpdater(Protocol):
         self,
         file_id: FileId,
         dto: ReloadFileDTO,
-        access: AccessController
+        issuer: Issuer
     ) -> File:
         raise NotImplementedError
 
 
 class FileDeleter(Protocol):
     @abstractmethod
-    async def delete_file(self, file_id: FileId, access: AccessController):
+    async def delete_file(self, file_id: FileId, issuer: Issuer):
         raise NotImplementedError
 
 

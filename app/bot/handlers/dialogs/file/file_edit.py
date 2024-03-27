@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.kbd import Column, SwitchTo, Cancel
 
 from app.bot.filters import MediaFilter
-from app.bot.middlewares.user_manager import ACCESS_CONTROLLER_KEY
+from app.bot.middlewares.user_manager import ISSUER_KEY
 from app.bot.services import FileCredentials
 from app.bot.states.dialogs import FileEditSG, CategoryFindSG
 from app.bot.widgets import StartWithData, Emoji
@@ -20,9 +20,9 @@ tl = TemplateProxy("file-edit")
 async def _process_new_title(_, __, manager: DialogManager, title: str):
     file_id: FileId = manager.start_data["file_id"]
     file_service: FileUsecase = manager.middleware_data["file_service"]
-    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = manager.middleware_data[ISSUER_KEY]
 
-    await file_service.update_title(file_id, title, ac)
+    await file_service.update_title(file_id, title, issuer)
     await manager.switch_to(FileEditSG.main)
 
 
@@ -30,9 +30,9 @@ async def _process_reload_file(m: Message, _, manager: DialogManager):
     cred = FileCredentials.from_message(m)
     file_id: int = manager.start_data["file_id"]
     file_service = manager.middleware_data["file_service"]
-    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = manager.middleware_data[ISSUER_KEY]
 
-    await file_service.reload_file(file_id, cred.to_reload_dto(), ac)
+    await file_service.reload_file(file_id, cred.to_reload_dto(), issuer)
     await manager.switch_to(FileEditSG.main)
 
 
@@ -54,9 +54,9 @@ async def _process_result(_, result: Any, manager: DialogManager):
 
     file_service: FileUsecase = manager.middleware_data.get("file_service")
     file_id: FileId = manager.start_data.get("file_id")
-    ac = manager.middleware_data[ACCESS_CONTROLLER_KEY]
+    issuer = manager.middleware_data[ISSUER_KEY]
 
-    await file_service.set_category(file_id, category_id, ac)
+    await file_service.set_category(file_id, category_id, issuer)
 
 
 async def _set_category_getter(dialog_manager: DialogManager, **_):
